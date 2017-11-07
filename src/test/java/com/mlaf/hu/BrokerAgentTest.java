@@ -7,8 +7,7 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class BrokerAgentTest
-    extends TestCase
+public class BrokerAgentTest extends TestCase
 {
     /**
      * Create the test case

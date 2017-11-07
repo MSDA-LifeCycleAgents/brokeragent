@@ -1,6 +1,10 @@
 
 \.idea/
 
-target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles\.lst
+APDescription\.txt
 
-target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles\.lst
+MTPs-Main-Container\.txt
+
+mlaf\.iml
+
+target

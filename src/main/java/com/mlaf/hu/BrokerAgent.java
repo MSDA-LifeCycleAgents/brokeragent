@@ -8,11 +8,13 @@ import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 public class BrokerAgent extends Agent {
-    private HashMap<AID, Topic> topics = new HashMap<AID, Topic>();
-    private int daysToKeep = 1;
+    private HashMap<AID, Topic> topics = new HashMap<>();
+    private static final int DAYS_TO_KEEP_MESSAGES = 1;
 
     protected void setup() {
         try {
@@ -21,24 +23,36 @@ public class BrokerAgent extends Agent {
                 @Override
                 public void action() {
                     ACLMessage subscriberMessage = receive();
-                    AID subscriber = subscriberMessage.getSender();
-                    String topicName = normalizeMessage(subscriberMessage.getContent());
-                    try {
-                        Message bufferedMessage = getMessageFromBuffer(subscriber, topicName, topicHelper);
-                        if (bufferedMessage == null) {
-                            bufferedMessage = new Message("No more messages in this queue.");
+                    if (subscriberMessage != null) {
+                        AID subscriber = subscriberMessage.getSender();
+                        String topicName = normalizeMessage(subscriberMessage.getContent());
+                        try {
+                            Message bufferedMessage = getMessageFromBuffer(subscriber, topicName, topicHelper);
+                            if (bufferedMessage == null) {
+                                bufferedMessage = new Message("No more messages in this queue.");
+                            }
+                            giveMessageToSubscriber(subscriber, bufferedMessage);
+                        } catch (ServiceException e) {
+                            e.printStackTrace();
                         }
-                        giveMessageToSubscriber(subscriber, bufferedMessage);
-                    } catch (ServiceException e) {
-                        e.printStackTrace();
+                    } else {
+                        block();
                     }
                 }
             });
             this.addBehaviour(new CyclicBehaviour() {
-                // TODO implementeer het opvragen van nieuwe berichten aan alle topics en store met storeMessage()
                 @Override
                 public void action() {
-
+                    for (Map.Entry<AID, Topic> topicPair : topics.entrySet()) {
+                        ACLMessage topicMessage = myAgent.receive(MessageTemplate.MatchTopic(topicPair.getKey()));
+                        if (topicMessage != null) {
+                            storeMessage(new Message(topicMessage.getContent(), topicMessage.getSender(), LocalDateTime.now()), topicPair.getKey());
+                        } else {
+                            block();
+                        }
+                        Topic topic = topicPair.getValue();
+                        topic.removeOldMessages();
+                    }
                 }
             });
         } catch (Exception e) {
@@ -47,7 +61,7 @@ public class BrokerAgent extends Agent {
     }
 
     private void addNewTopicToBuffer(AID topicAID) {
-        Topic topic = new Topic(topicAID);
+        Topic topic = new Topic(topicAID, DAYS_TO_KEEP_MESSAGES);
         this.topics.put(topicAID, topic);
     }
 

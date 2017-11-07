@@ -2,17 +2,20 @@ package com.mlaf.hu;
 
 import jade.core.AID;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Topic {
     private AID topic;
     private ArrayList<AID> subscribers;
     private ArrayList<Message> messages;
+    private int daysToKeepMessages;
 
-    Topic(AID topic) {
+    Topic(AID topic, int dTKM) {
         this.topic = topic;
         this.subscribers = new ArrayList<AID>();
         this.messages = new ArrayList<Message>();
+        this.daysToKeepMessages = dTKM;
     }
 
     public ArrayList<AID> getSubscribers() {
@@ -57,6 +60,16 @@ public class Topic {
     }
 
     Message getLastMessage() {
-        return this.messages.get(this.messages.size() - 1);
+        Message lastMessage = this.messages.get(this.messages.size() - 1);
+        this.messages.remove(lastMessage);
+        return lastMessage;
+    }
+
+    void removeOldMessages() {
+        for (Message message: this.messages) {
+            if (LocalDateTime.now().minusDays(this.daysToKeepMessages).equals(message.getDateOfArrival())) {
+                this.messages.remove(message);
+            }
+        }
     }
 }
