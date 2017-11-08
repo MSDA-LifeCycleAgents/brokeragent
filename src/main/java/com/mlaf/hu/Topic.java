@@ -4,26 +4,31 @@ import jade.core.AID;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Topic {
-    private AID topic;
+    private AID jadeTopic;
     private ArrayList<AID> subscribers;
     private ArrayList<Message> messages;
     private int daysToKeepMessages;
 
-    Topic(AID topic, int dTKM) {
-        this.topic = topic;
-        this.subscribers = new ArrayList<AID>();
-        this.messages = new ArrayList<Message>();
+    Topic(AID jadeTopic, int dTKM) {
+        this.jadeTopic = jadeTopic;
+        this.subscribers = new ArrayList<>();
+        this.messages = new ArrayList<>();
         this.daysToKeepMessages = dTKM;
     }
 
-    public ArrayList<AID> getSubscribers() {
+    public List<AID> getSubscribers() {
         return subscribers;
     }
 
-    public void setSubscribers(ArrayList<AID> subscribers) {
-        this.subscribers = subscribers;
+    public int getDaysToKeepMessages() {
+        return daysToKeepMessages;
+    }
+
+    public int getQueueSize() {
+        return this.messages.size();
     }
 
     void addToSubscribers(AID subscriber) {
@@ -38,25 +43,13 @@ public class Topic {
         int indexSubscriber = this.subscribers.indexOf(subscriber);
         try {
             return this.subscribers.get(indexSubscriber);
-        } catch (IndexOutOfBoundsException IOB) {
+        } catch (IndexOutOfBoundsException iobException) {
             return null;
         }
     }
 
-    public AID getTopic() {
-        return topic;
-    }
-
-    public void setTopic(AID topic) {
-        this.topic = topic;
-    }
-
-    public ArrayList<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(ArrayList<Message> messages) {
-        this.messages = messages;
+    public AID getJadeTopic() {
+        return jadeTopic;
     }
 
     Message getLastMessage() {
@@ -66,10 +59,12 @@ public class Topic {
     }
 
     void removeOldMessages() {
+        List<Message> messagesToRemove = new ArrayList<>();
         for (Message message: this.messages) {
-            if (LocalDateTime.now().minusDays(this.daysToKeepMessages).equals(message.getDateOfArrival())) {
-                this.messages.remove(message);
+            if (LocalDateTime.now().minusDays(this.daysToKeepMessages).isAfter(message.getDateOfArrival())) {
+                messagesToRemove.add(message);
             }
         }
+        this.messages.removeAll(messagesToRemove);
     }
 }

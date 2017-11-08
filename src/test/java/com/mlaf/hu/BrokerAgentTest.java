@@ -1,37 +1,17 @@
 package com.mlaf.hu;
 
-import junit.framework.Test;
+import jade.core.Agent;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-/**
- * Unit test for simple App.
- */
-public class BrokerAgentTest extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public BrokerAgentTest( String testName )
-    {
-        super( testName );
+
+public class BrokerAgentTest extends TestCase {
+    // Nothing to test here, methods are private
+    // Discussion, do we want them to be private? https://stackoverflow.com/questions/34571/how-do-i-test-a-class-that-has-private-methods-fields-or-inner-classes
+
+    public void testNothing() {
+        assertEquals(true, true); // :tadaaaa:
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( BrokerAgentTest.class );
-    }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+
 }

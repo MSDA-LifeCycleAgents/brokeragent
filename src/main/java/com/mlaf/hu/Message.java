@@ -1,6 +1,5 @@
 package com.mlaf.hu;
 
-import FIPA.DateTime;
 import jade.core.AID;
 
 import java.time.LocalDateTime;
@@ -23,23 +22,28 @@ public class Message {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
 
     public LocalDateTime getDateOfArrival() {
         return dateOfArrival;
-    }
-
-    public void setDateOfArrival(LocalDateTime dateOfArrival) {
-        this.dateOfArrival = dateOfArrival;
     }
 
     public AID getPublisher() {
         return publisher;
     }
 
-    public void setPublisher(AID publisher) {
-        this.publisher = publisher;
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Message: ");
+        sb.append(content);
+        if (this.publisher != null) {
+            sb.append("Publisher ");
+            sb.append(publisher);
+        }
+        if (this.dateOfArrival != null) {
+            sb.append("Date of Arrival ");
+            sb.append(dateOfArrival);
+        }
+        return sb.toString();
     }
 }
