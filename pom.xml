@@ -70,6 +70,44 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>topic-subscriber</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <configuration>
+                            <mainClass>jade.Boot</mainClass>
+                            <arguments>
+                                <argument>-conf</argument>
+                                <argument>src/main/resource/topic-subscriber.properties</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>topic-publisher</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <configuration>
+                            <mainClass>jade.Boot</mainClass>
+                            <arguments>
+                                <argument>-conf</argument>
+                                <argument>src/main/resource/topic-publisher.properties</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <properties>

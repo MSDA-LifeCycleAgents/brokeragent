@@ -53,12 +53,17 @@ public class Topic {
     }
 
     Message getLastMessage() {
-        Message lastMessage = this.messages.get(this.messages.size() - 1);
-        this.messages.remove(lastMessage);
-        return lastMessage;
+        try {
+            Message lastMessage = this.messages.get(this.messages.size() - 1);
+            this.messages.remove(lastMessage);
+            return lastMessage;
+        }
+        catch (ArrayIndexOutOfBoundsException ignored) {
+            return null;
+        }
     }
 
-    void removeOldMessages() {
+    public void removeOldMessages() {
         List<Message> messagesToRemove = new ArrayList<>();
         for (Message message: this.messages) {
             if (LocalDateTime.now().minusDays(this.daysToKeepMessages).isAfter(message.getDateOfArrival())) {
