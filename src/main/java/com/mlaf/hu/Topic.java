@@ -52,7 +52,7 @@ public class Topic {
         return jadeTopic;
     }
 
-    Message getLastMessage() {
+    Message getOldestMessage() {
         try {
             Message lastMessage = this.messages.get(this.messages.size() - 1);
             this.messages.remove(lastMessage);

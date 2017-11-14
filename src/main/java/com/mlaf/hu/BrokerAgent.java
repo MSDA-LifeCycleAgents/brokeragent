@@ -112,7 +112,7 @@ public class BrokerAgent extends Agent {
             return null;
         }
 
-        return topic.getLastMessage();
+        return topic.getOldestMessage();
     }
 
     public String normalizeMessage(String message) {
