@@ -17,9 +17,9 @@ import jade.util.Logger;
 
 import java.util.HashMap;
 
-public class BrokerAgent extends Agent {
+public class BrokerAgent extends Agent { //FIXME berichten en/of topics opslaan op disk via cli
     public HashMap<AID, Topic> topics = new HashMap<>();
-    private static final int DAYS_TO_KEEP_MESSAGES = 1;
+    private static final int DAYS_TO_KEEP_MESSAGES = 1; //FIXME cli
     public static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
     private final static String serviceName = "BROKER";
 
