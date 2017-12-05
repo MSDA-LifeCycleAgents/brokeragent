@@ -2,9 +2,10 @@ package com.mlaf.hu;
 
 import jade.core.AID;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Message {
+public class Message implements Serializable {
     private String content;
     private AID publisher;
     private LocalDateTime dateOfArrival;

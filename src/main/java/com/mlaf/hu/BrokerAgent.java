@@ -8,7 +8,6 @@ import jade.core.ServiceException;
 import jade.core.messaging.TopicManagementHelper;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.Property;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -17,11 +16,11 @@ import jade.util.Logger;
 
 import java.util.HashMap;
 
-public class BrokerAgent extends Agent { //FIXME berichten en/of topics opslaan op disk via cli
+public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan op disk via cli
     public HashMap<AID, Topic> topics = new HashMap<>();
-    private static final int DAYS_TO_KEEP_MESSAGES = 1; //FIXME cli
+    private static final int DAYS_TO_KEEP_MESSAGES = 1; //TODO cli
     public static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
-    private final static String serviceName = "BROKER";
+    private final static String SERVICE_NAME = "BROKER";
 
     @Override
     protected void setup() {
@@ -41,7 +40,7 @@ public class BrokerAgent extends Agent { //FIXME berichten en/of topics opslaan 
             DFAgentDescription dfd = new DFAgentDescription();
             dfd.setName(this.getAID());
             ServiceDescription sd = new ServiceDescription();
-            sd.setName(serviceName);
+            sd.setName(SERVICE_NAME);
             sd.setType("message-broker");
             // Agents that want to use this service need to "know" the weather-forecast-ontology
             sd.addOntologies("message-broker-ontology");

@@ -2,11 +2,12 @@ package com.mlaf.hu;
 
 import jade.core.AID;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Topic {
+public class Topic implements Serializable {
     private AID jadeTopic;
     private ArrayList<AID> subscribers;
     private ArrayList<Message> messages;
