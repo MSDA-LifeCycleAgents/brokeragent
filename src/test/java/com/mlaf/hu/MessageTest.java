@@ -33,4 +33,13 @@ public class MessageTest extends TestCase {
         assertNotNull(m.toString());
     }
 
+    public void testHashCode() {
+        pub = new AID("Publisher", true);
+        pubdate = LocalDateTime.now();
+        Message x = new Message("Dit is een test berichtje!", pub, pubdate);
+        Message y = new Message("Dit is een test berichtje!", pub, pubdate);
+        assertEquals(x, y);
+        assertEquals(x.hashCode(), y.hashCode());
+    }
+
 }

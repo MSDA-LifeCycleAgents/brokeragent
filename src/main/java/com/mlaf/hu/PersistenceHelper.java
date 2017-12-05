@@ -7,7 +7,7 @@ import java.io.*;
 
 public class PersistenceHelper {
 
-    private static String getBasePath() {
+    public static String getBasePath() {
         return "C:/BrokerAgent/";
     }
 
@@ -32,6 +32,7 @@ public class PersistenceHelper {
         } catch (IOException | ClassNotFoundException e) {
             // Something out of our hands has gone wrong?
             //TODO LOG
+            System.out.println("Could not load file, IO Error");
             e.printStackTrace();
             return null;
         }

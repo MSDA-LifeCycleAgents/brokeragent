@@ -75,5 +75,11 @@ public class TopicTest extends TestCase {
         assertEquals(0, t.getQueueSize());
     }
 
+    public void testHashCode() {
+        Topic x = new Topic(new AID("Test-Topic", true), 1);
+        Topic y = new Topic(new AID("Test-Topic", true), 1);
+        assertEquals(x, y);
+        assertEquals(x.hashCode(), y.hashCode());
+    }
 
 }

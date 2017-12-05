@@ -57,7 +57,6 @@ public class Message implements Serializable {
         if (obj.getClass() != getClass()) { return false; }
         Message rsh = (Message) obj;
         return new EqualsBuilder()
-                .appendSuper(super.equals(obj))
                 .append(content, rsh.content)
                 .append(publisher, rsh.publisher)
                 .append(dateOfArrival, rsh.dateOfArrival)
