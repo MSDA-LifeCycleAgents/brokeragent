@@ -26,8 +26,7 @@ public class MessageTest extends TestCase {
     }
 
     public void testGetPublisher() throws Exception {
-        assertEquals(pub, m.getPublisher());
-        System.out.println(m.toString());
+        assertEquals(pub, m.getPublisher());;
     }
 
     public void testToString() throws Exception {

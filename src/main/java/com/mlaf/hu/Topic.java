@@ -1,6 +1,8 @@
 package com.mlaf.hu;
 
 import jade.core.AID;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -55,11 +57,11 @@ public class Topic implements Serializable {
 
     Message getOldestMessage() {
         try {
-            Message lastMessage = this.messages.get(this.messages.size() - 1);
+            Message lastMessage = this.messages.get(0);
             this.messages.remove(lastMessage);
             return lastMessage;
         }
-        catch (ArrayIndexOutOfBoundsException ignored) {
+        catch (IndexOutOfBoundsException ignored) {
             return null;
         }
     }
@@ -72,5 +74,31 @@ public class Topic implements Serializable {
             }
         }
         this.messages.removeAll(messagesToRemove);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) { return false;}
+        if (obj == this) { return true;}
+        if (obj.getClass() != getClass()) { return false; }
+        Topic rsh = (Topic) obj;
+
+        return new EqualsBuilder()
+//                .appendSuper(super.equals(obj)) //FIXME
+                .append(jadeTopic, rsh.jadeTopic)
+                .append(subscribers, rsh.subscribers)
+//                .append(messages, rsh.messages) //FIXME
+                .append(daysToKeepMessages, rsh.daysToKeepMessages)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(jadeTopic)
+                .append(subscribers)
+                .append(messages)
+                .append(daysToKeepMessages)
+                .toHashCode();
     }
 }

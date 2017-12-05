@@ -2,6 +2,8 @@ package com.mlaf.hu;
 
 import com.mlaf.hu.behavior.ReceiveBehavior;
 import com.mlaf.hu.behavior.SendBehavior;
+import com.mlaf.hu.exceptions.InvallidTopicException;
+import com.mlaf.hu.exceptions.TopicNotManagedException;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.ServiceException;
@@ -17,16 +19,17 @@ import jade.util.Logger;
 import java.util.HashMap;
 
 public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan op disk via cli
+    private final static String SERVICE_NAME = "BROKER";
     public HashMap<AID, Topic> topics = new HashMap<>();
     private static final int DAYS_TO_KEEP_MESSAGES = 1; //TODO cli
     public static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
-    private final static String SERVICE_NAME = "BROKER";
+    private TopicManagementHelper topicHelper;
 
     @Override
     protected void setup() {
         try {
             registerToDF();
-            final TopicManagementHelper topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
+            topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
             addBehaviour(new SendBehavior(this, topicHelper));
             addBehaviour(new ReceiveBehavior(this));
         } catch (Exception e) {
@@ -70,13 +73,13 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     }
 
     private AID createTopic(String topicName, TopicManagementHelper helper) {
-        AID topic = null;
+        AID topicAid = null;
         try {
-            topic = helper.createTopic(topicName);
+            topicAid = helper.createTopic(topicName);
         } catch (Exception e) {
             brokerAgentLogger.log(Logger.SEVERE, String.format("Broker %s: ERROR creating topic %s", this.getLocalName(), topicName), e);
         }
-        return topic;
+        return topicAid;
     }
 
     public void storeMessage(Message message, AID topicAID) {
@@ -117,5 +120,51 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     public String normalizeMessage(String message) {
         //TODO make this useful
         return message;
+    }
+
+
+    public Topic getTopicByAID(AID aid) throws InvallidTopicException, TopicNotManagedException {
+        //TODO Let all methods use this to get topic
+        if (!topicHelper.isTopic(aid)) {
+            throw new InvallidTopicException(aid.getName() + " is not a valid topic AID");
+        }
+        if (!this.topics.containsKey(aid)) {
+            throw new TopicNotManagedException(aid.getName() + " is not managed");
+        }
+        return this.topics.get(aid);
+    }
+
+    public void storeTopic(AID topicAID) {
+        Topic t = null;
+        try {
+            t = getTopicByAID(topicAID);
+        } catch (InvallidTopicException e) {
+            //FIXME
+            e.printStackTrace();
+            return;
+        } catch (TopicNotManagedException e) {
+            //FIXME
+            e.printStackTrace();
+            return;
+        }
+        PersistenceHelper.storeObject(t, topicAID.getName());
+
+
+    }
+
+    public Topic getTopicFromDisk(String topicName) {
+        try {
+            return PersistenceHelper.loadTopic(topicName);
+        } catch (TopicNotManagedException e) {
+            //TODO LOG
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void loadTopic(String topicName) {
+        Topic topic = getTopicFromDisk(topicName);
+        AID aid = topicHelper.createTopic(topicName);
+        this.topics.put(aid, topic);
     }
 }

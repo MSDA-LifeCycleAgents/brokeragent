@@ -48,7 +48,7 @@ public class TopicTest extends TestCase {
         assertEquals(null, t.getOldestMessage());
     }
 
-    public void testGetLastMessage() throws Exception {
+    public void testGetOldestMessage() throws Exception {
         Topic t = new Topic(new AID("Test-Topic", true), 1);
         Message m1 = new Message("Hoi1");
         Message m2 = new Message("Hoi2");
@@ -58,10 +58,10 @@ public class TopicTest extends TestCase {
         t.addToMessages(m2);
         t.addToMessages(m3);
         t.addToMessages(m4);
-        assertEquals(m4, t.getOldestMessage());
-        assertEquals(m3, t.getOldestMessage());
-        assertEquals(m2, t.getOldestMessage());
         assertEquals(m1, t.getOldestMessage());
+        assertEquals(m2, t.getOldestMessage());
+        assertEquals(m3, t.getOldestMessage());
+        assertEquals(m4, t.getOldestMessage());
     }
 
     public void testRemoveOldMessages() throws Exception {

@@ -4,6 +4,8 @@ import jade.core.AID;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Message implements Serializable {
     private String content;
@@ -46,5 +48,29 @@ public class Message implements Serializable {
             sb.append(dateOfArrival);
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) { return false; }
+        if (obj == this) { return true; }
+        if (obj.getClass() != getClass()) { return false; }
+        Message rsh = (Message) obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(content, rsh.content)
+                .append(publisher, rsh.publisher)
+                .append(dateOfArrival, rsh.dateOfArrival)
+                .isEquals();
+
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(content)
+                .append(publisher)
+                .append(dateOfArrival)
+                .toHashCode();
     }
 }
