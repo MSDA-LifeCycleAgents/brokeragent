@@ -1,8 +1,8 @@
-package com.mlaf.hu.behavior;
+package com.mlaf.hu.brokeragent.behavior;
 
-import com.mlaf.hu.BrokerAgent;
-import com.mlaf.hu.Message;
-import com.mlaf.hu.Topic;
+import com.mlaf.hu.brokeragent.BrokerAgent;
+import com.mlaf.hu.brokeragent.Message;
+import com.mlaf.hu.brokeragent.Topic;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;

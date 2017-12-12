@@ -1,4 +1,4 @@
-package com.mlaf.hu;
+package com.mlaf.hu.brokeragent;
 
 import jade.core.AID;
 import org.apache.commons.lang3.builder.EqualsBuilder;

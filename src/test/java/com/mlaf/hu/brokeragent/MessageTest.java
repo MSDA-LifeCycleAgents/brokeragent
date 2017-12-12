@@ -1,4 +1,4 @@
-package com.mlaf.hu;
+package com.mlaf.hu.brokeragent;
 
 import jade.core.AID;
 import junit.framework.TestCase;

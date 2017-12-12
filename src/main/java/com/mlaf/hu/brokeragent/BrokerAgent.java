@@ -1,9 +1,9 @@
-package com.mlaf.hu;
+package com.mlaf.hu.brokeragent;
 
-import com.mlaf.hu.behavior.ReceiveBehavior;
-import com.mlaf.hu.behavior.SendBehavior;
-import com.mlaf.hu.exceptions.InvallidTopicException;
-import com.mlaf.hu.exceptions.TopicNotManagedException;
+import com.mlaf.hu.brokeragent.behavior.ReceiveBehavior;
+import com.mlaf.hu.brokeragent.behavior.SendBehavior;
+import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
+import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.ServiceException;

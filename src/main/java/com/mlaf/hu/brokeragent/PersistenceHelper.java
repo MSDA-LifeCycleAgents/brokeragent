@@ -1,7 +1,6 @@
-package com.mlaf.hu;
+package com.mlaf.hu.brokeragent;
 
-import com.mlaf.hu.exceptions.TopicNotManagedException;
-import jade.util.Logger;
+import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
 
 import java.io.*;
 

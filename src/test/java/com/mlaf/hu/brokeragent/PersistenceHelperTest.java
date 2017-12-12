@@ -1,6 +1,6 @@
-package com.mlaf.hu;
+package com.mlaf.hu.brokeragent;
 
-import com.mlaf.hu.exceptions.TopicNotManagedException;
+import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
 import jade.core.AID;
 import junit.framework.TestCase;
 

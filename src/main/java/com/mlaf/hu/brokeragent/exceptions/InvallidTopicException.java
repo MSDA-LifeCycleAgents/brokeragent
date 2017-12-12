@@ -1,4 +1,4 @@
-package com.mlaf.hu.exceptions;
+package com.mlaf.hu.brokeragent.exceptions;
 
 public class InvallidTopicException extends Exception {
     public InvallidTopicException(String message) {

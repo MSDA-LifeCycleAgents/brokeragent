@@ -1,7 +1,7 @@
-package com.mlaf.hu.behavior;
+package com.mlaf.hu.brokeragent.behavior;
 
-import com.mlaf.hu.BrokerAgent;
-import com.mlaf.hu.Message;
+import com.mlaf.hu.brokeragent.BrokerAgent;
+import com.mlaf.hu.brokeragent.Message;
 import jade.core.AID;
 import jade.core.ServiceException;
 import jade.core.behaviours.CyclicBehaviour;

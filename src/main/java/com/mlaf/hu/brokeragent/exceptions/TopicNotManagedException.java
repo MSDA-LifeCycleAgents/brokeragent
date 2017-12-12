@@ -1,4 +1,4 @@
-package com.mlaf.hu.exceptions;
+package com.mlaf.hu.brokeragent.exceptions;
 
 public class TopicNotManagedException extends Exception {
     public TopicNotManagedException(String message) {
