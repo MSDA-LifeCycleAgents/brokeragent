@@ -7,7 +7,7 @@ import java.io.*;
 public class PersistenceHelper {
 
     public static String getBasePath() {
-        return "C:/BrokerAgent/";
+        return System.getProperty("user.home") + "/MLAF/BrokerAgent/";
     }
 
     public static void storeObject(Object obj, String name) {
