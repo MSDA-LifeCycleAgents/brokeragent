@@ -7,6 +7,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
+import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -74,8 +75,27 @@ public abstract class SensorAgent extends Agent{
             e.printStackTrace();
             return null;
         }
+    }
 
+    private AID getBrokerAgent() {
+        //TODO(Auke) Remove duplication when DecisionAgent ServiceDesription is clear
+        DFAgentDescription template = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("message-broker"); // TODO Maybe another type name?
+        sd.addOntologies("message-broker-ontology");
+        sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
+        template.addServices(sd);
+        try {
+            DFAgentDescription[] result = DFService.search( this, template);
+            //TODO Catch 0 result
+            //TODO Handle more than one
+            return result[0].getName();
 
+        } catch (FIPAException e) {
+            //TODO Handle
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private static String sensorReadingsToXML(ArrayList<SensorReading> readings) {
