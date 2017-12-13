@@ -43,18 +43,15 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     @Override
     protected void setup() {
         try {
+            boolean succes = createDirectoryStructure();
             registerAsServiceToDF();
             topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
-            loadTopics();
+            if (succes) {
+                loadTopics();
+                addBehaviour(new SaveBehavior(this));
+            }
             addBehaviour(new SendBehavior(this, topicHelper));
             addBehaviour(new ReceiveBehavior(this));
-            addBehaviour(new SaveBehavior(this));
-            addBehaviour(new TickerBehaviour(this, 10000L) {
-                @Override
-                protected void onTick() {
-                    System.out.println(Arrays.asList(topics));
-                }
-            });
         } catch (Exception e) {
             brokerAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
@@ -221,4 +218,9 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
         }
         return toString.toString();
     }
+
+    private static boolean createDirectoryStructure() {
+        return (new File(STORAGE_BASEPATH).mkdirs()); // Return success
+    }
+
 }
