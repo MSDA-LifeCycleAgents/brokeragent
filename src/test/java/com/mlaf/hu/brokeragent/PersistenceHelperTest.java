@@ -39,7 +39,7 @@ public class PersistenceHelperTest extends TestCase {
         }
     }
 
-    public void testLoadBrokenFile() {
+    public void testLoadBrokenFile() throws IOException {
         setupBrokenFile();
         try {
             Topic failed = PersistenceHelper.loadTopic("broken");
@@ -49,8 +49,11 @@ public class PersistenceHelperTest extends TestCase {
         }
     }
 
-    private void setupBrokenFile() {
+    private void setupBrokenFile() throws IOException {
         System.out.println("Creating testfile " + testBrokenFilePath);
+        File testFile = new File(testBrokenFilePath);
+        //noinspection ResultOfMethodCallIgnored
+        testFile.createNewFile();
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(testBrokenFilePath), "utf-8"))) {
             String content = "BROKENFILE BROKENFILE";
@@ -61,15 +64,5 @@ public class PersistenceHelperTest extends TestCase {
             fail("Could not create test file!");
 
         }
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        File file = new File(testBrokenFilePath);
-        if (!file.delete()) {
-            System.out.println("Could not delete test file " + testBrokenFilePath);
-        }
-
     }
 }
