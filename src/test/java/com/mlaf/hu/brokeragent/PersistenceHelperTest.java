@@ -54,9 +54,11 @@ public class PersistenceHelperTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        System.out.println("Creating testfile " + testBrokenFilePath);
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(testBrokenFilePath))) {
             String content = "BROKENFILE BROKENFILE";
             bw.write(content);
+            bw.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
