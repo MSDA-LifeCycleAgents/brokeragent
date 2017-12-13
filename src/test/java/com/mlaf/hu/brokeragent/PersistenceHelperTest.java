@@ -3,12 +3,14 @@ package com.mlaf.hu.brokeragent;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
 import jade.core.AID;
 import junit.framework.TestCase;
+import org.junit.Ignore;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Ignore
 public class PersistenceHelperTest extends TestCase {
     String testBrokenFilePath = PersistenceHelper.getBasePath() + "broken.ser";
 

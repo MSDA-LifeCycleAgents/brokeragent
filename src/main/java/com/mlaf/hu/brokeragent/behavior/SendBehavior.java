@@ -2,6 +2,7 @@ package com.mlaf.hu.brokeragent.behavior;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
 import com.mlaf.hu.brokeragent.Message;
+import com.mlaf.hu.brokeragent.Topic;
 import jade.core.AID;
 import jade.core.ServiceException;
 import jade.core.behaviours.CyclicBehaviour;
@@ -13,8 +14,8 @@ public class SendBehavior extends CyclicBehaviour {
     private final BrokerAgent brokerAgent;
     private final TopicManagementHelper topicHelper;
 
-    public SendBehavior(BrokerAgent broke, TopicManagementHelper topicHelper) {
-        this.brokerAgent = broke;
+    public SendBehavior(BrokerAgent broker, TopicManagementHelper topicHelper) {
+        this.brokerAgent = broker;
         this.topicHelper = topicHelper;
     }
 
@@ -26,17 +27,20 @@ public class SendBehavior extends CyclicBehaviour {
             return;
         }
         AID subscriber = subscriberMessage.getSender();
-        String topicName = brokerAgent.normalizeMessage(subscriberMessage.getContent());
-        try {
-            Message bufferedMessage = brokerAgent.getMessageFromBuffer(subscriber, topicName, topicHelper);
-            int performative = ACLMessage.CONFIRM;
-            if (bufferedMessage == null) {
-                bufferedMessage = new Message("No more messages in this queue.");
-                performative = ACLMessage.DISCONFIRM;
-            }
-            brokerAgent.giveMessageToSubscriber(subscriber, bufferedMessage, performative);
-        } catch (ServiceException e) {
-            BrokerAgent.brokerAgentLogger.log(Logger.SEVERE, "Could not get messages from buffer", e);
+        int incomingPerformative = subscriberMessage.getPerformative();
+        ACLMessage message = null;
+        Topic representationTopic = brokerAgent.parseMessage(subscriberMessage.getContent());
+        if (incomingPerformative == ACLMessage.SUBSCRIBE) {
+            message = brokerAgent.addSubscriberToTopic(subscriber, representationTopic, topicHelper);
+        } else if (incomingPerformative == ACLMessage.REQUEST) {
+            message = brokerAgent.getMessageFromBuffer(subscriber, representationTopic, topicHelper);
+        } else {
+            block();
+            return;
+        }
+        if (message != null) {
+            System.out.println(message.getContent());
+            brokerAgent.send(message);
         }
     }
 }
