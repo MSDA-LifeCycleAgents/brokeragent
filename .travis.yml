@@ -1,5 +1,5 @@
 language: java
-sudo: true
+sudo: required
 before_script:
 - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script:
