@@ -15,6 +15,7 @@ public class Message implements Serializable {
     public Message(String msgContent) {
         this.content = msgContent;
     }
+
     public Message(String msgContent, AID pub, LocalDateTime dOA) {
         this.content = msgContent;
         this.publisher = pub;
@@ -24,7 +25,6 @@ public class Message implements Serializable {
     public String getContent() {
         return content;
     }
-
 
     public LocalDateTime getDateOfArrival() {
         return dateOfArrival;
