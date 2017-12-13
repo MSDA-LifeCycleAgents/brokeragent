@@ -7,11 +7,16 @@ import java.io.*;
 public class PersistenceHelper {
 
     public static String getBasePath() {
-        return System.getProperty("user.home") + "/MLAF/BrokerAgent/";
+        return System.getProperty("user.home") + File.separator + "MLAF" + File.separator + "BrokerAgent" + File.separator;
+    }
+
+    private static boolean createBasePathDirs() {
+        return (new File(getBasePath()).mkdirs()); // Return success
     }
 
     public static void storeObject(Object obj, String name) {
         //TODO configurable storagepath
+        createBasePathDirs();
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(getBasePath() + name + ".ser"))) {
             oos.writeObject(obj);
@@ -23,6 +28,7 @@ public class PersistenceHelper {
     }
 
     public static Topic loadTopic(String name) throws TopicNotManagedException {
+        createBasePathDirs();
         Topic topic = null;
         try (ObjectInputStream ois  = new ObjectInputStream(new FileInputStream(getBasePath() + name + ".ser"))) {
             topic = (Topic) ois.readObject();
