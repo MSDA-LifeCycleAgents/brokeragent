@@ -10,7 +10,7 @@ public class PersistenceHelper {
         return System.getProperty("user.home") + File.separator + "MLAF" + File.separator + "BrokerAgent" + File.separator;
     }
 
-    private static boolean createBasePathDirs() {
+    protected static boolean createBasePathDirs() {
         return (new File(getBasePath()).mkdirs()); // Return success
     }
 

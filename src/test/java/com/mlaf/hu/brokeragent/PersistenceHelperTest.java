@@ -40,6 +40,7 @@ public class PersistenceHelperTest extends TestCase {
     }
 
     public void testLoadBrokenFile() throws IOException {
+        PersistenceHelper.createBasePathDirs();
         setupBrokenFile();
         try {
             Topic failed = PersistenceHelper.loadTopic("broken");
