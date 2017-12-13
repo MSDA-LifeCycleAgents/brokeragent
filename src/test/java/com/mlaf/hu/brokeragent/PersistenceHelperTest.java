@@ -39,7 +39,7 @@ public class PersistenceHelperTest extends TestCase {
         }
     }
 
-    public void testLoadBrokenFile() throws IOException {
+    public void testLoadBrokenFile() {
         PersistenceHelper.createBasePathDirs();
         setupBrokenFile();
         try {
@@ -50,11 +50,11 @@ public class PersistenceHelperTest extends TestCase {
         }
     }
 
-    private void setupBrokenFile() throws IOException {
+    private void setupBrokenFile() {
         System.out.println("Creating testfile " + testBrokenFilePath);
-        File testFile = new File(testBrokenFilePath);
-        //noinspection ResultOfMethodCallIgnored
-        testFile.createNewFile();
+//        File testFile = new File(testBrokenFilePath);
+//        //noinspection ResultOfMethodCallIgnored
+//        testFile.createNewFile();
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(testBrokenFilePath), "utf-8"))) {
             String content = "BROKENFILE BROKENFILE";
