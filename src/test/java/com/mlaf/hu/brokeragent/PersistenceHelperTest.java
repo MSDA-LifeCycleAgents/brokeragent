@@ -60,6 +60,8 @@ public class PersistenceHelperTest extends TestCase {
             bw.close();
         } catch (IOException e) {
             e.printStackTrace();
+            fail("Could not create test file!");
+
         }
     }
 
