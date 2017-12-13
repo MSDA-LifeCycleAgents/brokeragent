@@ -4,16 +4,26 @@ import jade.core.AID;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@XmlRootElement( name = "MUSEUM" )
 public class Topic implements Serializable {
     private AID jadeTopic;
     private ArrayList<AID> subscribers;
     private ArrayList<Message> messages;
     private int daysToKeepMessages;
+    private String topicName;
+
+    Topic() {}
+
+    Topic(int dTKM) {
+        this.daysToKeepMessages = dTKM;
+    }
 
     Topic(AID jadeTopic, int dTKM) {
         this.jadeTopic = jadeTopic;
@@ -61,8 +71,8 @@ public class Topic implements Serializable {
             this.messages.remove(lastMessage);
             return lastMessage;
         }
-        catch (IndexOutOfBoundsException ignored) {
-            return null;
+        catch (NullPointerException | IndexOutOfBoundsException ignored) {
+            return new Message("No more messages in this queue.");
         }
     }
 
@@ -100,5 +110,31 @@ public class Topic implements Serializable {
                 .append(messages)
                 .append(daysToKeepMessages)
                 .toHashCode();
+    }
+
+    public String getTopicName() {
+        return topicName;
+    }
+
+    @XmlElement( name = "name" )
+    public void setTopicName(String topicName) {
+        this.topicName = topicName;
+    }
+
+    @XmlElement( name = "daysToKeepMessages" )
+    public void setDaysToKeepMessages(int dTKM ) {
+        this.daysToKeepMessages = dTKM;
+    }
+
+    public String toString() {
+        String oldestMessage = "No messages";
+        try {
+            oldestMessage = this.messages.get(0).toString();
+        } catch (NullPointerException | IndexOutOfBoundsException ignored) {}
+        return String.format("topicName: %s\ndaysToKeepMessages: %s\noldest message content: %s",
+                this.topicName,
+                this.daysToKeepMessages,
+                oldestMessage
+        );
     }
 }

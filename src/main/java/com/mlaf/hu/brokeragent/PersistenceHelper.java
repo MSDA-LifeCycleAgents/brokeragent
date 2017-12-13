@@ -1,10 +1,14 @@
 package com.mlaf.hu.brokeragent;
 
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
+import jade.util.Logger;
 
 import java.io.*;
 
+import static com.mlaf.hu.brokeragent.BrokerAgent.brokerAgentLogger;
+
 public class PersistenceHelper {
+    //FIXME I CAN BE DELETED, RIGHT?
 
     public static String getBasePath() {
         return System.getProperty("user.home") + File.separator + "MLAF" + File.separator + "BrokerAgent" + File.separator;
@@ -21,9 +25,7 @@ public class PersistenceHelper {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(getBasePath() + name + ".ser"))) {
             oos.writeObject(obj);
         } catch (IOException e) {
-            //TODO LOG
-            e.printStackTrace();
-//            brokerAgentLogger.log(Logger.SEVERE, () -> String.format("Could not write topic %s to disk %nError %s" , topicAID.getName(), e));
+            brokerAgentLogger.log(Logger.SEVERE, () -> String.format("Could not write object %s to disk %nError %s" , obj.toString(), e.getMessage()));
         }
     }
 
