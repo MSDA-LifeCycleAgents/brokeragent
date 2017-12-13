@@ -4,10 +4,7 @@ import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
 import jade.core.AID;
 import junit.framework.TestCase;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 public class PersistenceHelperTest extends TestCase {
     String testBrokenFilePath = PersistenceHelper.getBasePath() + "broken.ser";
@@ -54,10 +51,11 @@ public class PersistenceHelperTest extends TestCase {
 
     private void setupBrokenFile() {
         System.out.println("Creating testfile " + testBrokenFilePath);
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(testBrokenFilePath))) {
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(testBrokenFilePath), "utf-8"))) {
             String content = "BROKENFILE BROKENFILE";
-            bw.write(content);
-            bw.close();
+            writer.write(content);
+            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
             fail("Could not create test file!");
