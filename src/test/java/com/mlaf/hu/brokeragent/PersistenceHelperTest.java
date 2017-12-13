@@ -43,6 +43,7 @@ public class PersistenceHelperTest extends TestCase {
     }
 
     public void testLoadBrokenFile() {
+        setupBrokenFile();
         try {
             Topic failed = PersistenceHelper.loadTopic("broken");
             assertNull(failed);
@@ -51,9 +52,7 @@ public class PersistenceHelperTest extends TestCase {
         }
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    private void setupBrokenFile() {
         System.out.println("Creating testfile " + testBrokenFilePath);
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(testBrokenFilePath))) {
             String content = "BROKENFILE BROKENFILE";
