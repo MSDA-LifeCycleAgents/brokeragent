@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@XmlRootElement( name = "MUSEUM" )
+@XmlRootElement( name = "Topic" )
 public class Topic implements Serializable {
     private AID jadeTopic;
     private ArrayList<AID> subscribers;
