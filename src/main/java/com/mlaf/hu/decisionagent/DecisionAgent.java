@@ -1,7 +1,9 @@
 package com.mlaf.hu.decisionagent;
 
+import com.mlaf.hu.decisionagent.behavior.ReceiveBehavior;
+import com.mlaf.hu.decisionagent.behavior.RegisterBehavior;
+import com.mlaf.hu.decisionagent.behavior.UpdateBehavior;
 import com.mlaf.hu.decisionagent.representationmodels.Sensor;
-import com.sun.org.apache.bcel.internal.generic.Instruction;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -10,7 +12,6 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.util.Logger;
-import com.mlaf.hu.decisionagent.behavior.*;
 
 import javax.xml.bind.JAXB;
 import java.io.StringReader;
