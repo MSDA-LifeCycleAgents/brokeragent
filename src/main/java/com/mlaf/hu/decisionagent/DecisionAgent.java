@@ -1,5 +1,7 @@
 package com.mlaf.hu.decisionagent;
 
+import com.mlaf.hu.decisionagent.representationmodels.Sensor;
+import com.sun.org.apache.bcel.internal.generic.Instruction;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -8,22 +10,27 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.util.Logger;
+import com.mlaf.hu.decisionagent.behavior.*;
 
+import javax.xml.bind.JAXB;
+import java.io.StringReader;
 import java.util.HashMap;
 
 public abstract class DecisionAgent extends Agent {
     private static final String SERVICE_NAME = "DECISION-AGENT";
     private static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
-    private HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
+    public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
 
-    public DecisionAgent() {}
-
-    @Override
-    protected void setup() {
-
+    public DecisionAgent() {
+        super();
+        registerAsService();
+        addBehaviour(new RegisterBehavior(this));
+        addBehaviour(new ReceiveBehavior(this));
+        addBehaviour(new UpdateBehavior(this));
     }
 
-    public void registerAsService() {
+
+    private void registerAsService() {
         try {
             DFAgentDescription dfd = new DFAgentDescription();
             dfd.setName(this.getAID());
@@ -40,17 +47,38 @@ public abstract class DecisionAgent extends Agent {
         }
     }
 
-    public void registerSensorAgent() {
-
+    public void registerSensorAgent(AID sensoragent, InstructionSet instructionset) {
+        this.sensorAgents.put(sensoragent, instructionset);
     }
 
-    public void unregisterSensorAgent() {
-
-    }
+    public abstract void unregisterSensorAgent(AID sensoragent);
 
     public InstructionSet parseInstructionXml(String xml) {
-
+        InstructionSet is = new InstructionSet();
+        try {
+            is = JAXB.unmarshal(new StringReader(xml), InstructionSet.class);
+        } catch (Exception e) {
+            decisionAgentLogger.log(Logger.SEVERE, String.format("Error parsing XML: %s", e.getMessage()));
+        }
+        return is;
     }
+
+    public SensorReading parseSensorReadingXml (String xml) {
+        SensorReading sr = new SensorReading();
+        try {
+            sr = JAXB.unmarshal(new StringReader(xml), SensorReading.class);
+        } catch (Exception e) {
+            decisionAgentLogger.log(Logger.SEVERE, String.format("Error parsing XML: %s", e.getMessage()));
+        }
+        return sr;
+    }
+
+    public void handleSensorReading(int value, InstructionSet is, Sensor sensor) {
+        sensor.getReadings().add(value);
+        storeReading(value);
+    }
+
+    public abstract void storeReading(int value);
 
 
 }

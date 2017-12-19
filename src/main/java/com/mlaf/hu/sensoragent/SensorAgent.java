@@ -27,7 +27,7 @@ public abstract class SensorAgent extends Agent{
 
     public SensorAgent() {
         addBehaviour(new ReadSensorsBehavior(this, 1000));
-        //TODO(Auke) Get tickrate from instructionset.
+        //TODO(Auke) Get tickrate from representationmodels.
         //TODO(Auke) Look into sudden stopping of application and restarting it.
 
     }

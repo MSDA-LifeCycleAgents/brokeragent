@@ -21,7 +21,7 @@ public class SendBehavior extends CyclicBehaviour {
 
     @Override
     public void action() {
-        ACLMessage subscriberMessage = brokerAgent.receive();
+        ACLMessage subscriberMessage = brokerAgent.receive(); //FIXME use messagetemplates for better code quality
         if (subscriberMessage == null) {
             block();
             return;
@@ -39,7 +39,6 @@ public class SendBehavior extends CyclicBehaviour {
             return;
         }
         if (message != null) {
-            System.out.println(message.getContent());
             brokerAgent.send(message);
         }
     }
