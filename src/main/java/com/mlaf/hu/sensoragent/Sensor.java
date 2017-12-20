@@ -1,9 +1,20 @@
 package com.mlaf.hu.sensoragent;
 
-public interface Sensor {
-    public boolean activate();
-    public boolean deactivate();
-    public String getSensorID();
-    public String getValue();
-    public String getUnit();
+import java.util.List;
+
+public abstract class Sensor {
+    private boolean active;
+
+    public void activate() {
+        this.active = true;
+    }
+
+    public void deactivate() {
+        this.active = false;
+    }
+
+    public abstract String getSensorID();
+
+    public abstract List<SensorMeasurements> getMeasurements();
+
 }

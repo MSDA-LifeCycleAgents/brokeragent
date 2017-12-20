@@ -5,7 +5,7 @@ import com.mlaf.hu.sensoragent.SensorAgent;
 
 public class DummySensorAgent extends SensorAgent {
     public DummySensorAgent() {
-        super();
+        super(1000);
         Sensor dummy1 = new DummySensor("1");
         Sensor dummy2 = new DummySensor("2");
         dummy1.activate();

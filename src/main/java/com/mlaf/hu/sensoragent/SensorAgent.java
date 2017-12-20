@@ -1,132 +1,107 @@
 package com.mlaf.hu.sensoragent;
 
 import com.mlaf.hu.sensoragent.behavior.ReadSensorsBehavior;
+import com.mlaf.hu.sensoragent.behavior.SendBufferBehavior;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
-import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import jade.util.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
 
-public abstract class SensorAgent extends Agent{
+public abstract class SensorAgent extends Agent {
+    static java.util.logging.Logger sensorAgentLogger = Logger.getLogger("SensorAgentLogger");
     private ArrayList<Sensor> sensors = new ArrayList<>();
+    protected ArrayList<SensorReading> sensorReadingBuffer = new ArrayList<>();
+    boolean directToDecisionAgent = true; //TODO Read this from Instruction XML Maybe use thijs code?
 
-    public SensorAgent() {
-        addBehaviour(new ReadSensorsBehavior(this, 1000));
-        //TODO(Auke) Get tickrate from instructionset.
-        //TODO(Auke) Look into sudden stopping of application and restarting it.
-
+    public SensorAgent(int sensorRefreshRateMs) {
+        addBehaviour(new ReadSensorsBehavior(this, sensorRefreshRateMs));
+        addBehaviour(new SendBufferBehavior(this, sensorRefreshRateMs));
     }
 
-    public ArrayList<Sensor> getSensors() {
-        return new ArrayList<Sensor>(sensors);
+    public List<Sensor> getSensors() {
+        return new ArrayList<>(sensors);
     }
 
 
     public abstract String getInstructionXML();
 
-    public void addSensor(Sensor sensor) {
-        // TODO(Auke) Check if sensor ID is unique!
-        sensors.add(sensor);
+    public boolean addSensor(Sensor newSensor) {
+        for (Sensor s : sensors) {
+            if (s.getSensorID().equals(newSensor.getSensorID())) {
+                return false;
+            }
+        }
+        sensors.add(newSensor);
+        return true;
     }
 
-    public void sendSensorReadings(ArrayList<SensorReading> readings) {
-        String XML = sensorReadingsToXML(readings);
+    public void addSensorReadingToSendBuffer(SensorReading sensorReading) {
+        sensorReadingBuffer.add(sensorReading);
+    }
 
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        msg.addReceiver(getDecisionAgent());
-        msg.setLanguage("XML");
-        msg.setOntology("MLAF-Sensor-XML");
-        msg.setContent(XML);
-        //TODO(Auke) Do we want to send XML? Maybe send Readings since sending of serializable is also possible?
+    public void sendSensorReadings() {
+        AID destination = getDestination();
+        if (destination == null) {
+            return; // Destination is not found, maybe its offline, trying again in the future
+        }
+        for (SensorReading sensorReading: sensorReadingBuffer) {
+            String readingXML = sensorReading.toXML();
+            if (readingXML == null) {
+                sensorAgentLogger.log(Level.WARNING, "XML for Sensorreading is empty, skipping");
+                continue;
+            }
+            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+            msg.addReceiver(destination);
+            msg.setLanguage("XML");
+            msg.setOntology("MLAF-Sensor-XML");
+            msg.setContent(readingXML);
+            send(msg);
+        }
+        sensorReadingBuffer.clear();
+    }
 
+    private AID getDestination() {
+        if (directToDecisionAgent) {
+            return getDecisionAgent();
+        } else {
+            return getSensorReadingsTopic();
+        }
+
+    }
+
+    private AID getSensorReadingsTopic() {
+        return null; // TODO implement function to get topic from
     }
 
     private AID getDecisionAgent() {
         // Maybe rename to getDestination? Since sending to topic should also be possible.
-        //TODO Add getting of BrokerAgent AID
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
-        sd.setType("sensor-reading"); // TODO Maybe another type name?
+        sd.setType("sensor-reading");
         sd.addOntologies("MLAF-Sensor-XML");
         template.addServices(sd);
         try {
-            DFAgentDescription[] result = DFService.search( this, template);
-            //TODO Catch 0 result
-            //TODO Handle more than one
-            return result[0].getName();
-
-        } catch (FIPAException e) {
-            //TODO Handle
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private AID getBrokerAgent() {
-        //TODO(Auke) Remove duplication when DecisionAgent ServiceDesription is clear
-        DFAgentDescription template = new DFAgentDescription();
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("message-broker"); // TODO Maybe another type name?
-        sd.addOntologies("message-broker-ontology");
-        sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-        template.addServices(sd);
-        try {
-            DFAgentDescription[] result = DFService.search( this, template);
-            //TODO Catch 0 result
-            //TODO Handle more than one
-            return result[0].getName();
-
-        } catch (FIPAException e) {
-            //TODO Handle
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private static String sensorReadingsToXML(ArrayList<SensorReading> readings) {
-        DocumentBuilderFactory icFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder icBuilder;
-        try {
-            icBuilder = icFactory.newDocumentBuilder();
-            Document doc = icBuilder.newDocument();
-            //TODO Do we want an actual namespace document?
-            //TODO Add readings timestamp
-            Element mainRootElement = doc.createElementNS("https://github.com/MSDA-LifeCycleAgents/SensorReadingsXML", "readings");
-            doc.appendChild(mainRootElement);
-
-            for (SensorReading reading: readings) {
-                mainRootElement.appendChild(reading.getReadingNode(doc));
-
+            DFAgentDescription[] result = DFService.search(this, template);
+            if (result.length < 1) {
+                return null;
+            } else if (result.length > 1) {
+                return result[0].getName();
+                //TODO What do we want to do if multiple decisionagents are found?
+            } else {
+                return result[0].getName();
             }
-
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            DOMSource source = new DOMSource(doc);
-            StringWriter stringWriter = new StringWriter();
-            transformer.transform(source, new StreamResult(stringWriter));
-            return stringWriter.toString();
-
-        } catch (Exception e) {
-            //FIXME
-            e.printStackTrace();
+        } catch (FIPAException e) {
+            sensorAgentLogger.log(Level.SEVERE, "Could not get the Decision Agent", e);
             return null;
         }
     }
-
 
 }

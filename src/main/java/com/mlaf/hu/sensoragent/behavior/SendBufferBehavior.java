@@ -7,10 +7,10 @@ import jade.core.behaviours.TickerBehaviour;
 
 import java.util.ArrayList;
 
-public class ReadSensorsBehavior extends TickerBehaviour {
+public class SendBufferBehavior extends TickerBehaviour {
     private final SensorAgent sensorAgent;
 
-    public ReadSensorsBehavior(SensorAgent sa, long tickrate) {
+    public SendBufferBehavior(SensorAgent sa, long tickrate) {
         super(sa, tickrate);
         this.sensorAgent = sa;
     }
@@ -18,10 +18,6 @@ public class ReadSensorsBehavior extends TickerBehaviour {
 
     @Override
     protected void onTick() {
-        SensorReading sensorReading = new SensorReading();
-        for (Sensor sensor: sensorAgent.getSensors()) {
-            sensorReading.addSensorMeassurements(sensor, sensor.getMeasurements());
-        }
-        sensorAgent.addSensorReadingToSendBuffer(sensorReading);
+        sensorAgent.sendSensorReadings();
     }
 }
