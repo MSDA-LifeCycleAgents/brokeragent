@@ -1,5 +1,6 @@
 package com.mlaf.hu.proxy.mtp;
 
+import com.mlaf.hu.helpers.Configuration;
 import com.mlaf.hu.proxy.JMDNSManager;
 import jade.core.AID;
 import jade.core.Profile;
@@ -33,11 +34,6 @@ import org.xml.sax.SAXException;
 public class TcpServer {
 
     /**
-     * The default port.
-     */
-    public static final int DEFAULT_PORT = 6789;
-
-    /**
      * The XML parser implementation class.
      */
     public static final String XML_PARSER_CLASS = "org.apache.crimson.parser.XMLReaderImpl";
@@ -54,7 +50,9 @@ public class TcpServer {
     private final InChannel.Dispatcher dispatcher;
     private final Profile prfl;
     private final TcpAddress address;
-
+    
+    private int port;
+        
     /**
      * Creates a TcpServer with the default port on the local IPv4 network.
      *
@@ -64,9 +62,11 @@ public class TcpServer {
      * @throws IOException if activation fails
      */
     public TcpServer(InChannel.Dispatcher dispatcher, Profile prfl) throws SocketException, IOException {
+        setPort();
+        
         this.dispatcher = dispatcher;
         this.prfl = prfl;
-        this.address = new TcpAddress(JMDNSManager.getLocalIPv4Address(), DEFAULT_PORT);
+        this.address = new TcpAddress(JMDNSManager.getLocalIPv4Address(), port);
 
         activate();
     }
@@ -89,6 +89,15 @@ public class TcpServer {
 
     public TcpAddress getAddress() {
         return address;
+    }
+    
+    private void setPort(){
+        Configuration config = Configuration.getInstance();
+        try{
+            port = Integer.valueOf(config.getProperty("proxy.port"));
+        }catch(NumberFormatException e){
+            logger.log(Level.SEVERE, "Exception starting proxy, port is not found in configuration.");
+        }
     }
 
     /**

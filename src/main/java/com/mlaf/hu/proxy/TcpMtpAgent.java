@@ -1,5 +1,6 @@
 package com.mlaf.hu.proxy;
 
+import com.mlaf.hu.helpers.Configuration;
 import com.mlaf.hu.proxy.mtp.TcpMtp;
 import com.mlaf.hu.proxy.mtp.TcpServer;
 import jade.core.AID;
@@ -120,7 +121,8 @@ public class TcpMtpAgent extends Agent {
         }
 
         try {
-            jmdnsManager = new JMDNSManager(TcpServer.DEFAULT_PORT,
+            int port = Integer.valueOf(Configuration.getInstance().getProperty("proxy.port"));
+            jmdnsManager = new JMDNSManager(port,
                     new TcpMtpProxyServiceListener());
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Error initializing JMDNS", ex);
