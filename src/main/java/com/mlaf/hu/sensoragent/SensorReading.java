@@ -85,6 +85,7 @@ public class SensorReading {
         } catch (Exception e) {
             SensorAgent.sensorAgentLogger.log(Level.SEVERE, "Could not create XML", e);
             return null;
+            //TODO(Auke) Omdat hans zeurt, ombouwen naar custom exception.
         }
     }
 }

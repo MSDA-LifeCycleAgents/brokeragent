@@ -24,6 +24,8 @@ public abstract class SensorAgent extends Agent {
     public SensorAgent(int sensorRefreshRateMs) {
         addBehaviour(new ReadSensorsBehavior(this, sensorRefreshRateMs));
         addBehaviour(new SendBufferBehavior(this, sensorRefreshRateMs));
+        //TODO(Auke) Instructieset on startup sturen naar DA
+        // Als DA niet aanwezig is, setinactive, ticker behavior om te kijken of de DA er weer is.
     }
 
     public List<Sensor> getSensors() {
