@@ -1,6 +1,6 @@
-package com.mlaf.hu.decisionagent;
+package com.mlaf.hu.models;
 
-import com.mlaf.hu.decisionagent.representationmodels.Sensors;
+import com.mlaf.hu.models.Sensors;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

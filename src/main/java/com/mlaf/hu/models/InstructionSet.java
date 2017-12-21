@@ -1,8 +1,8 @@
-package com.mlaf.hu.decisionagent;
+package com.mlaf.hu.models;
 
-import com.mlaf.hu.decisionagent.representationmodels.Fallback;
-import com.mlaf.hu.decisionagent.representationmodels.Messaging;
-import com.mlaf.hu.decisionagent.representationmodels.Sensors;
+import com.mlaf.hu.models.Fallback;
+import com.mlaf.hu.models.Messaging;
+import com.mlaf.hu.models.Sensors;
 import org.springframework.scheduling.support.CronSequenceGenerator;
 
 import javax.xml.bind.annotation.XmlElement;
