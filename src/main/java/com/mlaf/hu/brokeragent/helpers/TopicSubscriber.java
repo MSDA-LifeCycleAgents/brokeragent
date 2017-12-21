@@ -59,7 +59,7 @@ public class TopicSubscriber extends Agent {
             DFAgentDescription[] result = DFService.search(this, dfd);
             if (result.length > 0)
                 System.out.println(result[0].getName());
-            return result[0].getName();
+                return result[0].getName();
         } catch (FIPAException fe) {
             fe.printStackTrace();
         }

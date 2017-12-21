@@ -112,12 +112,13 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     }
 
     public ACLMessage addSubscriberToTopic(AID subscriber, Topic representationTopic, TopicManagementHelper helper) {
-        ACLMessage message = new ACLMessage(ACLMessage.NOT_UNDERSTOOD);
+        ACLMessage message = new ACLMessage(ACLMessage.CONFIRM);
         message.addReceiver(subscriber);
         if (representationTopic.getTopicName() == null) {
             String content = "The BrokerAgent needs a topic name. Use the following format for subscribing:\n" +
-                    "<daysToKeepMessages></daysToKeepMessages>\n<name></name>";
+                             "<daysToKeepMessages></daysToKeepMessages>\n<name></name>";
             message.setContent(content);
+            message.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             brokerAgentLogger.log(Logger.SEVERE, content);
             return message;
         }
@@ -131,19 +132,20 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
         }
         if (topic != null) {
             topic.addToSubscribers(subscriber);
-            message.setContent(String.format("Subscribed to the Topic %s", topic.getJadeTopic()));
+            message.setContent(String.format("Subscribed to the Topic %s", topic.getTopicName()));
+            message.addUserDefinedParameter("name", topic.getTopicName());
         } else {
             message.setContent("Something went wrong while subscribing. See JADE logs.");
+            message.setPerformative(ACLMessage.NOT_UNDERSTOOD);
         }
-        message.setPerformative(ACLMessage.CONFIRM);
         return message;
     }
 
     public ACLMessage getMessageFromBuffer(AID subscriber, Topic representationTopic, TopicManagementHelper helper) {
-        ACLMessage message = new ACLMessage(ACLMessage.CONFIRM);
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
         if (representationTopic.getTopicName() == null) {
             String content = "The BrokerAgent needs a topic name. Use the following format for requesting:\n" +
-                    "<name></name>";
+                             "<name></name>";
             message.setContent(content);
             brokerAgentLogger.log(Logger.SEVERE, content);
             return message;
@@ -155,6 +157,7 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
             if (topic.getSubscriber(subscriber) != null) {
                 Message oldestMessage = topic.getOldestMessage();
                 message.setContent(oldestMessage.getContent());
+                message.setSender(oldestMessage.getPublisher());
             } else {
                 message.setPerformative(ACLMessage.NOT_UNDERSTOOD);
                 String content = String.format("Subscriber %s not subscribed for this Topic: %s. " +
@@ -170,7 +173,7 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
         return message;
     }
 
-    public Topic parseMessage(String message) {
+    public Topic unmarshalTopic(String message) {
         Topic topic = new Topic();
         try {
             topic = JAXB.unmarshal(new StringReader(message), Topic.class);

@@ -19,13 +19,17 @@ public class Topic implements Serializable {
     private int daysToKeepMessages;
     private String topicName;
 
-    Topic() {}
+    public Topic() {}
 
-    Topic(int dTKM) {
+    public Topic(int dTKM) {
         this.daysToKeepMessages = dTKM;
     }
 
-    Topic(AID jadeTopic, int dTKM) {
+    public Topic (String topicName) {
+        this.topicName = topicName;
+    }
+
+    public Topic(AID jadeTopic, int dTKM) {
         this.jadeTopic = jadeTopic;
         this.subscribers = new ArrayList<>();
         this.messages = new ArrayList<>();

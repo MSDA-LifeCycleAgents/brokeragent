@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 public abstract class DecisionAgent extends Agent {
     private static final String SERVICE_NAME = "DECISION-AGENT";
-    private static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
+    public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
     public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
 
     public DecisionAgent() {

@@ -1,14 +1,11 @@
 package com.mlaf.hu.brokeragent.behavior;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
-import com.mlaf.hu.brokeragent.Message;
 import com.mlaf.hu.brokeragent.Topic;
 import jade.core.AID;
-import jade.core.ServiceException;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
-import jade.util.Logger;
 
 public class SendBehavior extends CyclicBehaviour {
     private final BrokerAgent brokerAgent;
@@ -29,7 +26,7 @@ public class SendBehavior extends CyclicBehaviour {
         AID subscriber = subscriberMessage.getSender();
         int incomingPerformative = subscriberMessage.getPerformative();
         ACLMessage message = null;
-        Topic representationTopic = brokerAgent.parseMessage(subscriberMessage.getContent());
+        Topic representationTopic = brokerAgent.unmarshalTopic(subscriberMessage.getContent());
         if (incomingPerformative == ACLMessage.SUBSCRIBE) {
             message = brokerAgent.addSubscriberToTopic(subscriber, representationTopic, topicHelper);
         } else if (incomingPerformative == ACLMessage.REQUEST) {
