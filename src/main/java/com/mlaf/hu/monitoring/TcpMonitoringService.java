@@ -47,8 +47,11 @@ public class TcpMonitoringService extends MonitoringService{
         logger.log(Level.INFO, "Dumping cached messages:\n {0}", dump);
     }
     
-    @Override
-    protected boolean filter(ACLMessage message){
-        return message.getContent().equals("Flarf");
-    }
+//    @Override
+//    protected boolean filter(ACLMessage message){
+//        if(message == null || message.getContent() == null)
+//            return false;
+//        
+//        return message.getContent().startsWith("Foreign");
+//    }
 }

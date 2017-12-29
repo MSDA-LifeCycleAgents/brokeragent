@@ -17,7 +17,7 @@ public abstract class MonitoringService extends BaseService{
     protected static final Logger logger = Logger.getLogger(MonitoringService.class.getName());
     public static final String NAME = "mlaf-java.monitoringservice";
     
-    private Filter outFilter = new OutgoingLoggingFilter();
+    private final Filter outFilter = new OutgoingLoggingFilter();
     
     private Cache<ACLMessage> cache;
     
@@ -34,6 +34,8 @@ public abstract class MonitoringService extends BaseService{
         
         String cacheSizeStr = config.getProperty("monitoring.cache_size");
         int cacheSize = cacheSizeStr != null ? Integer.valueOf(cacheSizeStr) : 100;
+        cacheSize = cacheSize < 1 ? 1 : cacheSize;
+        
         cache = new Cache<>(cacheSize);
         cache.notifyOverflow(true);
         
