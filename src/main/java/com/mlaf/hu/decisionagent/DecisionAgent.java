@@ -3,6 +3,7 @@ package com.mlaf.hu.decisionagent;
 import com.mlaf.hu.decisionagent.behavior.ReceiveBehavior;
 import com.mlaf.hu.decisionagent.behavior.RegisterBehavior;
 import com.mlaf.hu.decisionagent.behavior.UpdateBehavior;
+import com.mlaf.hu.decisionagent.representationmodels.Measurement;
 import com.mlaf.hu.decisionagent.representationmodels.Sensor;
 import jade.core.AID;
 import jade.core.Agent;
@@ -74,8 +75,12 @@ public abstract class DecisionAgent extends Agent {
         return sr;
     }
 
-    public void handleSensorReading(int value, InstructionSet is, Sensor sensor) {
-        sensor.getReadings().add(value);
+    public void handleSensorReading(int value, InstructionSet is, Sensor sensor, String measurementId) {
+        try {
+            sensor.getMeasurements().getMeasurement(measurementId).getReadings().add(value);
+        }catch(NullPointerException npe) {
+            decisionAgentLogger.log(Logger.SEVERE, String.format("No measurement found by that ID: %s", measurementId));
+        }
         storeReading(value);
     }
 

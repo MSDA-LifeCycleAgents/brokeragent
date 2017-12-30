@@ -16,14 +16,7 @@ public class InstructionSetTest {
     @Before
     public void setUp() throws Exception {
         this.is = new InstructionSet();
-        this.is.setHeartbeatTimePattern("0 45 23 * * *");
     }
 
-    @Test
-    public void nextDate() {
-        assert this.is != null;
-        Date nextDate = this.is.nextDate();
-        assert nextDate != null;
-        assert nextDate.toString().equals(String.format("Tue Dec %s 23:45:00 CET 2017", LocalDateTime.now().getDayOfMonth()));
-    }
+
 }

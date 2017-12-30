@@ -14,70 +14,101 @@ public class DecisionAgentTest {
     @Before
     public void setUp() throws Exception {
         this.instructionXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-                "    <instructions>\n" +
-                "        <identifier>fVTz7OCaD8WFJE5Jvw7K</identifier>\n" +
-                "        <messaging>\n" +
-                "            <topic>\n" +
-                "                <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
-                "                <daysToKeepMessages>1</daysToKeepMessages>\n" +
-                "            </topic>\n" +
-                "            <directToDecisionAgent>False</directToDecisionAgent>\n" +
-                "        </messaging>\n" +
-                "        <sensors>\n" +
-                "            <sensor id=\"SystolicBloodPressure\">\n" +
-                "                <label>Systolic Blood Pressure</label>\n" +
-                "                <min>0</min>\n" +
-                "                <max>200</max>\n" +
-                "                <unit>mm Hg</unit>\n" +
-                "                <intervalinseconds>30</intervalinseconds>\n" +
-                "                <plans>\n" +
-                "                    <plan>\n" +
-                "                        <below>0.6</below>\n" +
-                "                        <message>Watch out!</message>\n" +
-                "                        <via>ScreenAgent</via>\n" +
-                "                        <to></to>\n" +
-                "                        <limit>30</limit>\n" +
-                "                    </plan>\n" +
-                "                    <plan>\n" +
-                "                        <below>0.4</below>\n" +
-                "                        <message>Panic!</message>\n" +
-                "                        <via>MailAgent</via>\n" +
-                "                        <to>brian.vanderbijl@hu.nl</to>\n" +
-                "                        <limit>3600</limit>\n" +
-                "                    </plan>\n" +
-                "                </plans>\n" +
-                "                <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n"+
-                "            </sensor>\n" +
-                "            <sensor id=\"HeartRate\">\n" +
-                "                <label>Heart Rate</label>\n" +
-                "                <min>0</min>\n" +
-                "                <max>200</max>\n" +
-                "                <unit>bpm</unit>\n" +
-                "                <intervalinseconds>30</intervalinseconds>\n" +
-                "                <plans>\n" +
-                "                    <plan>\n" +
-                "                        <below>0.6</below>\n" +
-                "                        <message>Watch out!</message>\n" +
-                "                        <via>ScreenAgent</via>\n" +
-                "                        <to></to>\n" +
-                "                        <limit>30</limit>\n" +
-                "                    </plan>\n" +
-                "                    <plan>\n" +
-                "                        <below>0.4</below>\n" +
-                "                        <message>Panic!</message>\n" +
-                "                        <via>MailAgent</via>\n" +
-                "                        <to>brian.vanderbijl@hu.nl</to>\n" +
-                "                        <limit>3600</limit>\n" +
-                "                    </plan>\n" +
-                "                </plans>\n" +
-                "                <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n" +
-                "            </sensor>\n" +
-                "        </sensors>\n" +
-                "        <fallback>\n" +
-                "            <via>ScreenAgent</via>\n" +
-                "            <to></to>\n" +
-                "        </fallback>\n" +
-                "    </instructions>\n";
+                "<instructions>\n" +
+                "    <identiefer>\n" +
+                "        fVTz7OCaD8WFJE5Jvw7K\n" +
+                "    </identiefer>\n" +
+                "    <messaging>\n" +
+                "        <topic>\n" +
+                "            <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
+                "            <daysToKeepMessages>1</daysToKeepMessages>\n" +
+                "        </topic>\n" +
+                "        <directToDecisionAgent>False</directToDecisionAgent>\n" +
+                "    </messaging>\n" +
+                "    <amountOfMissedDataPackages>5</amountOfMissedDataPackages>\n" +
+                "    <sensors>\n" +
+                "        <sensor id=\"SystolicBloodPressure\">\n" +
+                "            <label>Systolic Blood Pressure</label>\n" +
+                "            <intervalinseconds>30</intervalinseconds>\n" +
+                "            <unit>mm Hg</unit>\n" +
+                "            <measurements>\n" +
+                "                <measurement id=\"y\">\n" +
+                "                    <min>0</min>\n" +
+                "                    <max>200</max>\n" +
+                "                    <plans>\n" +
+                "                        <plan>\n" +
+                "                            <below>0.6</below>\n" +
+                "                            <message>Watch out!</message>\n" +
+                "                            <via>ScreenAgent</via>\n" +
+                "                            <to></to>\n" +
+                "                            <limit>30</limit>\n" +
+                "                        </plan>\n" +
+                "                        <plan>\n" +
+                "                            <below>0.4</below>\n" +
+                "                            <message>Panic!</message>\n" +
+                "                            <via>MailAgent</via>\n" +
+                "                            <to>brian.vanderbijl@hu.nl</to>\n" +
+                "                            <limit>3600</limit>\n" +
+                "                        </plan>\n" +
+                "                    </plans>\n" +
+                "                </measurement>\n" +
+                "                <measurement id=\"x\">\n" +
+                "                    <min>0</min>\n" +
+                "                    <max>200</max>\n" +
+                "                    <plans>\n" +
+                "                        <plan>\n" +
+                "                            <below>0.6</below>\n" +
+                "                            <message>Watch out!</message>\n" +
+                "                            <via>ScreenAgent</via>\n" +
+                "                            <to></to>\n" +
+                "                            <limit>30</limit>\n" +
+                "                        </plan>\n" +
+                "                        <plan>\n" +
+                "                            <below>0.4</below>\n" +
+                "                            <message>Panic!</message>\n" +
+                "                            <via>MailAgent</via>\n" +
+                "                            <to>brian.vanderbijl@hu.nl</to>\n" +
+                "                            <limit>3600</limit>\n" +
+                "                        </plan>\n" +
+                "                    </plans>\n" +
+                "                </measurement>\n" +
+                "            </measurements>\n" +
+                "            <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n" +
+                "        </sensor>\n" +
+                "        <sensor id=\"HeartRate\">\n" +
+                "            <label>Heart Rate</label>\n" +
+                "            <unit>bpm</unit>\n" +
+                "            <intervalinseconds>30</intervalinseconds>\n" +
+                "            <measurements>\n" +
+                "                <measurement id=\"only\">\n" +
+                "                    <min>0</min>\n" +
+                "                    <max>200</max>\n" +
+                "                    <plans>\n" +
+                "                        <plan>\n" +
+                "                            <below>0.6</below>\n" +
+                "                            <message>Watch out!</message>\n" +
+                "                            <via>ScreenAgent</via>\n" +
+                "                            <to></to>\n" +
+                "                            <limit>30</limit>\n" +
+                "                        </plan>\n" +
+                "                        <plan>\n" +
+                "                            <below>0.4</below>\n" +
+                "                            <message>Panic!</message>\n" +
+                "                            <via>MailAgent</via>\n" +
+                "                            <to>brian.vanderbijl@hu.nl</to>\n" +
+                "                            <limit>3600</limit>\n" +
+                "                        </plan>\n" +
+                "                    </plans>\n" +
+                "                </measurement>\n" +
+                "            </measurements>\n" +
+                "            <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n" +
+                "        </sensor>\n" +
+                "    </sensors>\n" +
+                "    <fallback>\n" +
+                "        <via>ScreenAgent</via>\n" +
+                "        <to></to>\n" +
+                "    </fallback>\n" +
+                "</instructions>";
         this.sensorReadingXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
                                 "<sensorreading>\n" +
                                 "\t<sensors>\n" +
@@ -112,7 +143,7 @@ public class DecisionAgentTest {
         InstructionSet is = this.da.parseInstructionXml(this.instructionXML);
         assert is.getIdentifier().equals("fVTz7OCaD8WFJE5Jvw7K");
         assert is.getSensors().getSensors().get(1).getLabel().equals("Heart Rate");
-        assert is.getSensors().getSensors().get(0).getPlans().getPlans().get(1).getVia().equals("MailAgent");
+        assert is.getSensors().getSensors().get(0).getMeasurements().getMeasurements().get(0).getPlans().getPlans().get(1).getVia().equals("MailAgent");
     }
 
     @Test
@@ -120,6 +151,5 @@ public class DecisionAgentTest {
         assert this.sensorReadingXML != null;
         SensorReading sr = this.da.parseSensorReadingXml(this.sensorReadingXML);
         assert sr.getSensors().getSensors().get(0).getId().equals("HeartRate");
-        assert sr.getSensors().getSensors().get(1).getValue() == 113;
     }
 }

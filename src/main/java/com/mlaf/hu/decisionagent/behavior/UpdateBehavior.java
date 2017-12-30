@@ -6,6 +6,8 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public class UpdateBehavior extends CyclicBehaviour {
@@ -17,9 +19,9 @@ public class UpdateBehavior extends CyclicBehaviour {
 
     @Override
     public void action() {
-        for (InstructionSet instructionSetLocal : this.DA.sensorAgents.values()) {
-            if (instructionSetLocal.nextDate().compareTo(new Date()) > 0) {
-                instructionSetLocal.setActive(false);
+        for (InstructionSet localInstructionSet : this.DA.sensorAgents.values()) {
+            if (ChronoUnit.SECONDS.between(localInstructionSet.getLastReceivedDataPackageAt(), LocalDateTime.now()) / localInstructionSet.getHighestIntervalFromSensors() == localInstructionSet.getAmountOfMissedDataPackages()) {
+                localInstructionSet.setActive(false);
             }
         }
         ACLMessage message = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.PROPAGATE));

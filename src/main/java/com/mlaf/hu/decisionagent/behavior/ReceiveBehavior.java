@@ -4,6 +4,7 @@ import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.decisionagent.InstructionSet;
 import com.mlaf.hu.decisionagent.SensorReading;
+import com.mlaf.hu.decisionagent.representationmodels.Measurement;
 import com.mlaf.hu.decisionagent.representationmodels.Sensor;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
@@ -17,6 +18,7 @@ import jade.util.Logger;
 
 import javax.xml.bind.JAXB;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 
 
 public class ReceiveBehavior extends CyclicBehaviour {
@@ -52,7 +54,10 @@ public class ReceiveBehavior extends CyclicBehaviour {
         for (Sensor inReading : sr.getSensors().getSensors()) {
             for (Sensor inInstructionSet : is.getSensors().getSensors()) {
                 if (inReading.getId().equals(inInstructionSet.getId())) {
-                    DA.handleSensorReading(inReading.getValue(), is, inInstructionSet);
+                    is.setLastReceivedDataPackageAt(LocalDateTime.now());
+                    for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
+                        DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
+                    }
                 }
             }
         }
