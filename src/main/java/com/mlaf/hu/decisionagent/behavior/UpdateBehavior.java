@@ -1,7 +1,7 @@
 package com.mlaf.hu.decisionagent.behavior;
 
 import com.mlaf.hu.decisionagent.DecisionAgent;
-import com.mlaf.hu.decisionagent.InstructionSet;
+import com.mlaf.hu.models.InstructionSet;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;

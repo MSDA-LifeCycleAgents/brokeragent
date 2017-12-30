@@ -1,16 +1,8 @@
-package com.mlaf.hu.decisionagent;
-
-import com.mlaf.hu.decisionagent.representationmodels.Fallback;
-import com.mlaf.hu.decisionagent.representationmodels.Messaging;
-import com.mlaf.hu.decisionagent.representationmodels.Sensor;
-import com.mlaf.hu.decisionagent.representationmodels.Sensors;
-import org.springframework.scheduling.support.CronSequenceGenerator;
+package com.mlaf.hu.models;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.TimeZone;
 
 @XmlRootElement(name = "instructions")
 public class InstructionSet {

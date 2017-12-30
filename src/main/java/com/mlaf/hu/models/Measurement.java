@@ -1,4 +1,4 @@
-package com.mlaf.hu.decisionagent.representationmodels;
+package com.mlaf.hu.models;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;

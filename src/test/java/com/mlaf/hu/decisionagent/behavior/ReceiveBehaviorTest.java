@@ -2,7 +2,7 @@ package com.mlaf.hu.decisionagent.behavior;
 
 import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
-import com.mlaf.hu.decisionagent.InstructionSet;
+import com.mlaf.hu.models.InstructionSet;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import junit.framework.TestCase;
@@ -12,8 +12,6 @@ import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import static org.junit.Assert.*;
 
 @Ignore
 public class ReceiveBehaviorTest extends TestCase {

@@ -4,7 +4,7 @@ import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.decisionagent.InstructionSet;
 import com.mlaf.hu.decisionagent.SensorReading;
-import com.mlaf.hu.decisionagent.representationmodels.Measurement;
+import com.mlaf.hu.models.Measurement;
 import com.mlaf.hu.decisionagent.representationmodels.Sensor;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;

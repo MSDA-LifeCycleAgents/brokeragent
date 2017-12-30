@@ -1,4 +1,4 @@
-package com.mlaf.hu.decisionagent.representationmodels;
+package com.mlaf.hu.models;
 
 import com.mlaf.hu.brokeragent.Topic;
 
