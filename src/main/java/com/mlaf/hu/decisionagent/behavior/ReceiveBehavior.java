@@ -2,10 +2,10 @@ package com.mlaf.hu.decisionagent.behavior;
 
 import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
-import com.mlaf.hu.decisionagent.InstructionSet;
-import com.mlaf.hu.decisionagent.SensorReading;
+import com.mlaf.hu.models.InstructionSet;
+import com.mlaf.hu.models.SensorReading;
 import com.mlaf.hu.models.Measurement;
-import com.mlaf.hu.decisionagent.representationmodels.Sensor;
+import com.mlaf.hu.models.Sensor;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
