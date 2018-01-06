@@ -1,8 +1,6 @@
 package com.mlaf.hu.models;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 
 @XmlRootElement ( name = "measurement")
@@ -11,7 +9,7 @@ public class Measurement {
     private Plans plans;
     private int min, max;
     private int value;
-    private ArrayList<Integer> readings = new ArrayList<>();
+    private ArrayList<Double> readings = new ArrayList<>();
 
     public Plans getPlans() {
         return plans;
@@ -48,11 +46,11 @@ public class Measurement {
         this.value = value;
     }
 
-    public ArrayList<Integer> getReadings() {
+    public ArrayList<Double> getReadings() {
         return readings;
     }
 
-    public void setReadings(ArrayList<Integer> readings) {
+    public void setReadings(ArrayList<Double> readings) {
         this.readings = readings;
     }
 

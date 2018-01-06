@@ -57,7 +57,7 @@ public class ReceiveBehaviorTest extends TestCase {
                 "                        <limit>3600</limit>\n" +
                 "                    </plan>\n" +
                 "                </plans>\n" +
-                "                <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n"+
+                "                <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n" +
                 "            </sensor>\n" +
                 "            <sensor id=\"HeartRate\">\n" +
                 "                <label>Heart Rate</label>\n" +
@@ -96,9 +96,10 @@ public class ReceiveBehaviorTest extends TestCase {
             }
 
             @Override
-            public void storeReading(int value) {
+            public void storeReading(double value) {
 
             }
+
         };
         this.RB = new ReceiveBehavior(this.da);
     }
@@ -117,7 +118,7 @@ public class ReceiveBehaviorTest extends TestCase {
     }
 
     @Test
-    public void testRequestFromTopic () {
+    public void testRequestFromTopic() {
         InstructionSet is = this.da.parseInstructionXml(this.instructionXML);
         ACLMessage message = this.RB.requestFromTopic(new AID("TEST", true), is);
         assert message.getPerformative() == ACLMessage.REQUEST;
@@ -125,25 +126,5 @@ public class ReceiveBehaviorTest extends TestCase {
         assert message.getContent().contains("<daysToKeepMessages>1</daysToKeepMessages>");
     }
 
-    private static Object genericInvokMethod(Object obj, String methodName,
-                                             int paramCount, Object... params) {
-        Method method;
-        Object requiredObj = null;
-        Object[] parameters = new Object[paramCount];
-        Class<?>[] classArray = new Class<?>[paramCount];
-        for (int i = 0; i < paramCount; i++) {
-            parameters[i] = params[i];
-            classArray[i] = params[i].getClass();
-        }
-        try {
-            method = obj.getClass().getDeclaredMethod(methodName, classArray);
-            method.setAccessible(true);
-            requiredObj = method.invoke(obj, params);
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return requiredObj;
-    }
 
 }

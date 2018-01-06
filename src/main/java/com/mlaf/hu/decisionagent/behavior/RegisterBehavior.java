@@ -16,13 +16,15 @@ public class RegisterBehavior extends CyclicBehaviour{
     @Override
     public void action() {
         ACLMessage message = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE));
-        InstructionSet is  = DA.parseInstructionXml(message.getContent());
-        DA.registerSensorAgent(message.getSender(), is);
-        String responseContent = is.testIntegrity();
-        int performative = is.isNotInteger() ? ACLMessage.DISCONFIRM : ACLMessage.CONFIRM;
-        ACLMessage response = new ACLMessage(performative);
-        response.setContent(responseContent);
-        DA.send(response);
+        if (message != null) {
+            InstructionSet is = DA.parseInstructionXml(message.getContent());
+            DA.registerSensorAgent(message.getSender(), is);
+            String responseContent = is.testIntegrity();
+            int performative = is.isNotInteger() ? ACLMessage.DISCONFIRM : ACLMessage.CONFIRM;
+            ACLMessage response = new ACLMessage(performative);
+            response.setContent(responseContent);
+            DA.send(response);
+        }
     }
 
 

@@ -25,8 +25,10 @@ public class UpdateBehavior extends CyclicBehaviour {
             }
         }
         ACLMessage message = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.PROPAGATE));
-        InstructionSet is = this.DA.sensorAgents.get(message.getSender());
-        is.setActive(true);
+        if (message != null) {
+            InstructionSet is = this.DA.sensorAgents.get(message.getSender());
+            is.setActive(true);
+        }
 
     }
 }

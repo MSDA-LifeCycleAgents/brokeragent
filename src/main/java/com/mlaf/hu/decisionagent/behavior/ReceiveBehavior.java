@@ -33,10 +33,14 @@ public class ReceiveBehavior extends CyclicBehaviour {
     @Override
     public void action() {
         ACLMessage directMessage = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-        directMessaging(directMessage);
+        if (directMessage != null) {
+            directMessaging(directMessage); // FIXME should it also respond with if it was understood or not?
+        }
         topicMessaging();
         ACLMessage isSubscribed = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM));
-        topicIsSubscribed(isSubscribed);
+        if (isSubscribed != null) {
+            topicIsSubscribed(isSubscribed);
+        }
     }
 
     private void topicIsSubscribed(ACLMessage isSubscribed) {
@@ -54,7 +58,6 @@ public class ReceiveBehavior extends CyclicBehaviour {
         for (Sensor inReading : sr.getSensors().getSensors()) {
             for (Sensor inInstructionSet : is.getSensors().getSensors()) {
                 if (inReading.getId().equals(inInstructionSet.getId())) {
-                    is.setLastReceivedDataPackageAt(LocalDateTime.now());
                     for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
                         DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
                     }

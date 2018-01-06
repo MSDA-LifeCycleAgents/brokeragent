@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import com.mlaf.hu.helpers.Configuration;
 import com.mlaf.hu.helpers.XmlParser;
+import jade.lang.acl.MessageTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -34,22 +35,22 @@ public class SlackAgent extends Agent{
             new CyclicBehaviour(){
                 @Override
                 public void action(){ 
-                    ACLMessage aclMessage = receive();
-                    if(aclMessage != null && aclMessage.getPerformative() == ACLMessage.REQUEST){
+                    ACLMessage aclMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+                    if (aclMessage != null) {
                         String content = aclMessage.getContent();
-                        
+
                         try {
                             Document xml = XmlParser.loadXMLFromString(content);
                             Element root = xml.getDocumentElement();
-                            
+
                             String message = XmlParser.getString("content", root);
                             String channel = XmlParser.getString("channel", root);
-                            
-                            if(message != null)
+
+                            if (message != null)
                                 sendMessage(message, channel);
                             else
                                 logger.log(Level.WARNING, "Failed to send message: invalid request");
-                            
+
                         } catch (ParserConfigurationException | SAXException | IOException ex) {
                             logger.log(Level.WARNING, "Failed to parse message: {0}", ex.getMessage());
                         }

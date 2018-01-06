@@ -23,6 +23,7 @@
                     <plans>
                         <plan>
                             <below>0.6</below>
+                            <above>0.6</above>
                             <message>Watch out!</message>
                             <via>ScreenAgent</via>
                             <to></to>
@@ -30,6 +31,7 @@
                         </plan>
                         <plan>
                             <below>0.4</below>
+                            <above>0.4</above>
                             <message>Panic!</message>
                             <via>MailAgent</via>
                             <to>brian.vanderbijl@hu.nl</to>

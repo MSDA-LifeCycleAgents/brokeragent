@@ -17,9 +17,7 @@ public class DecisionAgentTest {
     public void setUp() throws Exception {
         this.instructionXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
                 "<instructions>\n" +
-                "    <identiefer>\n" +
-                "        fVTz7OCaD8WFJE5Jvw7K\n" +
-                "    </identiefer>\n" +
+                "    <identifier>fVTz7OCaD8WFJE5Jvw7K</identifier>\n" +
                 "    <messaging>\n" +
                 "        <topic>\n" +
                 "            <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
@@ -129,9 +127,10 @@ public class DecisionAgentTest {
             }
 
             @Override
-            public void storeReading(int value) {
+            public void storeReading(double value) {
 
             }
+
         };
     }
 

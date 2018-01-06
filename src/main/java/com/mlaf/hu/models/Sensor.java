@@ -3,8 +3,8 @@ package com.mlaf.hu.models;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 
-@XmlRootElement ( name = "sensor")
-public class Sensor{
+@XmlRootElement(name = "sensor")
+public class Sensor {
     private String id;
     private String label;
     private int intervalInSeconds;
@@ -29,7 +29,7 @@ public class Sensor{
         this.label = label;
     }
 
-    @XmlElement (name = "intervalinseconds")
+    @XmlElement(name = "intervalinseconds")
     public int getIntervalInSeconds() {
         return intervalInSeconds;
     }
@@ -49,5 +49,9 @@ public class Sensor{
 
     public Measurements getMeasurements() {
         return measurements;
+    }
+
+    public void setMeasurements(Measurements measurements) {
+        this.measurements = measurements;
     }
 }

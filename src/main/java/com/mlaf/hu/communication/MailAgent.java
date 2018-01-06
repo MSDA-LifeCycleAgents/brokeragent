@@ -23,6 +23,7 @@ import javax.mail.PasswordAuthentication;
 import javax.xml.parsers.ParserConfigurationException;
 import com.mlaf.hu.helpers.Configuration;
 import com.mlaf.hu.helpers.XmlParser;
+import jade.lang.acl.MessageTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -40,23 +41,23 @@ public class MailAgent extends Agent{
             new CyclicBehaviour(){
                 @Override
                 public void action(){ 
-                    ACLMessage aclMessage = receive();
-                    if(aclMessage != null && aclMessage.getPerformative() == ACLMessage.REQUEST){
+                    ACLMessage aclMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+                    if (aclMessage != null) {
                         String content = aclMessage.getContent();
-                        
+
                         try {
                             Document xml = XmlParser.loadXMLFromString(content);
                             Element root = xml.getDocumentElement();
-                            
+
                             String message = XmlParser.getString("content", root);
                             String subject = XmlParser.getString("subject", root);
                             String to = XmlParser.getString("to", root);
-                            
-                            if(message != null && to != null)
+
+                            if (message != null && to != null)
                                 sendMail(message, subject, to);
                             else
                                 logger.log(Level.WARNING, "Failed to send message: invalid request");
-                            
+
                         } catch (ParserConfigurationException | SAXException | IOException ex) {
                             logger.log(Level.WARNING, "Failed to parse message: {0}", ex.getMessage());
                         }
