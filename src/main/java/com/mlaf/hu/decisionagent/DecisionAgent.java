@@ -3,21 +3,15 @@ package com.mlaf.hu.decisionagent;
 import com.mlaf.hu.decisionagent.behavior.ReceiveBehavior;
 import com.mlaf.hu.decisionagent.behavior.RegisterBehavior;
 import com.mlaf.hu.decisionagent.behavior.UpdateBehavior;
+import com.mlaf.hu.helpers.JadeServices;
 import com.mlaf.hu.models.*;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
-import jade.domain.FIPANames;
 import jade.util.Logger;
 
 import javax.xml.bind.JAXB;
 import java.io.StringReader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,30 +29,13 @@ public abstract class DecisionAgent extends Agent {
     @Override
     protected void setup() {
         try {
-            registerAsService();
+            JadeServices.registerAsService(SERVICE_NAME, "decision-agent", null, null, this);
             addBehaviour(new RegisterBehavior(this));
             addBehaviour(new ReceiveBehavior(this));
             addBehaviour(new UpdateBehavior(this));
         } catch (Exception e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
-        }
-    }
-
-    private void registerAsService() {
-        try {
-            DFAgentDescription dfd = new DFAgentDescription();
-            dfd.setName(this.getAID());
-            ServiceDescription sd = new ServiceDescription();
-            sd.setName(SERVICE_NAME);
-            sd.setType("decision-agent");
-            sd.addOntologies("decision-agent-ontology");
-            sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-            dfd.addServices(sd);
-            DFService.register(this, dfd);
-            decisionAgentLogger.log(Logger.INFO, "Registered the Decision Agent as a service to the DF.");
-        } catch (FIPAException e) {
-            decisionAgentLogger.log(Logger.SEVERE, () -> String.format("Registering as service failed: %s", e.getMessage()));
         }
     }
 
@@ -120,35 +97,6 @@ public abstract class DecisionAgent extends Agent {
         }
     }
 
-    public void executePlan(Plan plan) {
-        Class communcationHelper = null;
-        try {
-            communcationHelper = Class.forName(String.format("communication.%s", plan.getVia()));
-            Object invoker = (Object) communcationHelper.newInstance();
-            Void send = (Void) genericInvokMethod(invoker, "send", 2, plan.getMessage(), plan.getTo());
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-    }
+    public abstract void executePlan(Plan plan);
 
-    private static Object genericInvokMethod(Object obj, String methodName,
-                                             int paramCount, Object... params) {
-        Method method;
-        Object requiredObj = null;
-        Object[] parameters = new Object[paramCount];
-        Class<?>[] classArray = new Class<?>[paramCount];
-        for (int i = 0; i < paramCount; i++) {
-            parameters[i] = params[i];
-            classArray[i] = params[i].getClass();
-        }
-        try {
-            method = obj.getClass().getDeclaredMethod(methodName, classArray);
-            method.setAccessible(true);
-            requiredObj = method.invoke(obj, params);
-        } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        return requiredObj;
-    }
 }

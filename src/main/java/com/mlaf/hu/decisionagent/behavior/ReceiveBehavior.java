@@ -2,23 +2,18 @@ package com.mlaf.hu.decisionagent.behavior;
 
 import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
+import com.mlaf.hu.helpers.JadeServices;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.SensorReading;
 import com.mlaf.hu.models.Measurement;
 import com.mlaf.hu.models.Sensor;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.util.Logger;
 
 import javax.xml.bind.JAXB;
 import java.io.StringWriter;
-import java.time.LocalDateTime;
 
 
 public class ReceiveBehavior extends CyclicBehaviour {
@@ -27,7 +22,7 @@ public class ReceiveBehavior extends CyclicBehaviour {
 
     public ReceiveBehavior(DecisionAgent da) {
         DA = da;
-        this.brokeragent = getService();
+        this.brokeragent = JadeServices.getService("message-broker", this.DA);
     }
 
     @Override
@@ -76,26 +71,6 @@ public class ReceiveBehavior extends CyclicBehaviour {
                 }
             }
         }
-    }
-
-    private AID getService() { //FIXME nullpointer exception because DA.getDefaultDF() returns null. Why?
-        DFAgentDescription dfd = new DFAgentDescription();
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("message-broker");
-        dfd.addServices(sd);
-        try {
-            DFAgentDescription[] result = DFService.search(DA, dfd);
-            if (result.length > 0)
-                return result[0].getName();
-            else {
-                DecisionAgent.decisionAgentLogger.log(Logger.SEVERE,
-                        "The Broker Agent needs to be running in order to retrieve the service. \n" +
-                        "Start the Broker Agent and restart the Decision Agent");
-            }
-        } catch (FIPAException fe) {
-            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, () -> String.format("Something went wrong trying to find the Broker Agent Service: %s", fe.getMessage()));
-        }
-        return null;
     }
 
     private ACLMessage subscribeToTopic(AID service, InstructionSet is) {

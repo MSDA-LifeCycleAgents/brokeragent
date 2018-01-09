@@ -5,10 +5,11 @@
  */
 package com.mlaf.hu.communication;
 
+import com.mlaf.hu.helpers.JadeServices;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import java.io.IOException;
+
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,13 +21,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
-import javax.xml.parsers.ParserConfigurationException;
+
 import com.mlaf.hu.helpers.Configuration;
-import com.mlaf.hu.helpers.XmlParser;
 import jade.lang.acl.MessageTemplate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -37,37 +34,27 @@ public class MailAgent extends Agent{
     
     @Override
     public void setup(){
+        JadeServices.registerAsService("MailAgent", "MailAgent", null, null, this);
         addBehaviour(
             new CyclicBehaviour(){
                 @Override
                 public void action(){ 
                     ACLMessage aclMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
                     if (aclMessage != null) {
-                        String content = aclMessage.getContent();
-
-                        try {
-                            Document xml = XmlParser.loadXMLFromString(content);
-                            Element root = xml.getDocumentElement();
-
-                            String message = XmlParser.getString("content", root);
-                            String subject = XmlParser.getString("subject", root);
-                            String to = XmlParser.getString("to", root);
-
-                            if (message != null && to != null)
-                                sendMail(message, subject, to);
-                            else
-                                logger.log(Level.WARNING, "Failed to send message: invalid request");
-
-                        } catch (ParserConfigurationException | SAXException | IOException ex) {
-                            logger.log(Level.WARNING, "Failed to parse message: {0}", ex.getMessage());
-                        }
+                        String message = aclMessage.getContent();
+                        String to = aclMessage.getUserDefinedParameter("to");
+                        if (message != null && to != null)
+                                sendMail(message, to);
+                        else
+                            logger.log(Level.WARNING, "Failed to send message: invalid request");
                     }
                 }
             }
         );
     }
-    
-    private void sendMail(String message, String subject, String to){
+
+
+    private void sendMail(String message, String to){
         Configuration config = Configuration.getInstance();
         String host = config.getProperty("mail.host");
         String from = config.getProperty("mail.from");
@@ -79,12 +66,11 @@ public class MailAgent extends Agent{
             return;
         }
         
-        if(subject == null)
-            subject = config.getProperty("mail.default_subject");
+        String subject = config.getProperty("mail.default_subject");
         
         Properties sysProps = System.getProperties();
         sysProps.setProperty("mail.smtp.auth", "true");
-	sysProps.setProperty("mail.smtp.starttls.enable", "true");
+	    sysProps.setProperty("mail.smtp.starttls.enable", "true");
         sysProps.setProperty("mail.smtp.host", host);
         sysProps.setProperty("mail.smtp.port", port);
         

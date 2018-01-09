@@ -20,7 +20,7 @@ public class UpdateBehavior extends CyclicBehaviour {
     @Override
     public void action() {
         for (InstructionSet localInstructionSet : this.DA.sensorAgents.values()) {
-            if (ChronoUnit.SECONDS.between(localInstructionSet.getLastReceivedDataPackageAt(), LocalDateTime.now()) / localInstructionSet.getHighestIntervalFromSensors() == localInstructionSet.getAmountOfMissedDataPackages()) {
+            if (ChronoUnit.SECONDS.between(localInstructionSet.getLastReceivedDataPackageAt(), LocalDateTime.now()) / localInstructionSet.getHighestIntervalFromSensors() >= localInstructionSet.getAmountOfMissedDataPackages()) {
                 localInstructionSet.setActive(false);
             }
         }

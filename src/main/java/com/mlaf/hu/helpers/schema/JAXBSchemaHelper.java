@@ -1,4 +1,4 @@
-package com.mlaf.hu.helpers;
+package com.mlaf.hu.helpers.schema;
 
 import com.mlaf.hu.models.InstructionSet;
 
