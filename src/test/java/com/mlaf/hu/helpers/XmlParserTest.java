@@ -1,18 +1,16 @@
-package com.mlaf.hu.decisionagent;
+package com.mlaf.hu.helpers;
 
-import com.mlaf.hu.models.InstructionSet;
-import com.mlaf.hu.models.Plan;
+import com.mlaf.hu.helpers.exceptions.RelevantException;
+import com.mlaf.hu.models.Sensor;
 import com.mlaf.hu.models.SensorReading;
-import jade.core.AID;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DecisionAgentTest {
-    private String instructionXML;
-    private String sensorReadingXML;
-    private DecisionAgent da;
+import static org.junit.Assert.*;
 
+public class XmlParserTest {
+    XmlParser helper;
+    String instructionXML, sensorReadingXML;
 
     @Before
     public void setUp() throws Exception {
@@ -114,49 +112,39 @@ public class DecisionAgentTest {
                                 "<sensorreading>\n" +
                                 "\t<sensors>\n" +
                                 "\t\t<sensor id=\"HeartRate\">\n" +
-                                "\t\t\t<value>133</value>\n" +
+                                "\t\t\t<measurements>\n" +
+                                "\t\t\t\t<measurement id=\"x\">\n" +
+                                "\t\t\t\t\t<value>133</value>\n" +
+                                "\t\t\t\t</measurement>\n" +
+                                "\t\t\t\t<measurement id=\"y\">\n" +
+                                "\t\t\t\t\t<value>122</value>\n" +
+                                "\t\t\t\t</measurement>\n" +
+                                "\t\t\t</measurements>\n" +
                                 "\t\t</sensor>\n" +
                                 "\t\t<sensor id=\"SystolicBloodPressure\">\n" +
-                                "\t\t\t<value>113</value>\n" +
+                                "\t\t\t<measurements>\n" +
+                                "\t\t\t\t<measurement id=\"henk\">\n" +
+                                "\t\t\t\t\t<value>113</value>\n" +
+                                "\t\t\t\t</measurement>\n" +
+                                "\t\t\t</measurements>\n" +
                                 "\t\t</sensor>\n" +
-                                "\t</sensors>\n" +
+                                "\t</sensors> \n" +
                                 "</sensorreading>";
-        this.da = new DecisionAgent() {
-            @Override
-            public void unregisterSensorAgent(AID sensoragent) {
-
-            }
-
-            @Override
-            public void storeReading(double value) {
-
-            }
-
-            @Override
-            public void executePlan(Plan plan) {
-
-            }
-
-        };
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test
-    public void parseInstructionXml() {
-        assert this.instructionXML != null;
-        InstructionSet is = this.da.parseInstructionXml(this.instructionXML);
-        assert is.getIdentifier().equals("fVTz7OCaD8WFJE5Jvw7K");
-        assert is.getSensors().getSensors().get(1).getLabel().equals("Heart Rate");
-        assert is.getSensors().getSensors().get(0).getMeasurements().getMeasurements().get(0).getPlans().getPlans().get(1).getVia().equals("MailAgent");
+    public void unparse() {
+        SensorReading sr = null;
+        try {
+            sr = (SensorReading) XmlParser.unparse(SensorReading.class, this.sensorReadingXML);
+        } catch (RelevantException e) {
+            e.printStackTrace();
+        }
+        assert sr != null;
+
     }
 
     @Test
-    public void parseSensorReadingXml() {
-        assert this.sensorReadingXML != null;
-        SensorReading sr = this.da.parseSensorReadingXml(this.sensorReadingXML);
-        assert sr.getSensors().getSensors().get(0).getId().equals("HeartRate");
+    public void parse() {
     }
 }
