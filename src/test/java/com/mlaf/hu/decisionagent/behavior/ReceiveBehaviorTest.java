@@ -3,7 +3,6 @@ package com.mlaf.hu.decisionagent.behavior;
 import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.models.InstructionSet;
-import com.mlaf.hu.models.Plan;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import junit.framework.TestCase;
@@ -11,7 +10,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-<<<<<<< HEAD:src/test/java/com/mlaf/hu/decisionagent/behavior/ReceiveBehaviorTest.java
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -21,18 +19,6 @@ public class ReceiveBehaviorTest extends TestCase {
     private Topic topic;
     private DecisionAgent da;
     private String instructionXML;
-=======
-public class DummySensorAgent extends SensorAgent {
-    public DummySensorAgent() {
-        super(1000);
-        Sensor dummy1 = new DummySensor("1");
-        Sensor dummy2 = new DummySensor("2");
-        dummy1.activate();
-        addSensor(dummy1);
-        dummy2.activate();
-        addSensor(dummy2);
-    }
->>>>>>> develop:src/main/java/com/mlaf/hu/dummysensoragent/DummySensorAgent.java
 
     @Before
     public void setUp() throws Exception {
@@ -111,11 +97,6 @@ public class DummySensorAgent extends SensorAgent {
 
             @Override
             public void storeReading(double value) {
-
-            }
-
-            @Override
-            public void executePlan(Plan plan) {
 
             }
 
