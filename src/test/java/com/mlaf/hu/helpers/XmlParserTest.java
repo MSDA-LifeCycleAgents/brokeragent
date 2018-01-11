@@ -1,12 +1,9 @@
 package com.mlaf.hu.helpers;
 
-import com.mlaf.hu.helpers.exceptions.RelevantException;
-import com.mlaf.hu.models.Sensor;
+import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.SensorReading;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class XmlParserTest {
     XmlParser helper;
@@ -136,8 +133,8 @@ public class XmlParserTest {
     public void unparse() {
         SensorReading sr = null;
         try {
-            sr = (SensorReading) XmlParser.unparse(SensorReading.class, this.sensorReadingXML);
-        } catch (RelevantException e) {
+            sr = XmlParser.parseToObject(SensorReading.class, this.sensorReadingXML);
+        } catch (ParseException e) {
             e.printStackTrace();
         }
         assert sr != null;

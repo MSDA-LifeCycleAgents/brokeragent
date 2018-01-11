@@ -9,7 +9,7 @@ import jade.lang.acl.ACLMessage;
 public class ImplementationExampleDecisionAgent extends DecisionAgent {
 
     @Override
-    public void unregisterSensorAgent(AID sensoragent) {
+    public void unregisterSensorAgentCallback(AID sensoragent) {
 
     }
 
@@ -19,12 +19,8 @@ public class ImplementationExampleDecisionAgent extends DecisionAgent {
     }
 
     @Override
-    public void executePlan(Plan plan) {
-        ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent(plan.getMessage());
-        message.addReceiver(JadeServices.getService(plan.getVia(), this));
-        message.addUserDefinedParameter("to", plan.getTo());
-        this.send(message);
+    public void executePlanCallback(Plan plan) {
+
     }
 
 }

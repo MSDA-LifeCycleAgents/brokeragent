@@ -1,5 +1,6 @@
 package com.mlaf.hu.decisionagent;
 
+import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.Plan;
 import com.mlaf.hu.models.SensorReading;
@@ -122,8 +123,9 @@ public class DecisionAgentTest {
                                 "\t</sensors>\n" +
                                 "</sensorreading>";
         this.da = new DecisionAgent() {
+
             @Override
-            public void unregisterSensorAgent(AID sensoragent) {
+            public void unregisterSensorAgentCallback(AID sensoragent) {
 
             }
 
@@ -132,8 +134,9 @@ public class DecisionAgentTest {
 
             }
 
+
             @Override
-            public void executePlan(Plan plan) {
+            public void executePlanCallback(Plan plan) {
 
             }
 
@@ -145,7 +148,7 @@ public class DecisionAgentTest {
     }
 
     @Test
-    public void parseInstructionXml() {
+    public void parseInstructionXml() throws ParseException {
         assert this.instructionXML != null;
         InstructionSet is = this.da.parseInstructionXml(this.instructionXML);
         assert is.getIdentifier().equals("fVTz7OCaD8WFJE5Jvw7K");
@@ -154,7 +157,7 @@ public class DecisionAgentTest {
     }
 
     @Test
-    public void parseSensorReadingXml() {
+    public void parseSensorReadingXml() throws ParseException {
         assert this.sensorReadingXML != null;
         SensorReading sr = this.da.parseSensorReadingXml(this.sensorReadingXML);
         assert sr.getSensors().getSensors().get(0).getId().equals("HeartRate");

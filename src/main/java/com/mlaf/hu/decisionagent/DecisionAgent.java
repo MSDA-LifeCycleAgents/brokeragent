@@ -1,19 +1,20 @@
 package com.mlaf.hu.decisionagent;
 
-import com.mlaf.hu.decisionagent.behavior.ReceiveBehavior;
-import com.mlaf.hu.decisionagent.behavior.RegisterBehavior;
-import com.mlaf.hu.decisionagent.behavior.UpdateBehavior;
+import com.mlaf.hu.decisionagent.behaviour.ReceiveBehaviour;
+import com.mlaf.hu.decisionagent.behaviour.RegisterSensorAgentBehaviour;
+import com.mlaf.hu.decisionagent.behaviour.UpdateStatusSensorAgentBehaviour;
 import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.XmlParser;
+import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.*;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
+import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
-import javax.xml.bind.JAXB;
-import java.io.StringReader;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class DecisionAgent extends Agent {
@@ -21,6 +22,7 @@ public abstract class DecisionAgent extends Agent {
     private static final int MAX_READINGS = 100;
     public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
     public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
+    private AID brokerService;
 
     public DecisionAgent() {
         super();
@@ -30,9 +32,9 @@ public abstract class DecisionAgent extends Agent {
     protected void setup() {
         try {
             JadeServices.registerAsService(SERVICE_NAME, "decision-agent", null, null, this);
-            addBehaviour(new RegisterBehavior(this));
-            addBehaviour(new ReceiveBehavior(this));
-            addBehaviour(new UpdateBehavior(this));
+            addBehaviour(new RegisterSensorAgentBehaviour(this));
+            addBehaviour(new ReceiveBehaviour(this));
+            addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
         } catch (Exception e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
@@ -50,37 +52,27 @@ public abstract class DecisionAgent extends Agent {
         this.sensorAgents.put(sensoragent, instructionset);
     }
 
-    public abstract void unregisterSensorAgent(AID sensoragent);
-
-    public InstructionSet parseInstructionXml(String xml) {
-        InstructionSet is = new InstructionSet();
-        try {
-            is = JAXB.unmarshal(new StringReader(xml), InstructionSet.class);
-        } catch (Exception e) {
-            decisionAgentLogger.log(Logger.SEVERE, String.format("Error parsing XML: %s", e.getMessage()));
-        }
-        return is;
+    public void unregisterSensorAgent(AID sensoragent) {
+        this.sensorAgents.remove(sensoragent);
+        unregisterSensorAgentCallback(sensoragent);
     }
 
-    public SensorReading parseSensorReadingXml(String xml) {
-        SensorReading sr = new SensorReading();
-        try {
-            sr = JAXB.unmarshal(new StringReader(xml), SensorReading.class);
-        } catch (Exception e) {
-            decisionAgentLogger.log(Logger.SEVERE, String.format("Error parsing XML: %s", e.getMessage()));
-        }
-        return sr;
+    public abstract void unregisterSensorAgentCallback(AID sensoragent);
+
+    public InstructionSet parseInstructionXml(String xml) throws ParseException {
+        return XmlParser.parseToObject(InstructionSet.class, xml);
+    }
+
+    public SensorReading parseSensorReadingXml(String xml) throws ParseException {
+        return XmlParser.parseToObject(SensorReading.class, xml);
     }
 
     public void handleSensorReading(double value, InstructionSet is, Sensor sensor, String measurementId) {
         try {
             Measurement measurement = sensor.getMeasurements().getMeasurement(measurementId);
-            ArrayList<Double> readings = measurement.getReadings();
+            CircularFifoQueue<Double> readings = measurement.getReadings();
             readings.add(value);
             is.setLastReceivedDataPackageAt(LocalDateTime.now());
-            if (readings.size() > MAX_READINGS) {
-                readings.remove(readings.size() - 1);
-            }
         } catch (NullPointerException npe) {
             decisionAgentLogger.log(Logger.SEVERE, String.format("No measurement found by that ID: %s", measurementId));
         }
@@ -97,6 +89,15 @@ public abstract class DecisionAgent extends Agent {
         }
     }
 
-    public abstract void executePlan(Plan plan);
+    private void executePlan(Plan plan) {
+        ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+        message.setContent(plan.getMessage());
+        message.addReceiver(JadeServices.getService(plan.getVia(), this));
+        message.addUserDefinedParameter("to", plan.getTo());
+        this.send(message);
+        executePlanCallback(plan);
+    }
+
+    public abstract void executePlanCallback(Plan plan);
 
 }

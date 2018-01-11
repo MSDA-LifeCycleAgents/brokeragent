@@ -1,4 +1,4 @@
-package com.mlaf.hu.brokeragent.behavior;
+package com.mlaf.hu.brokeragent.behaviour;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
 import com.mlaf.hu.brokeragent.Message;
@@ -11,10 +11,10 @@ import jade.lang.acl.MessageTemplate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-public class ReceiveBehavior extends CyclicBehaviour {
+public class ReceiveBehaviour extends CyclicBehaviour {
     private final BrokerAgent brokerAgent;
 
-    public ReceiveBehavior(BrokerAgent broke) {
+    public ReceiveBehaviour(BrokerAgent broke) {
         this.brokerAgent = broke;
     }
 

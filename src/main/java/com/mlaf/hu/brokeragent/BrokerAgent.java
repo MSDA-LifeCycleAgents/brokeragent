@@ -1,33 +1,21 @@
 package com.mlaf.hu.brokeragent;
 
-import com.mlaf.hu.brokeragent.behavior.ReceiveBehavior;
-import com.mlaf.hu.brokeragent.behavior.SaveBehavior;
-import com.mlaf.hu.brokeragent.behavior.SendBehavior;
+import com.mlaf.hu.brokeragent.behaviour.ReceiveBehaviour;
+import com.mlaf.hu.brokeragent.behaviour.SaveBehaviour;
+import com.mlaf.hu.brokeragent.behaviour.SendBehaviour;
 import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
+import com.mlaf.hu.helpers.JadeServices;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import sun.rmi.runtime.Log;
 
 import javax.xml.bind.JAXB;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,50 +32,39 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     protected void setup() {
         try {
             boolean succes = createDirectoryStructure();
-            registerAsServiceToDF();
+            JadeServices.registerAsService(SERVICE_NAME, "message-broker", "message-broker-ontology", FIPANames.ContentLanguage.FIPA_SL, this);
             topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
             if (succes) {
                 loadTopics();
-                addBehaviour(new SaveBehavior(this));
+                addBehaviour(new SaveBehaviour(this));
             }
-            addBehaviour(new SendBehavior(this, topicHelper));
-            addBehaviour(new ReceiveBehavior(this));
+            addBehaviour(new SendBehaviour(this, topicHelper));
+            addBehaviour(new ReceiveBehaviour(this));
         } catch (Exception e) {
             brokerAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
         }
     }
 
-    private void registerAsServiceToDF() {
+    protected void takeDown() {
         try {
-            DFAgentDescription dfd = new DFAgentDescription();
-            dfd.setName(this.getAID());
-            ServiceDescription sd = new ServiceDescription();
-            sd.setName(SERVICE_NAME);
-            sd.setType("message-broker");
-            sd.addOntologies("message-broker-ontology");
-            sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-            dfd.addServices(sd);
-            DFService.register(this, dfd);
-            brokerAgentLogger.log(Logger.INFO, ("Registered the BrokerAgent as a service to the DF."));
-        } catch (FIPAException e) {
-            e.printStackTrace();
+            DFService.deregister(this);
+        } catch (Exception ignore) {
         }
     }
 
-    private Topic addNewTopicToBuffer(AID topicAID, int daysToKeepMessages) {
-        Topic topic = new Topic(topicAID, daysToKeepMessages);
-        this.topics.put(topicAID, topic);
-        brokerAgentLogger.log(Logger.FINE, String.format("New topic added: %s, daysToKeepMessages: %s", topic.getTopicName(), topic.getDaysToKeepMessages()));
-        return topic;
+    private Topic addNewTopicToBuffer(Topic representationTopic) {
+        this.topics.put(representationTopic.getJadeTopic(), representationTopic);
+        brokerAgentLogger.log(Logger.FINE, String.format("New topic added: %s, daysToKeepMessages: %s", representationTopic.getTopicName(), representationTopic.getDaysToKeepMessages()));
+        return representationTopic;
     }
 
-    private Topic registerTopic(AID topic, int daysToKeepMessages, TopicManagementHelper helper) {
+    private Topic registerTopic(Topic representationTopic, TopicManagementHelper helper) {
         try {
-            helper.register(topic);
-            return this.addNewTopicToBuffer(topic, daysToKeepMessages);
+            helper.register(representationTopic.getJadeTopic());
+            return this.addNewTopicToBuffer(representationTopic);
         } catch (Exception e) {
-            brokerAgentLogger.log(Logger.SEVERE, String.format("Broker %s: ERROR registering to topic %s", this.getLocalName(), topic), e);
+            brokerAgentLogger.log(Logger.SEVERE, String.format("Broker %s: ERROR registering to topic %s", this.getLocalName(), representationTopic.getTopicName()), e);
             return null;
         }
     }
@@ -128,11 +105,12 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
             topic = this.getTopicByAID(topicAID);
         } catch (InvallidTopicException | TopicNotManagedException e) {
             brokerAgentLogger.log(Logger.INFO, String.format("Topic: %s does not exist yet. Creating topic and registering topic...", representationTopic.getTopicName()));
-            topic = this.registerTopic(topicAID, representationTopic.getDaysToKeepMessages(), helper);
+            representationTopic.setJadeTopic(topicAID);
+            topic = this.registerTopic(representationTopic, helper);
         }
         if (topic != null) {
             topic.addToSubscribers(subscriber);
-            message.setContent(String.format("Subscribed to the Topic %s", topic.getTopicName()));
+            message.setContent(String.format("Subscribed to the Topic: %s", topic.getTopicName()));
             message.addUserDefinedParameter("name", topic.getTopicName());
         } else {
             message.setContent("Something went wrong while subscribing. See JADE logs.");

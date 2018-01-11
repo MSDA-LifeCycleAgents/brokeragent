@@ -14,9 +14,9 @@ import java.util.List;
 @XmlRootElement( name = "Topic" )
 public class Topic implements Serializable {
     private AID jadeTopic;
-    private ArrayList<AID> subscribers;
-    private ArrayList<Message> messages;
-    private int daysToKeepMessages;
+    private ArrayList<AID> subscribers = new ArrayList<>();
+    private ArrayList<Message> messages =  new ArrayList<>();
+    private Integer daysToKeepMessages = null;
     private String topicName;
 
     public Topic() {}
@@ -34,6 +34,12 @@ public class Topic implements Serializable {
         this.subscribers = new ArrayList<>();
         this.messages = new ArrayList<>();
         this.daysToKeepMessages = dTKM;
+    }
+
+    public Topic (AID jadeTopic, int dTKM, String topicName) {
+        this.jadeTopic = jadeTopic;
+        this.daysToKeepMessages = dTKM;
+        this.topicName = topicName;
     }
 
     public List<AID> getSubscribers() {
@@ -67,6 +73,10 @@ public class Topic implements Serializable {
 
     public AID getJadeTopic() {
         return jadeTopic;
+    }
+
+    public void setJadeTopic(AID jadeTopic) {
+        this.jadeTopic = jadeTopic;
     }
 
     Message getOldestMessage() {

@@ -11,7 +11,7 @@ public class InstructionSet {
     private Sensors sensors;
     private Fallback fallback;
     private boolean active = true;
-    private boolean notInteger = false;
+    private boolean mallformed = false;
     private LocalDateTime lastReceivedDataPackageAt;
     private int amountOfMissedDataPackages = 5;
 
@@ -54,64 +54,70 @@ public class InstructionSet {
         return active;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setInActive() {
+        this.active = false;
+    }
+    public void setActive() {
+        this.active = true;
     }
 
-    public boolean isNotInteger() {
-        return this.notInteger;
+    public boolean isMallformed() {
+        return this.mallformed;
     }
 
-    public String testIntegrity() {
-        String integer = "The XML is in correct format";
+    public String checkComposition() {
         String missing = "";
         if (this.identifier == null) {
-            this.notInteger = true;
+            this.mallformed = true;
             missing += "<identifier></identifier>";
         }
         if (this.messaging.getTopic() == null && !this.messaging.isDirectToDecisionAgent()) {
-            this.notInteger = true;
+            this.mallformed = true;
             missing += "<messaging>\n" +
-                    "\t<topic>\n" +
-                    "\t\t<name></name>\n" +
-                    "\t\t<daysToKeepMessages></daysToKeepMessages>\n" +
-                    "\t</topic>\n" +
-                    "\t<directToDecisionAgent>false</directToDecisionAgent>\n" +
-                    "</messaging>";
+                        "\t<topic>\n" +
+                        "\t\t<name></name>\n" +
+                        "\t\t<daysToKeepMessages></daysToKeepMessages>\n" +
+                        "\t</topic>\n" +
+                        "\t<directToDecisionAgent>false</directToDecisionAgent>\n" +
+                        "</messaging>";
         }
         if (this.sensors.getSensors().get(0) == null) {
-            this.notInteger = true;
+            this.mallformed = true;
             missing += "<sensors>\n" +
-                    "\t<sensor id=\"\">\n" +
-                    "\t\t<label></label>\n" +
-                    "\t\t<min></min>\n" +
-                    "\t\t<max></max>\n" +
-                    "\t\t<unit></unit>\n" +
-                    "\t\t<intervalinseconds></intervalinseconds>\n" +
-                    "\t\t<plans>\n" +
-                    "\t\t\t<plan>\n" +
-                    "\t\t\t\t<below></below>\n" +
-                    "\t\t\t\t<message></message>\n" +
-                    "\t\t\t\t<via></via>\n" +
-                    "\t\t\t\t<to></to>\n" +
-                    "\t\t\t\t<limit></limit>\n" +
-                    "\t\t\t</plan>\n" +
-                    "\t\t</plans>\n" +
-                    "\t\t<amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n" +
-                    "\t</sensor>\n" +
-                    "</sensors>";
+                        "\t<sensor id=\"\">\n" +
+                        "\t\t<label></label>\n" +
+                        "\t\t<intervalinseconds></intervalinseconds>\n" +
+                        "\t\t<unit></unit>\n" +
+                        "\t\t<measurements>\n" +
+                        "\t\t\t<measurement id=\"\">\n" +
+                        "\t\t\t\t<min></min>\n" +
+                        "\t\t\t\t<max></max>\n" +
+                        "\t\t\t\t<plans>\n" +
+                        "\t\t\t\t\t<plan>\n" +
+                        "\t\t\t\t\t\t<below></below>\n" +
+                        "\t\t\t\t\t\t<above></above>\n" +
+                        "\t\t\t\t\t\t<message></message>\n" +
+                        "\t\t\t\t\t\t<via></via>\n" +
+                        "\t\t\t\t\t\t<to></to>\n" +
+                        "\t\t\t\t\t\t<limit></limit>\n" +
+                        "\t\t\t\t\t</plan>\n" +
+                        "\t\t\t\t</plans>\n" +
+                        "\t\t\t</measurement>\n" +
+                        "\t\t</measurements>\n" +
+                        "\t</sensor>\n" +
+                        "</sensors>";
         }
         if (this.fallback == null) {
-            this.notInteger = true;
+            this.mallformed = true;
             missing += "<fallback>\n" +
-                    "\t<via>ScreenAgent</via>\n" +
-                    "\t<to></to>\n" +
-                    "</fallback>\n";
+                        "\t<via>ScreenAgent</via>\n" +
+                        "\t<to></to>\n" +
+                        "</fallback>\n";
         }
-        if (notInteger) {
+        if (mallformed) {
             return String.format("XML is missing the following tag(s):\n%s", missing);
         }
-        return integer;
+        return null;
     }
 
     public LocalDateTime getLastReceivedDataPackageAt() {

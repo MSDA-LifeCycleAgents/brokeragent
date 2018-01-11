@@ -9,6 +9,8 @@ import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.util.Logger;
 
+import java.util.concurrent.TimeUnit;
+
 public class JadeServices {
     private static java.util.logging.Logger DFHelperLogger = Logger.getLogger("DFHelperLogger");
 
@@ -35,20 +37,20 @@ public class JadeServices {
         }
     }
 
-    public static AID getService(String serviceName, Agent currentAgent) { //FIXME nullpointer exception because DA.getDefaultDF() returns null. Why?
+    public static AID getService(String serviceType, Agent currentAgent) {
         DFAgentDescription dfd = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
-        sd.setType(serviceName);
+        sd.setType(serviceType);
         dfd.addServices(sd);
         try {
             DFAgentDescription[] result = DFService.search(currentAgent, dfd);
             if (result.length > 0)
                 return result[0].getName();
             else {
-                DFHelperLogger.log(Logger.SEVERE, String.format("Could not get %s as a service, is it running?", serviceName));
+                DFHelperLogger.log(Logger.SEVERE, String.format("Could not get %s as a service, is it running?", serviceType));
             }
         } catch (FIPAException fe) {
-            DFHelperLogger.log(Logger.SEVERE, () -> String.format("Something went wrong trying to find the %s Service: %s", serviceName, fe.getMessage()));
+            DFHelperLogger.log(Logger.SEVERE, () -> String.format("Something went wrong trying to find the %s Service: %s", serviceType, fe.getMessage()));
         }
         return null;
     }

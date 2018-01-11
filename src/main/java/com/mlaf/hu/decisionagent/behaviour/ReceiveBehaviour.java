@@ -1,8 +1,8 @@
-package com.mlaf.hu.decisionagent.behavior;
+package com.mlaf.hu.decisionagent.behaviour;
 
 import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.SensorReading;
 import com.mlaf.hu.models.Measurement;
@@ -11,27 +11,34 @@ import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.util.Logger;
 
 import javax.xml.bind.JAXB;
 import java.io.StringWriter;
 
+/**
+ *  This behaviour will according to the instructionset either wait to receive direct INFORM messages with it's data-package as content
+ *  or it will ask the Broker Agent to hand him another datapackage. This second option will result in the Broker Agent sending an INFORM ACLMessage with
+ *  a data-package inside, just like with handleDirectMessage. In the end all the data-packages are received by the method
+ *  handleDirectMessage.
+ */
 
-public class ReceiveBehavior extends CyclicBehaviour {
+public class ReceiveBehaviour extends CyclicBehaviour {
     private DecisionAgent DA;
-    private AID brokeragent;
+    private AID brokerAgent;
 
-    public ReceiveBehavior(DecisionAgent da) {
+    public ReceiveBehaviour(DecisionAgent da) {
         DA = da;
-        this.brokeragent = JadeServices.getService("message-broker", this.DA);
     }
 
     @Override
     public void action() {
         ACLMessage directMessage = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
         if (directMessage != null) {
-            directMessaging(directMessage); // FIXME should it also respond with if it was understood or not?
+            ACLMessage response = handleDirectMessage(directMessage);
+            this.DA.send(response);
         }
-        topicMessaging();
+        handleTopicMessaging();
         ACLMessage isSubscribed = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM));
         if (isSubscribed != null) {
             topicIsSubscribed(isSubscribed);
@@ -47,27 +54,36 @@ public class ReceiveBehavior extends CyclicBehaviour {
         }
     }
 
-    private void directMessaging(ACLMessage message) {
-        SensorReading sr = DA.parseSensorReadingXml(message.getContent());
-        InstructionSet is = DA.sensorAgents.get(message.getSender());
-        for (Sensor inReading : sr.getSensors().getSensors()) {
-            for (Sensor inInstructionSet : is.getSensors().getSensors()) {
-                if (inReading.getId().equals(inInstructionSet.getId())) {
-                    for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
-                        DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
+    private ACLMessage handleDirectMessage(ACLMessage message) {
+        ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
+        try {
+            SensorReading sr = DA.parseSensorReadingXml(message.getContent());
+            InstructionSet is = DA.sensorAgents.get(message.getSender());
+            for (Sensor inReading : sr.getSensors().getSensors()) {
+                for (Sensor inInstructionSet : is.getSensors().getSensors()) {
+                    if (inReading.getId().equals(inInstructionSet.getId())) {
+                        for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
+                            DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
+                        }
                     }
                 }
             }
+            response.setContent("Composition: ok");
+        } catch (ParseException e) {
+            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, e.getMessage());
+            response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+            response.setContent("Composition: wrong, check documentation.");
         }
+        return response;
     }
 
-    private void topicMessaging() {
+    private void handleTopicMessaging() {
         for (InstructionSet is : DA.sensorAgents.values()) {
             if (!is.getMessaging().isDirectToDecisionAgent()) {
                 if (is.getMessaging().isRegisteredToTopic()) {
-                    DA.send(requestFromTopic(this.brokeragent, is));
+                    DA.send(requestFromTopic(this.brokerAgent, is));
                 } else {
-                    DA.send(subscribeToTopic(this.brokeragent, is));
+                    DA.send(subscribeToTopic(this.brokerAgent, is));
                 }
             }
         }
@@ -83,13 +99,13 @@ public class ReceiveBehavior extends CyclicBehaviour {
 
     public ACLMessage requestFromTopic(AID service, InstructionSet is) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        Topic topic = new Topic(is.getMessaging().getTopic().getTopicName()); //FIXME shouldnt consist of daystokeep
+        Topic topic = new Topic(is.getMessaging().getTopic().getTopicName());
         message.addReceiver(service);
         message.setContent(marshalTopic(topic));
         return message;
     }
-    
-    public String marshalTopic (Topic topic) {
+
+    public String marshalTopic(Topic topic) {
         java.io.StringWriter marshalledTopic = new StringWriter();
         JAXB.marshal(topic, marshalledTopic);
         return marshalledTopic.toString();

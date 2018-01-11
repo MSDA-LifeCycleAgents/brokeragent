@@ -1,4 +1,4 @@
-package com.mlaf.hu.brokeragent.behavior;
+package com.mlaf.hu.brokeragent.behaviour;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
 import com.mlaf.hu.brokeragent.Topic;
@@ -7,11 +7,11 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
 
-public class SendBehavior extends CyclicBehaviour {
+public class SendBehaviour extends CyclicBehaviour {
     private final BrokerAgent brokerAgent;
     private final TopicManagementHelper topicHelper;
 
-    public SendBehavior(BrokerAgent broker, TopicManagementHelper topicHelper) {
+    public SendBehaviour(BrokerAgent broker, TopicManagementHelper topicHelper) {
         this.brokerAgent = broker;
         this.topicHelper = topicHelper;
     }

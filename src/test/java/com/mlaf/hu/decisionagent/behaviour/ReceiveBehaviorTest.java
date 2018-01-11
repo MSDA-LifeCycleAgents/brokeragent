@@ -1,7 +1,8 @@
-package com.mlaf.hu.decisionagent.behavior;
+package com.mlaf.hu.decisionagent.behaviour;
 
 import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
+import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.Plan;
 import jade.core.AID;
@@ -11,12 +12,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 @Ignore
 public class ReceiveBehaviorTest extends TestCase {
-    private ReceiveBehavior RB;
+    private ReceiveBehaviour RB;
     private Topic topic;
     private DecisionAgent da;
     private String instructionXML;
@@ -91,8 +89,9 @@ public class ReceiveBehaviorTest extends TestCase {
                 "        </fallback>\n" +
                 "    </instructions>\n";
         this.da = new DecisionAgent() {
+
             @Override
-            public void unregisterSensorAgent(AID sensoragent) {
+            public void unregisterSensorAgentCallback(AID sensoragent) {
 
             }
 
@@ -102,12 +101,12 @@ public class ReceiveBehaviorTest extends TestCase {
             }
 
             @Override
-            public void executePlan(Plan plan) {
+            public void executePlanCallback(Plan plan) {
 
             }
 
         };
-        this.RB = new ReceiveBehavior(this.da);
+        this.RB = new ReceiveBehaviour(this.da);
     }
 
     @Test
@@ -124,7 +123,7 @@ public class ReceiveBehaviorTest extends TestCase {
     }
 
     @Test
-    public void testRequestFromTopic() {
+    public void testRequestFromTopic() throws ParseException {
         InstructionSet is = this.da.parseInstructionXml(this.instructionXML);
         ACLMessage message = this.RB.requestFromTopic(new AID("TEST", true), is);
         assert message.getPerformative() == ACLMessage.REQUEST;

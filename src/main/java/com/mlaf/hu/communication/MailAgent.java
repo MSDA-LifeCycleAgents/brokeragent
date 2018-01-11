@@ -8,6 +8,7 @@ package com.mlaf.hu.communication;
 import com.mlaf.hu.helpers.JadeServices;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
 import jade.lang.acl.ACLMessage;
 
 import java.util.Properties;
@@ -53,6 +54,12 @@ public class MailAgent extends Agent{
         );
     }
 
+    protected void takeDown() {
+        try {
+            DFService.deregister(this);
+        } catch (Exception ignore) {
+        }
+    }
 
     private void sendMail(String message, String to){
         Configuration config = Configuration.getInstance();

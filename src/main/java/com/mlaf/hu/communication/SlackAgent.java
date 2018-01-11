@@ -11,6 +11,7 @@ import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
 import jade.lang.acl.ACLMessage;
 
 import java.io.IOException;
@@ -45,6 +46,13 @@ public class SlackAgent extends Agent {
                     }
                 }
         );
+    }
+
+    protected void takeDown() {
+        try {
+            DFService.deregister(this);
+        } catch (Exception ignore) {
+        }
     }
 
     private void sendMessage(String message, String channel) {
