@@ -1,15 +1,17 @@
 package com.mlaf.hu.models;
 
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
 
-@XmlRootElement ( name = "measurement")
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+
+
+@XmlRootElement(name = "measurement")
 public class Measurement {
     private String id;
     private Plans plans;
     private int min, max;
-    private int value;
-    private ArrayList<Double> readings = new ArrayList<>();
+    private double value;
+    private CircularFifoQueue<Double> readings = new CircularFifoQueue<>(100);
 
     public Plans getPlans() {
         return plans;
@@ -38,19 +40,19 @@ public class Measurement {
     }
 
     @XmlElement(name = "value")
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(int value) {
+    public void setValue(double value) {
         this.value = value;
     }
 
-    public ArrayList<Double> getReadings() {
+    public CircularFifoQueue<Double> getReadings() {
         return readings;
     }
 
-    public void setReadings(ArrayList<Double> readings) {
+    public void setReadings(CircularFifoQueue<Double> readings) {
         this.readings = readings;
     }
 
