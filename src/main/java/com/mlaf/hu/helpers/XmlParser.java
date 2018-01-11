@@ -5,7 +5,7 @@
  */
 package com.mlaf.hu.helpers;
 
-import com.mlaf.hu.helpers.exceptions.RelevantException;
+import com.mlaf.hu.helpers.exceptions.ParseException;
 import jade.util.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -46,24 +46,22 @@ public class XmlParser {
         return null;
     }
 
-    public static <T> T unparse(Class<T> clazz, String xml) throws RelevantException {
+    public static <T> T parseToObject(Class<T> clazz, String xml) throws ParseException {
         try {
             Object obj = JAXB.unmarshal(new StringReader(xml), clazz);
             return clazz.cast(obj);
         } catch (Exception e) {
-            XmlParserLogger.log(Logger.SEVERE, String.format("Error unparsing XML and casting it to object: %s", e.getMessage()));
-            throw new RelevantException(String.format("Error unparsing XML and casting it to object: %s", e.getMessage()));
+            throw new ParseException(String.format("Error parsing to object: %s", e.getMessage()));
         }
     }
 
-    public static String parse(Object obj, String xml) throws RelevantException {
+    public static String parseToXml(Object obj) throws ParseException {
         StringWriter marshalledObject = new StringWriter();
         try {
             JAXB.marshal(obj, marshalledObject);
             return marshalledObject.toString();
         } catch (Exception e) {
-            XmlParserLogger.log(Logger.SEVERE, String.format("Error parsing XML: %s", e.getMessage()));
-            throw new RelevantException(String.format("Error parsing XML: %s", e.getMessage()));
+            throw new ParseException(String.format("Error parsing to XML: %s", e.getMessage()));
         }
     }
 
