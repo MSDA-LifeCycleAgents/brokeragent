@@ -12,11 +12,23 @@ public class Sensors {
     @XmlElement(name = "sensor")
     private ArrayList<Sensor> sensors = null;
 
+    public Sensors() {
+        this.sensors = new ArrayList<>();
+    }
+
     public ArrayList<Sensor> getSensors() {
         return sensors;
     }
 
     public void setSensors(ArrayList<Sensor> sensors) {
         this.sensors = sensors;
+    }
+
+    public void addSensor(Sensor sensor) {
+        this.sensors.add(sensor);
+    }
+
+    public boolean isEmpty() {
+        return this.sensors.isEmpty();
     }
 }

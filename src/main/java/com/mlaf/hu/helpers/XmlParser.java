@@ -55,6 +55,7 @@ public class XmlParser {
         }
     }
 
+    //TODO(Auke) Rename
     public static String parseToXml(Object obj) throws ParseException {
         StringWriter marshalledObject = new StringWriter();
         try {

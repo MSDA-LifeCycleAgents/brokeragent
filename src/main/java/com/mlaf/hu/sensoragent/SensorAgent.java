@@ -1,5 +1,10 @@
 package com.mlaf.hu.sensoragent;
 
+import com.mlaf.hu.helpers.XmlParser;
+import com.mlaf.hu.helpers.exceptions.ParseException;
+import com.mlaf.hu.models.InstructionSet;
+import com.mlaf.hu.models.Messaging;
+import com.mlaf.hu.models.SensorReading;
 import com.mlaf.hu.sensoragent.behavior.ReadSensorsBehavior;
 import com.mlaf.hu.sensoragent.behavior.SendBufferBehavior;
 import jade.core.AID;
@@ -13,40 +18,76 @@ import jade.util.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedTransferQueue;
 import java.util.logging.Level;
 
 public abstract class SensorAgent extends Agent {
-    static java.util.logging.Logger sensorAgentLogger = Logger.getLogger("SensorAgentLogger");
+    static protected java.util.logging.Logger sensorAgentLogger = Logger.getLogger("SensorAgentLogger");
     private ArrayList<Sensor> sensors = new ArrayList<>();
-    protected ArrayList<SensorReading> sensorReadingBuffer = new ArrayList<>();
-    boolean directToDecisionAgent = true; //TODO Read this from Instruction XML Maybe use thijs code?
+    private LinkedTransferQueue<SensorReading> sensorReadingQueue = new LinkedTransferQueue<>();
+    transient InstructionSet instructionSet;
 
-    public SensorAgent(int sensorRefreshRateMs) {
-        addBehaviour(new ReadSensorsBehavior(this, sensorRefreshRateMs));
-        addBehaviour(new SendBufferBehavior(this, sensorRefreshRateMs));
-        //TODO(Auke) Instructieset on startup sturen naar DA
-        // Als DA niet aanwezig is, setinactive, ticker behavior om te kijken of de DA er weer is.
+    public SensorAgent() {
+        addBehaviour(new ReadSensorsBehavior(this));
+        addBehaviour(new SendBufferBehavior(this));
+        instructionSet = readInstructionSet();
+        registerWithDA();
     }
 
     public List<Sensor> getSensors() {
         return new ArrayList<>(sensors);
     }
 
-
-    public abstract String getInstructionXML();
-
-    public boolean addSensor(Sensor newSensor) {
-        for (Sensor s : sensors) {
-            if (s.getSensorID().equals(newSensor.getSensorID())) {
-                return false;
-            }
+    public void registerWithDA() {
+        AID decisionAgent = getDecisionAgent();
+        if (decisionAgent == null) {
+            sensorAgentLogger.log(Level.SEVERE, "Could not find DecisionAgent");
+            this.doDelete();
         }
-        sensors.add(newSensor);
-        return true;
+        ACLMessage message = new ACLMessage(ACLMessage.SUBSCRIBE);
+        message.setContent(this.getInstructionXML());
+        message.addReceiver(decisionAgent);
+        send(message);
+        //TODO Handle conversation to check wether the DA accepted it or not.
+
     }
 
-    public void addSensorReadingToSendBuffer(SensorReading sensorReading) {
-        sensorReadingBuffer.add(sensorReading);
+
+    protected abstract String getInstructionXML();
+
+    private InstructionSet readInstructionSet() {
+        try {
+            return XmlParser.parseToObject(InstructionSet.class, getInstructionXML());
+        } catch (ParseException e) {
+            sensorAgentLogger.log(Level.SEVERE, "Could not parse the provided XML Instructionset", e);
+            //TODO maybe stop the program, we have yet to decide what to do when an unrecoverable error occurs
+            return null;
+        }
+    }
+
+
+    public void addSensor(Sensor newSensor) throws InvalidSensorException{
+        for (Sensor s : sensors) {
+            if (s.getSensorID().equals(newSensor.getSensorID())) {
+                throw new InvalidSensorException("Sensor " + newSensor.getSensorID() + " is alreay registered");
+            }
+        }
+        boolean foundInInstructionset = false;
+        for (com.mlaf.hu.models.Sensor isSensor : instructionSet.getSensors().getSensors()) {
+            if (isSensor.getId().equals(newSensor.getSensorID())) {
+                foundInInstructionset = true;
+                break;
+            }
+        }
+        if (!foundInInstructionset) {
+            throw new InvalidSensorException("Sensor " + newSensor.getSensorID() + " is not found in instructionset");
+        }
+        sensors.add(newSensor);
+    }
+
+    public void addSensorReadingToSendQueue(SensorReading sensorReading) {
+        if (sensorReading.isEmpty()) { return; }
+        sensorReadingQueue.add(sensorReading);
     }
 
     public void sendSensorReadings() {
@@ -54,47 +95,52 @@ public abstract class SensorAgent extends Agent {
         if (destination == null) {
             return; // Destination is not found, maybe its offline, trying again in the future
         }
-        for (SensorReading sensorReading: sensorReadingBuffer) {
-            String readingXML = sensorReading.toXML();
-            if (readingXML == null) {
-                sensorAgentLogger.log(Level.WARNING, "XML for Sensorreading is empty, skipping");
-                continue;
-            }
-            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-            msg.addReceiver(destination);
-            msg.setLanguage("XML");
-            msg.setOntology("MLAF-Sensor-XML");
-            msg.setContent(readingXML);
-            send(msg);
+
+        SensorReading sensorReading = sensorReadingQueue.poll();
+        String readingXml = null;
+        try {
+            readingXml = XmlParser.parseToXml(sensorReading);
+        } catch (ParseException e) {
+            sensorAgentLogger.log(Level.SEVERE, "Could not marshall ");
         }
-        sensorReadingBuffer.clear();
+        if (readingXml == null) {
+            sensorAgentLogger.log(Level.SEVERE, "Got Empty XML for sensor reading");
+            return;
+        }
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(destination);
+        msg.setLanguage("XML");
+        msg.setOntology("MLAF-Sensor-XML");
+        msg.setContent(readingXml);
+        send(msg);
     }
 
     private AID getDestination() {
-        if (directToDecisionAgent) {
+        Messaging messaging = instructionSet.getMessaging();
+        if (messaging.isDirectToDecisionAgent()) {
             return getDecisionAgent();
         } else {
-            return getSensorReadingsTopic();
+            return messaging.getTopic().getJadeTopic();
         }
-
     }
 
-    private AID getSensorReadingsTopic() {
-        return null; // TODO implement function to get topic from
-    }
 
     private AID getDecisionAgent() {
         // Maybe rename to getDestination? Since sending to topic should also be possible.
+        //TODO Replace with Service Discovery
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
-        sd.setType("sensor-reading");
+        sd.setName("DECISION-AGENT");
+        sd.setType("decision-agent");
         sd.addOntologies("MLAF-Sensor-XML");
         template.addServices(sd);
         try {
             DFAgentDescription[] result = DFService.search(this, template);
-            if (result.length < 1) {
+            if (1==1) {System.out.println("Test");}
+            if (result == null || result.length < 1) {
                 return null;
             } else if (result.length > 1) {
+                sensorAgentLogger.log(Level.WARNING, "Found multiple decisionagent, only using the first one");
                 return result[0].getName();
                 //TODO What do we want to do if multiple decisionagents are found?
             } else {
