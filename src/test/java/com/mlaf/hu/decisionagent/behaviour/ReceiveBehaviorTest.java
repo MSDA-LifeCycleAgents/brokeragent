@@ -1,26 +1,31 @@
-package com.mlaf.hu.dummysensoragent;
+package com.mlaf.hu.decisionagent.behaviour;
 
-import com.mlaf.hu.sensoragent.Sensor;
-import com.mlaf.hu.sensoragent.SensorAgent;
+import com.mlaf.hu.brokeragent.Topic;
+import com.mlaf.hu.decisionagent.DecisionAgent;
+import com.mlaf.hu.helpers.exceptions.ParseException;
+import com.mlaf.hu.models.InstructionSet;
+import com.mlaf.hu.models.Plan;
+import jade.core.AID;
+import jade.lang.acl.ACLMessage;
+import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class DummySensorAgent extends SensorAgent {
-    public DummySensorAgent() {
-        super(1000);
-        Sensor dummy1 = new DummySensor("1");
-        Sensor dummy2 = new DummySensor("2");
-        dummy1.activate();
-        addSensor(dummy1);
-        dummy2.activate();
-        addSensor(dummy2);
-    }
+@Ignore
+public class ReceiveBehaviorTest extends TestCase {
+    private ReceiveBehaviour RB;
+    private Topic topic;
+    private DecisionAgent da;
+    private String instructionXML;
 
-    @Override
-    public String getInstructionXML() {
-        return "<xml>\n" +
+    @Before
+    public void setUp() throws Exception {
+        this.topic = new Topic(1);
+        this.topic.setTopicName("JADE");
+        this.instructionXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
                 "    <instructions>\n" +
-                "        <identiefer>\n" +
-                "            fVTz7OCaD8WFJE5Jvw7K\n" +
-                "        </identiefer>\n" +
+                "        <identifier>fVTz7OCaD8WFJE5Jvw7K</identifier>\n" +
                 "        <messaging>\n" +
                 "            <topic>\n" +
                 "                <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
@@ -51,9 +56,7 @@ public class DummySensorAgent extends SensorAgent {
                 "                        <limit>3600</limit>\n" +
                 "                    </plan>\n" +
                 "                </plans>\n" +
-                "                <backupMeasurements>\n" +
-                "                    <amount>20</amount>\n" +
-                "                </backupMeasurements>\n" +
+                "                <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n" +
                 "            </sensor>\n" +
                 "            <sensor id=\"HeartRate\">\n" +
                 "                <label>Heart Rate</label>\n" +
@@ -77,16 +80,56 @@ public class DummySensorAgent extends SensorAgent {
                 "                        <limit>3600</limit>\n" +
                 "                    </plan>\n" +
                 "                </plans>\n" +
-                "                <backupMeasurements>\n" +
-                "                    <amount>20</amount>\n" +
-                "                </backupMeasurements>\n" +
+                "                <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n" +
                 "            </sensor>\n" +
                 "        </sensors>\n" +
                 "        <fallback>\n" +
                 "            <via>ScreenAgent</via>\n" +
                 "            <to></to>\n" +
                 "        </fallback>\n" +
-                "    </instructions>\n" +
-                "</xml>";
+                "    </instructions>\n";
+        this.da = new DecisionAgent() {
+
+            @Override
+            public void unregisterSensorAgentCallback(AID sensoragent) {
+
+            }
+
+            @Override
+            public void storeReading(double value) {
+
+            }
+
+            @Override
+            public void executePlanCallback(Plan plan) {
+
+            }
+
+        };
+        this.RB = new ReceiveBehaviour(this.da);
     }
+
+    @Test
+    public void testTopicMarshalling() {
+        assert this.RB != null;
+        assert this.topic != null;
+        assert this.topic.getTopicName() != null;
+        assert this.topic.getDaysToKeepMessages() > 0;
+        String topicXML = this.RB.marshalTopic(this.topic);
+        assert topicXML.startsWith("<?xml");
+        assert topicXML.contains("<daysToKeepMessages>1</daysToKeepMessages>");
+        assert topicXML.contains("<name>JADE</name>");
+
+    }
+
+    @Test
+    public void testRequestFromTopic() throws ParseException {
+        InstructionSet is = this.da.parseInstructionXml(this.instructionXML);
+        ACLMessage message = this.RB.requestFromTopic(new AID("TEST", true), is);
+        assert message.getPerformative() == ACLMessage.REQUEST;
+        System.out.println(message.getContent());
+        assert message.getContent().contains("<daysToKeepMessages>1</daysToKeepMessages>");
+    }
+
+
 }

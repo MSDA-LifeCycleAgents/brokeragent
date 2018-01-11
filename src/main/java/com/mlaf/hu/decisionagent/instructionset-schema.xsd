@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="Topic" type="topic"/>
+
+  <xs:element name="instructions" type="instructionSet"/>
+
+  <xs:element name="measurement" type="measurement"/>
+
+  <xs:element name="measurements" type="measurements"/>
+
+  <xs:element name="plans" type="plans"/>
+
+  <xs:element name="sensor" type="sensor"/>
+
+  <xs:element name="sensors" type="sensors"/>
+
+  <xs:complexType name="instructionSet">
+    <xs:sequence>
+      <xs:element name="active" type="xs:boolean"/>
+      <xs:element name="amountOfMissedDataPackages" type="xs:int"/>
+      <xs:element name="fallback" type="fallback" minOccurs="0"/>
+      <xs:element name="identifier" type="xs:string" minOccurs="0"/>
+      <xs:element name="lastReceivedDataPackageAt" type="localDateTime" minOccurs="0"/>
+      <xs:element name="messaging" type="messaging" minOccurs="0"/>
+      <xs:element ref="sensors" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="fallback">
+    <xs:sequence>
+      <xs:element name="to" type="xs:string" minOccurs="0"/>
+      <xs:element name="via" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="localDateTime" final="extension restriction">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="messaging">
+    <xs:sequence>
+      <xs:element name="directToDecisionAgent" type="xs:boolean"/>
+      <xs:element name="registeredToTopic" type="xs:boolean"/>
+      <xs:element name="topic" type="topic" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="topic">
+    <xs:sequence>
+      <xs:element name="daysToKeepMessages" type="xs:int"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sensors">
+    <xs:sequence>
+      <xs:element ref="sensor" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sensor">
+    <xs:sequence>
+      <xs:element name="amountOfBackupMeasurements" type="xs:int"/>
+      <xs:element name="intervalinseconds" type="xs:int"/>
+      <xs:element name="label" type="xs:string" minOccurs="0"/>
+      <xs:element ref="measurements" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="measurements">
+    <xs:sequence>
+      <xs:element ref="measurement" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="measurement">
+    <xs:sequence>
+      <xs:element name="max" type="xs:int"/>
+      <xs:element name="min" type="xs:int"/>
+      <xs:element ref="plans" minOccurs="0"/>
+      <xs:element name="readings" type="xs:int" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="value" type="xs:int"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="plans">
+    <xs:sequence>
+      <xs:element name="plan" type="plan" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="plan">
+    <xs:sequence>
+      <xs:element name="below" type="xs:double"/>
+      <xs:element name="limit" type="xs:int"/>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+      <xs:element name="to" type="xs:string" minOccurs="0"/>
+      <xs:element name="via" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

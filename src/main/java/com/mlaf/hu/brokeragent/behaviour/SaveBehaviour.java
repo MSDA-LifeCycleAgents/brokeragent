@@ -1,12 +1,12 @@
-package com.mlaf.hu.brokeragent.behavior;
+package com.mlaf.hu.brokeragent.behaviour;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
 import jade.core.behaviours.TickerBehaviour;
 
-public class SaveBehavior extends TickerBehaviour {
+public class SaveBehaviour extends TickerBehaviour {
     private final BrokerAgent brokerAgent;
 
-    public SaveBehavior(BrokerAgent broker) {
+    public SaveBehaviour(BrokerAgent broker) {
         super(broker, BrokerAgent.STORE_INTERVAL_IN_MS);
         this.brokerAgent = broker;
     }

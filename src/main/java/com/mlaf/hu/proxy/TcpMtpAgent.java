@@ -100,7 +100,7 @@ public class TcpMtpAgent extends Agent {
     private JMDNSManager jmdnsManager;
 
     /**
-     * Creates the JMDNS Manager and adds the behavior registering all JADE
+     * Creates the JMDNS Manager and adds the behaviour registering all JADE
      * agents there. Also, listens for incoming serverSocket messages.
      */
     @Override

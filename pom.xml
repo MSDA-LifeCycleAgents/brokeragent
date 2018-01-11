@@ -119,7 +119,7 @@
             </build>
         </profile>
         <profile>
-            <id>sensoragent</id>
+            <id>decision-agent</id>
             <build>
                 <plugins>
                     <plugin>
@@ -130,7 +130,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/sensor-agent.properties</argument>
+                                <argument>src/main/resource/decision-agent.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -203,6 +203,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
