@@ -1,5 +1,6 @@
 package com.mlaf.hu.proxy.mtp;
 
+import com.mlaf.hu.proxy.parser.AclXmlParser;
 import jade.core.AID;
 import jade.core.Profile;
 import jade.domain.FIPAAgentManagement.Envelope;
@@ -16,10 +17,12 @@ import java.io.StringReader;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  *
@@ -140,8 +143,16 @@ public class TcpMtp implements MTP {
         openConnections.clear();
     }
 
-    public void deliver(String string, Envelope envlp, byte[] bytes) throws MTPException {
-        // Check if there is already an open socket.
+    @Override
+    public void deliver(String string, Envelope envlp, byte[] aclBytes) throws MTPException {
+        byte[] bytes = parseAclToXml(aclBytes);
+        
+        if(bytes == null)
+            bytes = aclBytes;
+        else
+            envlp.setPayloadLength((long) bytes.length);
+        
+        
         Socket socket = null;
         if (openConnections.containsKey(string)) {
             logger.log(Level.INFO, "Reusing connection to {0}. Checking if still open.", string);
@@ -204,5 +215,19 @@ public class TcpMtp implements MTP {
             logger.log(Level.WARNING, "Forwarding envelope failed: ", e);
             throw new MTPException("Forwarding envelope failed: ", e);
         }
+    }
+    
+    private byte[] parseAclToXml(byte[] aclMessage){
+        try {
+            StringReader msgReader = new StringReader(new String(aclMessage));
+            ACLMessage msg = ACLParser.create().parse(msgReader);
+            String result = AclXmlParser.parse(msg);
+            return result.getBytes();
+        } catch (ParseException ex) {
+            Logger.getLogger(TcpMtp.class.getName()).log(Level.WARNING, "Parser Exception: ", ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(TcpMtp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 }
