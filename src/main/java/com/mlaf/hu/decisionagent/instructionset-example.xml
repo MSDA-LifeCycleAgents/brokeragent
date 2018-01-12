@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<instructions>
+    <identiefer>
+        fVTz7OCaD8WFJE5Jvw7K
+    </identiefer>
+    <messaging>
+        <topic>
+            <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>
+            <daysToKeepMessages>1</daysToKeepMessages>
+        </topic>
+        <directToDecisionAgent>False</directToDecisionAgent>
+    </messaging>
+    <amountOfMissedDataPackages>5</amountOfMissedDataPackages>
+    <sensors>
+        <sensor id="SystolicBloodPressure">
+            <label>Systolic Blood Pressure</label>
+            <intervalinseconds>30</intervalinseconds>
+            <unit>mm Hg</unit>
+            <measurements>
+                <measurement id="y">
+                    <min>0</min>
+                    <max>200</max>
+                    <plans>
+                        <plan>
+                            <below>0.6</below>
+                            <above>0.6</above>
+                            <message>Watch out!</message>
+                            <via>ScreenAgent</via>
+                            <to></to>
+                            <limit>30</limit>
+                        </plan>
+                        <plan>
+                            <below>0.4</below>
+                            <above>0.4</above>
+                            <message>Panic!</message>
+                            <via>MailAgent</via>
+                            <to>brian.vanderbijl@hu.nl</to>
+                            <limit>3600</limit>
+                        </plan>
+                    </plans>
+                </measurement>
+                <measurement id="x">
+                    <min>0</min>
+                    <max>200</max>
+                    <plans>
+                        <plan>
+                            <below>0.6</below>
+                            <message>Watch out!</message>
+                            <via>ScreenAgent</via>
+                            <to></to>
+                            <limit>30</limit>
+                        </plan>
+                        <plan>
+                            <below>0.4</below>
+                            <message>Panic!</message>
+                            <via>MailAgent</via>
+                            <to>brian.vanderbijl@hu.nl</to>
+                            <limit>3600</limit>
+                        </plan>
+                    </plans>
+                </measurement>
+            </measurements>
+            <amountOfBackupMeasurements>20</amountOfBackupMeasurements>
+        </sensor>
+        <sensor id="HeartRate">
+            <label>Heart Rate</label>
+            <unit>bpm</unit>
+            <intervalinseconds>30</intervalinseconds>
+            <measurements>
+                <measurement id="only">
+                    <min>0</min>
+                    <max>200</max>
+                    <plans>
+                        <plan>
+                            <below>0.6</below>
+                            <message>Watch out!</message>
+                            <via>ScreenAgent</via>
+                            <to></to>
+                            <limit>30</limit>
+                        </plan>
+                        <plan>
+                            <below>0.4</below>
+                            <message>Panic!</message>
+                            <via>MailAgent</via>
+                            <to>brian.vanderbijl@hu.nl</to>
+                            <limit>3600</limit>
+                        </plan>
+                    </plans>
+                </measurement>
+            </measurements>
+            <amountOfBackupMeasurements>20</amountOfBackupMeasurements>
+        </sensor>
+    </sensors>
+    <fallback>
+        <via>ScreenAgent</via>
+        <to></to>
+    </fallback>
+</instructions>
