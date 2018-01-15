@@ -4,6 +4,7 @@ import com.mlaf.hu.decisionagent.behaviour.ReceiveBehaviour;
 import com.mlaf.hu.decisionagent.behaviour.RegisterSensorAgentBehaviour;
 import com.mlaf.hu.decisionagent.behaviour.UpdateStatusSensorAgentBehaviour;
 import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.*;
@@ -35,6 +36,9 @@ public abstract class DecisionAgent extends Agent {
             addBehaviour(new RegisterSensorAgentBehaviour(this));
             addBehaviour(new ReceiveBehaviour(this));
             addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
+            ServiceDiscovery sd = new ServiceDiscovery(this);
+            AID DA_TEST = sd.lookupDecisionAgent();
+            System.out.println(DA_TEST);
         } catch (Exception e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
