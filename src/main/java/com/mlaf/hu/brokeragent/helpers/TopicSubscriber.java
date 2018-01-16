@@ -1,6 +1,6 @@
 package com.mlaf.hu.brokeragent.helpers;
 
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.DFServices;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -12,7 +12,7 @@ public class TopicSubscriber extends Agent {
 
     protected void setup() {
         try {
-            AID brokerService = JadeServices.getService("message-broker", this);
+            AID brokerService = DFServices.getService("message-broker", this);
             this.addBehaviour(new TickerBehaviour(this, 10000L) {
                 @Override
                 protected void onTick() {

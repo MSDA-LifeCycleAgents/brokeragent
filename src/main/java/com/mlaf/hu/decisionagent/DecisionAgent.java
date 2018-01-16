@@ -3,13 +3,15 @@ package com.mlaf.hu.decisionagent;
 import com.mlaf.hu.decisionagent.behaviour.ReceiveBehaviour;
 import com.mlaf.hu.decisionagent.behaviour.RegisterSensorAgentBehaviour;
 import com.mlaf.hu.decisionagent.behaviour.UpdateStatusSensorAgentBehaviour;
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.*;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -31,14 +33,24 @@ public abstract class DecisionAgent extends Agent {
     @Override
     protected void setup() {
         try {
-            JadeServices.registerAsService(SERVICE_NAME, "decision-agent", null, null, this);
+            DFServices.registerAsService(createServiceDescription(), this);
             addBehaviour(new RegisterSensorAgentBehaviour(this));
             addBehaviour(new ReceiveBehaviour(this));
             addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
+            ServiceDiscovery sd_decision_agent = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
+            AID DA_TEST = sd_decision_agent.ensureAID(20);
+            System.out.println(DA_TEST);
         } catch (Exception e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
         }
+    }
+
+    public ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName(SERVICE_NAME);
+        sd.setType("decision-agent");
+        return sd;
     }
 
     protected void takeDown() {
@@ -92,7 +104,7 @@ public abstract class DecisionAgent extends Agent {
     private void executePlan(Plan plan) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
         message.setContent(plan.getMessage());
-        message.addReceiver(JadeServices.getService(plan.getVia(), this));
+        message.addReceiver(DFServices.getService(plan.getVia(), this));
         message.addUserDefinedParameter("to", plan.getTo());
         this.send(message);
         executePlanCallback(plan);
