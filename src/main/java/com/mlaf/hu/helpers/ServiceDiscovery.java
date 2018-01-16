@@ -25,14 +25,14 @@ public class ServiceDiscovery {
         this.serviceDescription = sd;
     }
 
-    public AID getAID() {
+    public AID getAID() throws ServiceDiscoveryNotFoundException {
         LocalDateTime now = LocalDateTime.now();
         if (cachedAID != null && now.isBefore(lastUpdate.plusMinutes(1))) {
             return cachedAID;
         }
         ArrayList<AID> result = lookupByDescriptor(this.serviceDescription);
         if (result.isEmpty()) {
-            return null;
+            throw new ServiceDiscoveryNotFoundException("Could not find the service: " + this.serviceDescription.getName());
         }
         lastUpdate = LocalDateTime.now();
         cachedAID = result.get(0);
@@ -48,7 +48,7 @@ public class ServiceDiscovery {
                 return result;
             }
         }
-        throw new ServiceDiscoveryNotFoundException();
+        throw new ServiceDiscoveryNotFoundException("Could not find the service: " + this.serviceDescription.getName());
     }
 
     public ArrayList<AID> lookupByDescriptor(ServiceDescription sd) {

@@ -21,10 +21,8 @@ import java.util.HashMap;
 
 public abstract class DecisionAgent extends Agent {
     private static final String SERVICE_NAME = "DECISION-AGENT";
-    private static final int MAX_READINGS = 100;
     public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
     public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
-    private AID brokerService;
 
     public DecisionAgent() {
         super();
@@ -37,9 +35,6 @@ public abstract class DecisionAgent extends Agent {
             addBehaviour(new RegisterSensorAgentBehaviour(this));
             addBehaviour(new ReceiveBehaviour(this));
             addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
-            ServiceDiscovery sd_decision_agent = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
-            AID DA_TEST = sd_decision_agent.ensureAID(20);
-            System.out.println(DA_TEST);
         } catch (Exception e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
