@@ -12,6 +12,7 @@ import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class SlackAgent extends Agent {
 
     @Override
     public void setup() {
-        JadeServices.registerAsService("SlackAgent", "SlackAgent", null, null, this);
+        JadeServices.registerAsService(createServiceDescription(), this);
         addBehaviour(
                 new CyclicBehaviour() {
                     @Override
@@ -47,6 +48,14 @@ public class SlackAgent extends Agent {
                 }
         );
     }
+
+    public ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName("SlackAgent");
+        sd.setType("SlackAgent");
+        return sd;
+    }
+
 
     protected void takeDown() {
         try {

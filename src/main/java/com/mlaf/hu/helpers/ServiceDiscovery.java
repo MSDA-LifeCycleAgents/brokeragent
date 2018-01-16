@@ -36,7 +36,7 @@ public class ServiceDiscovery {
         }
         lastUpdate = LocalDateTime.now();
         cachedAID = result.get(0);
-        return cachedAID; //TODO What to do if multiple are found?
+        return cachedAID;
     }
 
     public AID ensureAID(int timeout_s) throws ServiceDiscoveryNotFoundException {

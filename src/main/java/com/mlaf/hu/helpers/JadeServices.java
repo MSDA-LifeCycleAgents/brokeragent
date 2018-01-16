@@ -14,24 +14,13 @@ import java.util.concurrent.TimeUnit;
 public class JadeServices {
     private static java.util.logging.Logger DFHelperLogger = Logger.getLogger("DFHelperLogger");
 
-    public static void registerAsService(String name, String type, String ontology, String language, Agent a) {
+    public static void registerAsService(ServiceDescription sd, Agent a) {
         try {
             DFAgentDescription dfd = new DFAgentDescription();
             dfd.setName(a.getAID());
-            ServiceDescription sd = new ServiceDescription();
-            sd.setName(name);
-            sd.setType(type);
-            if (ontology == null) {
-                ontology = String.format("%s-ontology", type);
-            }
-            sd.addOntologies(ontology);
-            if (language == null){
-                language = FIPANames.ContentLanguage.FIPA_SL;
-            }
-            sd.addLanguages(language);
             dfd.addServices(sd);
             DFService.register(a, dfd);
-            DFHelperLogger.log(Logger.INFO, String.format("Registered the %s as a service to the DF.", name));
+            DFHelperLogger.log(Logger.INFO, String.format("Registered the %s as a service to the DF.", sd.getName()));
         } catch (FIPAException e) {
             DFHelperLogger.log(Logger.SEVERE, () -> String.format("Registering as service failed: %s", e.getMessage()));
         }

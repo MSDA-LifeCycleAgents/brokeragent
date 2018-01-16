@@ -12,6 +12,8 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.Service;
 import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -33,7 +35,7 @@ public abstract class DecisionAgent extends Agent {
     @Override
     protected void setup() {
         try {
-            JadeServices.registerAsService(SERVICE_NAME, "decision-agent", null, null, this);
+            JadeServices.registerAsService(createServiceDescription(), this);
             addBehaviour(new RegisterSensorAgentBehaviour(this));
             addBehaviour(new ReceiveBehaviour(this));
             addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
@@ -44,6 +46,13 @@ public abstract class DecisionAgent extends Agent {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
         }
+    }
+
+    public ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName(SERVICE_NAME);
+        sd.setType("decision-agent");
+        return sd;
     }
 
     protected void takeDown() {
