@@ -30,12 +30,13 @@ public class ServiceDiscovery {
         if (cachedAID != null && now.isBefore(lastUpdate.plusMinutes(1))) {
             return cachedAID;
         }
-        //TODO Add to cache
         ArrayList<AID> result = lookupByDescriptor(this.serviceDescription);
         if (result.isEmpty()) {
             return null;
         }
-        return result.get(0); //TODO What to do if multiple are found?
+        lastUpdate = LocalDateTime.now();
+        cachedAID = result.get(0);
+        return cachedAID; //TODO What to do if multiple are found?
     }
 
     public AID ensureAID(int timeout_s) throws ServiceDiscoveryNotFoundException {
@@ -48,8 +49,6 @@ public class ServiceDiscovery {
             }
         }
         throw new ServiceDiscoveryNotFoundException();
-
-
     }
 
     public ArrayList<AID> lookupByDescriptor(ServiceDescription sd) {
@@ -98,14 +97,5 @@ public class ServiceDiscovery {
         sd.setType("MailAgent");
         sd.setName("MailAgent");
         return sd;
-    }
-
-
-    public AID lookupDecisionAgent() {
-        ArrayList<AID> result = lookupByDescriptor(SD_DECISION_AGENT());
-        if (result.isEmpty()) {
-            return null;
-        }
-        return result.get(0);
     }
 }
