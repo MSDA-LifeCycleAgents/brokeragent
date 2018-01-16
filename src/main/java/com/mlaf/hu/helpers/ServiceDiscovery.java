@@ -1,5 +1,6 @@
 package com.mlaf.hu.helpers;
 
+import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
@@ -8,15 +9,47 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.util.Logger;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
 public class ServiceDiscovery {
     public static java.util.logging.Logger serviceDiscoveryLogger = Logger.getLogger("ServiceDiscoveryLogger");
-    Agent agent;
+    private Agent agent;
+    private ServiceDescription serviceDescription = null;
+    private LocalDateTime lastUpdate;
+    private AID cachedAID;
 
-    public ServiceDiscovery(Agent agent) {
+    public ServiceDiscovery(Agent agent, ServiceDescription sd) {
         this.agent = agent;
+        this.serviceDescription = sd;
+    }
+
+    public AID getAID() {
+        LocalDateTime now = LocalDateTime.now();
+        if (cachedAID != null && now.isBefore(lastUpdate.plusMinutes(1))) {
+            return cachedAID;
+        }
+        //TODO Add to cache
+        ArrayList<AID> result = lookupByDescriptor(this.serviceDescription);
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result.get(0); //TODO What to do if multiple are found?
+    }
+
+    public AID ensureAID(int timeout_s) throws ServiceDiscoveryNotFoundException {
+        LocalDateTime timeout = LocalDateTime.now().plusSeconds(timeout_s);
+        AID result;
+        while (LocalDateTime.now().isBefore(timeout)) {
+            result = getAID();
+            if (result != null) {
+                return result;
+            }
+        }
+        throw new ServiceDiscoveryNotFoundException();
+
+
     }
 
     public ArrayList<AID> lookupByDescriptor(ServiceDescription sd) {
@@ -39,11 +72,37 @@ public class ServiceDiscovery {
         return resultArray;
     }
 
-    public AID lookupDecisionAgent() {
+    public static ServiceDescription SD_DECISION_AGENT() {
         ServiceDescription sd = new ServiceDescription();
         sd.setType("decision-agent");
         sd.setName("DECISION-AGENT");
-        ArrayList<AID> result = lookupByDescriptor(sd);
+        return sd;
+    }
+
+    public static ServiceDescription SD_BROKER_AGENT() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("message-broker");
+        sd.setName("BROKER");
+        return sd;
+    }
+
+    public static ServiceDescription SD_COMM_SLACK_AGENT() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("SlackAgent");
+        sd.setName("SlackAgent");
+        return sd;
+    }
+
+    public static ServiceDescription SD_COMM_MAIL_AGENT() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("MailAgent");
+        sd.setName("MailAgent");
+        return sd;
+    }
+
+
+    public AID lookupDecisionAgent() {
+        ArrayList<AID> result = lookupByDescriptor(SD_DECISION_AGENT());
         if (result.isEmpty()) {
             return null;
         }

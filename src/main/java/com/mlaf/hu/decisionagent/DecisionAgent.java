@@ -10,6 +10,7 @@ import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.*;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.Service;
 import jade.domain.DFService;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
@@ -36,8 +37,8 @@ public abstract class DecisionAgent extends Agent {
             addBehaviour(new RegisterSensorAgentBehaviour(this));
             addBehaviour(new ReceiveBehaviour(this));
             addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
-            ServiceDiscovery sd = new ServiceDiscovery(this);
-            AID DA_TEST = sd.lookupDecisionAgent();
+            ServiceDiscovery sd_decision_agent = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
+            AID DA_TEST = sd_decision_agent.ensureAID(20);
             System.out.println(DA_TEST);
         } catch (Exception e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
