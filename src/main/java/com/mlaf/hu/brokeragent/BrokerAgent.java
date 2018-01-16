@@ -46,7 +46,7 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
         }
     }
 
-    public ServiceDescription createServiceDescription() {
+    public static ServiceDescription createServiceDescription() {
         ServiceDescription sd = new ServiceDescription();
         sd.setName(SERVICE_NAME);
         sd.setType("message-broker");
