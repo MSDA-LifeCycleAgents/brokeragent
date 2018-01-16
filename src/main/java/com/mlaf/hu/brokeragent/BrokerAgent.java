@@ -10,9 +10,11 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.messaging.TopicManagementHelper;
 import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
+import org.apache.maven.settings.Server;
 
 import javax.xml.bind.JAXB;
 import java.io.*;
@@ -32,7 +34,7 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     protected void setup() {
         try {
             boolean succes = createDirectoryStructure();
-            JadeServices.registerAsService(SERVICE_NAME, "message-broker", "message-broker-ontology", FIPANames.ContentLanguage.FIPA_SL, this);
+            JadeServices.registerAsService(createServiceDescription(), this);
             topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
             if (succes) {
                 loadTopics();
@@ -44,6 +46,13 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
             brokerAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
         }
+    }
+
+    public ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName(SERVICE_NAME);
+        sd.setType("message-broker");
+        return sd;
     }
 
     protected void takeDown() {
