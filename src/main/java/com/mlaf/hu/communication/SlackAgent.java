@@ -5,7 +5,7 @@
  */
 package com.mlaf.hu.communication;
 
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.DFServices;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
@@ -30,7 +30,7 @@ public class SlackAgent extends Agent {
 
     @Override
     public void setup() {
-        JadeServices.registerAsService(createServiceDescription(), this);
+        DFServices.registerAsService(createServiceDescription(), this);
         addBehaviour(
                 new CyclicBehaviour() {
                     @Override

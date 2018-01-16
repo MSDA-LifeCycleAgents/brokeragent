@@ -5,16 +5,14 @@ import com.mlaf.hu.brokeragent.behaviour.SaveBehaviour;
 import com.mlaf.hu.brokeragent.behaviour.SendBehaviour;
 import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.DFServices;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.messaging.TopicManagementHelper;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
-import org.apache.maven.settings.Server;
 
 import javax.xml.bind.JAXB;
 import java.io.*;
@@ -34,7 +32,7 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     protected void setup() {
         try {
             boolean succes = createDirectoryStructure();
-            JadeServices.registerAsService(createServiceDescription(), this);
+            DFServices.registerAsService(createServiceDescription(), this);
             topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
             if (succes) {
                 loadTopics();

@@ -5,7 +5,7 @@
  */
 package com.mlaf.hu.communication;
 
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.DFServices;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -36,7 +36,7 @@ public class MailAgent extends Agent{
     
     @Override
     public void setup(){
-        JadeServices.registerAsService(createServiceDescription(), this);
+        DFServices.registerAsService(createServiceDescription(), this);
         addBehaviour(
             new CyclicBehaviour(){
                 @Override

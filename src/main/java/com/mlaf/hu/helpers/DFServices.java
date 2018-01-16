@@ -11,7 +11,7 @@ import jade.util.Logger;
 
 import java.util.concurrent.TimeUnit;
 
-public class JadeServices {
+public class DFServices {
     private static java.util.logging.Logger DFHelperLogger = Logger.getLogger("DFHelperLogger");
 
     public static void registerAsService(ServiceDescription sd, Agent a) {
