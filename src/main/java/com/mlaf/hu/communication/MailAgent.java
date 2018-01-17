@@ -5,10 +5,11 @@
  */
 package com.mlaf.hu.communication;
 
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.DFServices;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 
 import java.util.Properties;
@@ -35,7 +36,7 @@ public class MailAgent extends Agent{
     
     @Override
     public void setup(){
-        JadeServices.registerAsService("MailAgent", "MailAgent", null, null, this);
+        DFServices.registerAsService(createServiceDescription(), this);
         addBehaviour(
             new CyclicBehaviour(){
                 @Override
@@ -53,6 +54,13 @@ public class MailAgent extends Agent{
             }
         );
     }
+    public ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName("MailAgent");
+        sd.setType("MailAgent");
+        return sd;
+    }
+
 
     protected void takeDown() {
         try {

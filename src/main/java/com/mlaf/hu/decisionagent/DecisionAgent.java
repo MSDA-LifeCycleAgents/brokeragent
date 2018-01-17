@@ -3,13 +3,15 @@ package com.mlaf.hu.decisionagent;
 import com.mlaf.hu.decisionagent.behaviour.ReceiveBehaviour;
 import com.mlaf.hu.decisionagent.behaviour.RegisterSensorAgentBehaviour;
 import com.mlaf.hu.decisionagent.behaviour.UpdateStatusSensorAgentBehaviour;
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.*;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -19,10 +21,8 @@ import java.util.HashMap;
 
 public abstract class DecisionAgent extends Agent {
     private static final String SERVICE_NAME = "DECISION-AGENT";
-    private static final int MAX_READINGS = 100;
     public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
     public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
-    private AID brokerService;
 
     public DecisionAgent() {
         super();
@@ -31,7 +31,7 @@ public abstract class DecisionAgent extends Agent {
     @Override
     protected void setup() {
         try {
-            JadeServices.registerAsService(SERVICE_NAME, "decision-agent", null, null, this);
+            DFServices.registerAsService(createServiceDescription(), this);
             addBehaviour(new RegisterSensorAgentBehaviour(this));
             addBehaviour(new ReceiveBehaviour(this));
             addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
@@ -39,6 +39,13 @@ public abstract class DecisionAgent extends Agent {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
         }
+    }
+
+    public ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName(SERVICE_NAME);
+        sd.setType("decision-agent");
+        return sd;
     }
 
     protected void takeDown() {
@@ -92,7 +99,7 @@ public abstract class DecisionAgent extends Agent {
     private void executePlan(Plan plan) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
         message.setContent(plan.getMessage());
-        message.addReceiver(JadeServices.getService(plan.getVia(), this));
+        message.addReceiver(DFServices.getService(plan.getVia(), this));
         message.addUserDefinedParameter("to", plan.getTo());
         this.send(message);
         executePlanCallback(plan);

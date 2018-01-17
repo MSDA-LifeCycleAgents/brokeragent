@@ -5,12 +5,12 @@ import com.mlaf.hu.brokeragent.behaviour.SaveBehaviour;
 import com.mlaf.hu.brokeragent.behaviour.SendBehaviour;
 import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
-import com.mlaf.hu.helpers.JadeServices;
+import com.mlaf.hu.helpers.DFServices;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.messaging.TopicManagementHelper;
 import jade.domain.DFService;
-import jade.domain.FIPANames;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
 
@@ -32,7 +32,7 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     protected void setup() {
         try {
             boolean succes = createDirectoryStructure();
-            JadeServices.registerAsService(SERVICE_NAME, "message-broker", "message-broker-ontology", FIPANames.ContentLanguage.FIPA_SL, this);
+            DFServices.registerAsService(createServiceDescription(), this);
             topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
             if (succes) {
                 loadTopics();
@@ -44,6 +44,13 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
             brokerAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
         }
+    }
+
+    public static ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName(SERVICE_NAME);
+        sd.setType("message-broker");
+        return sd;
     }
 
     protected void takeDown() {
