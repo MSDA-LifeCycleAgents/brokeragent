@@ -59,6 +59,7 @@ public class AclXmlParser {
         appendTextElement(doc, root, "language", message.getLanguage());
         appendTextElement(doc, root, "ontology", message.getOntology());
         appendTextElement(doc, root, "protocol", message.getProtocol());
+        appendTextElement(doc, root, "conversation-id", message.getConversationId());
         
         return docToString(doc);
     }    
@@ -163,9 +164,7 @@ public class AclXmlParser {
 
         Element addresses = doc.createElement("addresses");
         for(String url : aid.getAddressesArray()){
-            Element address = doc.createElement("address");
-            appendTextElement(doc, address, "url", url);
-            addresses.appendChild(address);
+            appendTextElement(doc, addresses, "url", url);
         }
         identifier.appendChild(addresses);
         element.appendChild(identifier);

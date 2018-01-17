@@ -222,7 +222,7 @@ public class TcpMtp implements MTP {
             StringReader msgReader = new StringReader(new String(aclMessage));
             ACLMessage msg = ACLParser.create().parse(msgReader);
             String result = AclXmlParser.parse(msg);
-            return result.getBytes();
+            return (result + "\r\n\n").getBytes();
         } catch (ParseException ex) {
             Logger.getLogger(TcpMtp.class.getName()).log(Level.WARNING, "Parser Exception: ", ex);
         } catch (ParserConfigurationException ex) {
