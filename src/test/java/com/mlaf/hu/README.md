@@ -4,19 +4,24 @@
 
 ## Proof of Concept (Start at: 22-01-2017):
 - [ ] ESP with C++ Framework Working
-- [ ] ESP connected 
-- [ ] Raspberry Pi running with JADE
-- [ ] Decision Agent running within JADE
-- [ ] Proxy running within JADE
+- [ ] Connecting sensors to device and the ESP.
+- [ ] Raspberry Pi running with JADE.
+- [ ] Decision Agent running within JADE.
+- [ ] Proxy running within JADE.
 - [ ] Testcase: "Making the Decision Agent executing a plan when a value above and under the max and minimum."
 
 ## C++ Sensor Agent Framework (Done before 22-01-2017):
-- [ ] Unit Testing
-- [ ] Integration Testing
+- [ ] Unit Testing.
+- [ ] Integration Testing.
 
 ## Decision Agent (Done before 22-01-2017):
-- [ ] Integration Testing
+- [ ] Abstract class for Communication Agents.
+- [ ] Integration Testing.
 
 ## Java/JADE Sensor Agent Framework (Done before 22-01-2017):
-- [ ] Unit Testing
-- [ ] Integration Testing
+- [ ] Unit Testing.
+- [ ] Integration Testing.
+
+## Documentation
+- [ ] Technical document.
+- [ ] Expanding README on the homepage for future developers to get started.
