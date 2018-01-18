@@ -9,6 +9,11 @@ public abstract class Sensor {
     private LocalDateTime lastRead;
     private int readInterval;
 
+    public Sensor(int readInterval) {
+        lastRead = LocalDateTime.now();
+        this.readInterval = readInterval;
+    }
+
     public void activate() {
         this.active = true;
     }

@@ -9,7 +9,8 @@ public class Sensor extends com.mlaf.hu.sensoragent.Sensor {
     private String sensorID;
 
     public Sensor(String idPostfix) {
-        this.sensorID = "ImplementationSensor" + idPostfix;
+        super(10);
+        this.sensorID = "DummySensor" + idPostfix;
     }
 
     @Override
