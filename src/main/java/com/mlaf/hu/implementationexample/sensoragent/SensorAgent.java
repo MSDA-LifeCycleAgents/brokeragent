@@ -1,26 +1,22 @@
-package com.mlaf.hu.dummysensoragent;
-
+package com.mlaf.hu.implementationexample.sensoragent;
 import com.mlaf.hu.sensoragent.InvalidSensorException;
-import com.mlaf.hu.sensoragent.Sensor;
-import com.mlaf.hu.sensoragent.SensorAgent;
 
 import java.util.logging.Level;
 
-public class DummySensorAgent extends SensorAgent {
+public class SensorAgent extends com.mlaf.hu.sensoragent.SensorAgent {
 
-    public DummySensorAgent() {
+    public SensorAgent() {
         super();
-        Sensor s1 = new DummySensor("1");
+        com.mlaf.hu.sensoragent.Sensor s1 = new Sensor("1");
         s1.activate();
-        Sensor s2 = new DummySensor("2");
+        com.mlaf.hu.sensoragent.Sensor s2 = new Sensor("2");
         s2.activate();
         try {
             addSensor(s1);
             addSensor(s2);
         } catch (InvalidSensorException e) {
-            sensorAgentLogger.log(Level.WARNING, "Could not register sensor", e);
+            sensorAgentLogger.log(Level.WARNING, "Could not register sensor", e.getMessage());
         }
-
     }
 
     @Override

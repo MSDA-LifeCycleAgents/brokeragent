@@ -1,13 +1,13 @@
-package com.mlaf.hu.sensoragent.behavior;
+package com.mlaf.hu.sensoragent.behaviour;
 
 import com.mlaf.hu.sensoragent.SensorAgent;
 import jade.core.behaviours.CyclicBehaviour;
 
 
-public class SendBufferBehavior extends CyclicBehaviour {
+public class SendBufferBehaviour extends CyclicBehaviour {
     private final SensorAgent sensorAgent;
 
-    public SendBufferBehavior(SensorAgent sa) {
+    public SendBufferBehaviour(SensorAgent sa) {
         super(sa);
         this.sensorAgent = sa;
     }

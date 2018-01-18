@@ -1,8 +1,8 @@
 package com.mlaf.hu.helpers;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
-import com.mlaf.hu.communication.MailAgent;
-import com.mlaf.hu.communication.SlackAgent;
+import com.mlaf.hu.communicationagents.MailAgent;
+import com.mlaf.hu.communicationagents.SlackAgent;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.models.Plan;
 import jade.core.AID;

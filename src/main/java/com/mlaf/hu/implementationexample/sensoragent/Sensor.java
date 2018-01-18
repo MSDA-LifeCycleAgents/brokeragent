@@ -1,16 +1,15 @@
-package com.mlaf.hu.dummysensoragent;
+package com.mlaf.hu.implementationexample.sensoragent;
 
 import com.mlaf.hu.models.Measurement;
 import com.mlaf.hu.models.Measurements;
-import com.mlaf.hu.sensoragent.Sensor;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class DummySensor extends Sensor {
-    String sensorID;
+public class Sensor extends com.mlaf.hu.sensoragent.Sensor {
+    private String sensorID;
 
-    public DummySensor(String idPostfix) {
-        this.sensorID = "DummySensor" + idPostfix;
+    public Sensor(String idPostfix) {
+        this.sensorID = "ImplementationSensor" + idPostfix;
     }
 
     @Override
@@ -23,7 +22,6 @@ public class DummySensor extends Sensor {
         Measurements measurements = new Measurements();
         measurements.addMeasurement(new Measurement("val1", getRandomNum()));
         measurements.addMeasurement(new Measurement("val2", getRandomNum()));
-
         return measurements;
     }
 

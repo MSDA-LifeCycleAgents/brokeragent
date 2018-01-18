@@ -9,7 +9,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.util.Logger;
 
 /**
- * This behavior will continuously wait for incoming SUBSCRIBE messages and after having parsed the InstructionSet in XML format
+ * This behaviour will continuously wait for incoming SUBSCRIBE messages and after having parsed the InstructionSet in XML format
  * add the Sensor Agent to the HashMap<AID, Instructionset>(). If the InstructionSet misses certain XML tags it will respond
  * to the sender with exactly what is missing.
  */
