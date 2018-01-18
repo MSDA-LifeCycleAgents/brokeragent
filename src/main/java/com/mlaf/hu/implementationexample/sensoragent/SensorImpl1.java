@@ -5,12 +5,12 @@ import com.mlaf.hu.models.Measurements;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Sensor extends com.mlaf.hu.sensoragent.Sensor {
+public class SensorImpl1 extends com.mlaf.hu.sensoragent.Sensor {
     private String sensorID;
 
-    public Sensor(String idPostfix) {
+    public SensorImpl1() {
         super(10);
-        this.sensorID = "DummySensor" + idPostfix;
+        this.sensorID = "DummySensor1";
     }
 
     @Override

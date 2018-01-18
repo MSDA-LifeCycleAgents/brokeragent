@@ -7,9 +7,9 @@ public class SensorAgent extends com.mlaf.hu.sensoragent.SensorAgent {
 
     public SensorAgent() {
         super();
-        com.mlaf.hu.sensoragent.Sensor s1 = new Sensor("1");
+        com.mlaf.hu.sensoragent.Sensor s1 = new SensorImpl1();
         s1.activate();
-        com.mlaf.hu.sensoragent.Sensor s2 = new Sensor("2");
+        com.mlaf.hu.sensoragent.Sensor s2 = new SensorImpl2();
         s2.activate();
         try {
             addSensor(s1);

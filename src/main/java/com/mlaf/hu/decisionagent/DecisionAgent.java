@@ -58,7 +58,7 @@ public abstract class DecisionAgent extends Agent {
         if (!sensorAgentExists(sensoragent)) {
             instructionset.setRegisteredAt(LocalDateTime.now());
             this.sensorAgents.put(sensoragent, instructionset);
-            DecisionAgent.decisionAgentLogger.log(Logger.INFO, "New Sensor Agent added: " + sensoragent);
+            DecisionAgent.decisionAgentLogger.log(Logger.INFO, "New SensorImpl1 Agent added: " + sensoragent);
         }
     }
 

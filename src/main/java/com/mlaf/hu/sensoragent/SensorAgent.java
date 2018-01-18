@@ -70,7 +70,7 @@ public abstract class SensorAgent extends Agent {
     protected void addSensor(Sensor newSensor) throws InvalidSensorException {
         for (Sensor s : sensors) {
             if (s.getSensorID().equals(newSensor.getSensorID())) {
-                throw new InvalidSensorException("Sensor " + newSensor.getSensorID() + " is alreay registered");
+                throw new InvalidSensorException("SensorImpl1 " + newSensor.getSensorID() + " is alreay registered");
             }
         }
         boolean foundInInstructionset = false;
@@ -81,7 +81,7 @@ public abstract class SensorAgent extends Agent {
             }
         }
         if (!foundInInstructionset) {
-            throw new InvalidSensorException("Sensor " + newSensor.getSensorID() + " is not found in instructionset");
+            throw new InvalidSensorException("SensorImpl1 " + newSensor.getSensorID() + " is not found in instructionset");
         }
         sensors.add(newSensor);
     }
@@ -109,7 +109,7 @@ public abstract class SensorAgent extends Agent {
         try {
             readingXml = XmlParser.parseToXml(sensorReading);
         } catch (ParseException e) {
-            sensorAgentLogger.log(Level.SEVERE, "Could not marshall the Sensor Reading.");
+            sensorAgentLogger.log(Level.SEVERE, "Could not marshall the SensorImpl1 Reading.");
         }
         if (readingXml == null) {
             sensorAgentLogger.log(Level.SEVERE, "Got empty XML for sensor reading.");
@@ -118,7 +118,7 @@ public abstract class SensorAgent extends Agent {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.addReceiver(destination);
         msg.setLanguage("XML");
-        msg.setOntology("MLAF-Sensor-XML");
+        msg.setOntology("MLAF-SensorImpl1-XML");
         msg.setContent(readingXml);
         send(msg);
         sensorAgentLogger.log(Level.INFO, String.format("New reading sent for sensor: %s", sensorReading.getSensors().getSensors().get(0).getId()));
