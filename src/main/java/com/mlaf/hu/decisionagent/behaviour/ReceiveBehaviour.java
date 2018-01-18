@@ -92,9 +92,9 @@ public class ReceiveBehaviour extends CyclicBehaviour {
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Composition: wrong, check documentation.");
         } catch (SensorNotFoundException e) {
-            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE,"InstructionSet misses sensor: " + e.getMessage());
+            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE,"InstructionSet misses sensor from sensor reading: " + e.getMessage());
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
-            response.setContent("InstructionSet misses sensor: " + e.getMessage());
+            response.setContent("InstructionSet misses sensor from sensor reading: " + e.getMessage());
         }
         return response;
     }
