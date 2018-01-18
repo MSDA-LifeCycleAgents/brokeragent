@@ -1,5 +1,6 @@
 package com.mlaf.hu.models;
 
+import com.mlaf.hu.helpers.exceptions.SensorNotFoundException;
 import com.mlaf.hu.models.Sensors;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,5 +27,14 @@ public class SensorReading {
 
     public boolean isEmpty() {
         return this.sensors.isEmpty();
+    }
+
+    public Sensor getSensor(String sensorId) throws SensorNotFoundException {
+        for(Sensor sensor: sensors.getSensors()) {
+            if (sensor.getId().equals(sensorId)) {
+                return sensor;
+            }
+        }
+        throw new SensorNotFoundException(sensorId);
     }
 }

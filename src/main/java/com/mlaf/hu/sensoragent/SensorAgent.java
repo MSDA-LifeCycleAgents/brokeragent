@@ -93,14 +93,9 @@ public abstract class SensorAgent extends Agent {
         sensorReadingQueue.add(sensorReading);
     }
 
-    public void sendSensorReadings() {
+    public void sendSensorReadings() throws ServiceDiscoveryNotFoundException, ServiceException{
         AID destination = null;
-        try {
-            destination = getDestination();
-        } catch (ServiceDiscoveryNotFoundException | ServiceException e) {
-            e.printStackTrace();
-            return;
-        }
+        destination = getDestination();
         SensorReading sensorReading = sensorReadingQueue.poll();
         if (sensorReading == null) {
             return;

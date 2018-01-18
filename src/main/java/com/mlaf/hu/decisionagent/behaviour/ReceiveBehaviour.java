@@ -5,6 +5,7 @@ import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.exceptions.ParseException;
+import com.mlaf.hu.helpers.exceptions.SensorNotFoundException;
 import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.SensorReading;
@@ -24,10 +25,10 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
- *  This behaviour will according to the instructionset either wait to receive direct INFORM messages with it's data-package as content
- *  or it will ask the Broker Agent to hand him another datapackage. This second option will result in the Broker Agent sending an INFORM ACLMessage with
- *  a data-package inside, just like with handleDirectMessage. In the end all the data-packages are received by the method
- *  handleDirectMessage.
+ * This behaviour will according to the instructionset either wait to receive direct INFORM messages with it's data-package as content
+ * or it will ask the Broker Agent to hand him another datapackage. This second option will result in the Broker Agent sending an INFORM ACLMessage with
+ * a data-package inside, just like with handleDirectMessage. In the end all the data-packages are received by the method
+ * handleDirectMessage.
  */
 
 public class ReceiveBehaviour extends CyclicBehaviour {
@@ -80,20 +81,20 @@ public class ReceiveBehaviour extends CyclicBehaviour {
         try {
             SensorReading sr = DA.parseSensorReadingXml(message.getContent());
             InstructionSet is = DA.sensorAgents.get(message.getSender());
-            for (Sensor inInstructionSet : is.getSensors().getSensors()) {
-                for (Sensor inReading : sr.getSensors().getSensors()) {
-                    if (inReading.getId().equals(inInstructionSet.getId())) {
-                        for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
-                            DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
-                        }
-                    }
+            for (Sensor inReading : sr.getSensors().getSensors()) {
+                Sensor inInstructionSet = is.getSensor(inReading.getId());
+                for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
+                    DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
                 }
             }
-            response.setContent("Composition: ok");
         } catch (ParseException e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, e.getMessage());
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Composition: wrong, check documentation.");
+        } catch (SensorNotFoundException e) {
+            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE,"InstructionSet misses sensor: " + e.getMessage());
+            response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+            response.setContent("InstructionSet misses sensor: " + e.getMessage());
         }
         return response;
     }

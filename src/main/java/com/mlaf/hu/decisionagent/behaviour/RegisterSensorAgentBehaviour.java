@@ -33,7 +33,7 @@ public class RegisterSensorAgentBehaviour extends CyclicBehaviour {
             ACLMessage response = new ACLMessage(ACLMessage.DISCONFIRM);
             response.setContent(responseContent);
             if (DA.sensorAgentExists(message.getSender())) {
-                response.setContent("You were already registered.");
+                response.setContent("You are already registered.");
             }
             if (!is.isMallformed()) {
                 response.setPerformative(ACLMessage.CONFIRM);
