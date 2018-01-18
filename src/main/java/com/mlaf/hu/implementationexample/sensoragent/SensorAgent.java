@@ -15,7 +15,7 @@ public class SensorAgent extends com.mlaf.hu.sensoragent.SensorAgent {
             addSensor(s1);
             addSensor(s2);
         } catch (InvalidSensorException e) {
-            sensorAgentLogger.log(Level.WARNING, "Could not register sensor", e.getMessage());
+            sensorAgentLogger.log(Level.WARNING, "Could not register sensor, reason: " + e.getMessage(), e);
         }
     }
 

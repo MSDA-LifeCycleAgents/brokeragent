@@ -102,6 +102,9 @@ public abstract class SensorAgent extends Agent {
             return;
         }
         SensorReading sensorReading = sensorReadingQueue.poll();
+        if (sensorReading == null) {
+            return;
+        }
         String readingXml = null;
         try {
             readingXml = XmlParser.parseToXml(sensorReading);
