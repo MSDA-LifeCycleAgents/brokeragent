@@ -23,11 +23,12 @@ public class SendBehaviour extends CyclicBehaviour {
         ACLMessage getContentMessage = brokerAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
         ACLMessage responseSubscription = null;
         ACLMessage responseGetContent = null;
-        Topic representationTopic = brokerAgent.unmarshalTopic(subscriberMessage.getContent());
         if (subscriberMessage != null) {
+            Topic representationTopic = brokerAgent.unmarshalTopic(subscriberMessage.getContent());
             responseSubscription = brokerAgent.addSubscriberToTopic(subscriberMessage.getSender(), representationTopic, topicHelper);
         }
         if (getContentMessage != null) {
+            Topic representationTopic = brokerAgent.unmarshalTopic(getContentMessage.getContent());
             responseGetContent = brokerAgent.getMessageFromBuffer(getContentMessage.getSender(), representationTopic, topicHelper);
         }
         if (responseSubscription != null) {
