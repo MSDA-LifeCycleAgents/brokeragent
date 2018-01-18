@@ -14,6 +14,7 @@ public class InstructionSet {
     private boolean mallformed = false;
     private LocalDateTime lastReceivedDataPackageAt;
     private int amountOfMissedDataPackages = 5;
+    private LocalDateTime registeredAt;
 
     @XmlElement(name = "identifier")
     public String getIdentifier() {
@@ -145,5 +146,13 @@ public class InstructionSet {
             }
         }
         return highestInterval;
+    }
+
+    public LocalDateTime getRegisteredAt() {
+        return registeredAt;
+    }
+
+    public void setRegisteredAt(LocalDateTime registeredAt) {
+        this.registeredAt = registeredAt;
     }
 }

@@ -25,7 +25,7 @@ public class DecisionAgentTest {
                 "            <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
                 "            <daysToKeepMessages>1</daysToKeepMessages>\n" +
                 "        </topic>\n" +
-                "        <directToDecisionAgent>False</directToDecisionAgent>\n" +
+                "        <directToDecisionAgent>true</directToDecisionAgent>\n" +
                 "    </messaging>\n" +
                 "    <amountOfMissedDataPackages>5</amountOfMissedDataPackages>\n" +
                 "    <sensors>\n" +

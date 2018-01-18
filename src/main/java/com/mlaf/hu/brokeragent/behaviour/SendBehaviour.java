@@ -6,6 +6,7 @@ import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 public class SendBehaviour extends CyclicBehaviour {
     private final BrokerAgent brokerAgent;
@@ -18,25 +19,22 @@ public class SendBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        ACLMessage subscriberMessage = brokerAgent.receive(); //FIXME use messagetemplates for better code quality
-        if (subscriberMessage == null) {
-            block();
-            return;
-        }
-        AID subscriber = subscriberMessage.getSender();
-        int incomingPerformative = subscriberMessage.getPerformative();
-        ACLMessage message = null;
+        ACLMessage subscriberMessage = brokerAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE));
+        ACLMessage getContentMessage = brokerAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+        ACLMessage responseSubscription = null;
+        ACLMessage responseGetContent = null;
         Topic representationTopic = brokerAgent.unmarshalTopic(subscriberMessage.getContent());
-        if (incomingPerformative == ACLMessage.SUBSCRIBE) {
-            message = brokerAgent.addSubscriberToTopic(subscriber, representationTopic, topicHelper);
-        } else if (incomingPerformative == ACLMessage.REQUEST) {
-            message = brokerAgent.getMessageFromBuffer(subscriber, representationTopic, topicHelper);
-        } else {
-            block();
-            return;
+        if (subscriberMessage != null) {
+            responseSubscription = brokerAgent.addSubscriberToTopic(subscriberMessage.getSender(), representationTopic, topicHelper);
         }
-        if (message != null) {
-            brokerAgent.send(message);
+        if (getContentMessage != null) {
+            responseGetContent = brokerAgent.getMessageFromBuffer(getContentMessage.getSender(), representationTopic, topicHelper);
+        }
+        if (responseSubscription != null) {
+            brokerAgent.send(responseSubscription);
+        }
+        if (responseGetContent != null) {
+            brokerAgent.send(responseGetContent);
         }
     }
 }

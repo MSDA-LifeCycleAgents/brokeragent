@@ -23,7 +23,7 @@ import java.util.concurrent.LinkedTransferQueue;
 import java.util.logging.Level;
 
 public abstract class SensorAgent extends Agent {
-    static protected java.util.logging.Logger sensorAgentLogger = Logger.getLogger("SensorAgentLogger");
+    public static java.util.logging.Logger sensorAgentLogger = Logger.getLogger("SensorAgentLogger");
     private ArrayList<Sensor> sensors = new ArrayList<>();
     private LinkedTransferQueue<SensorReading> sensorReadingQueue = new LinkedTransferQueue<>();
     private transient InstructionSet instructionSet;
@@ -121,6 +121,7 @@ public abstract class SensorAgent extends Agent {
         msg.setOntology("MLAF-Sensor-XML");
         msg.setContent(readingXml);
         send(msg);
+        sensorAgentLogger.log(Level.INFO, String.format("New reading sent for sensor: %s", sensorReading.getSensors().getSensors().get(0).getId()));
     }
 
     private AID getDestination() throws ServiceDiscoveryNotFoundException, ServiceException {

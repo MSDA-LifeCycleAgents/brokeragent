@@ -23,15 +23,15 @@ public class SensorAgent extends com.mlaf.hu.sensoragent.SensorAgent {
     protected String getInstructionXML() {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
                 "<instructions>\n" +
-                "    <identiefer>\n" +
+                "    <identifier>\n" +
                 "        fVTz7OCaD8WFJE5Jvw7K\n" +
-                "    </identiefer>\n" +
+                "    </identifier>\n" +
                 "    <messaging>\n" +
                 "        <topic>\n" +
                 "            <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
                 "            <daysToKeepMessages>1</daysToKeepMessages>\n" +
                 "        </topic>\n" +
-                "        <directToDecisionAgent>False</directToDecisionAgent>\n" +
+                "        <directToDecisionAgent>true</directToDecisionAgent>\n" +
                 "    </messaging>\n" +
                 "    <amountOfMissedDataPackages>5</amountOfMissedDataPackages>\n" +
                 "    <sensors>\n" +

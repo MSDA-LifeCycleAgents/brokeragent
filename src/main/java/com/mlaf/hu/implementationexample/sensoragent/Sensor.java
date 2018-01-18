@@ -21,8 +21,8 @@ public class Sensor extends com.mlaf.hu.sensoragent.Sensor {
     @Override
     public Measurements getMeasurements() {
         Measurements measurements = new Measurements();
-        measurements.addMeasurement(new Measurement("val1", getRandomNum()));
-        measurements.addMeasurement(new Measurement("val2", getRandomNum()));
+        measurements.addMeasurement(new Measurement("y", getRandomNum()));
+        measurements.addMeasurement(new Measurement("x", getRandomNum()));
         return measurements;
     }
 

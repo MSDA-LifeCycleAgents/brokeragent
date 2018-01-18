@@ -80,8 +80,8 @@ public class ReceiveBehaviour extends CyclicBehaviour {
         try {
             SensorReading sr = DA.parseSensorReadingXml(message.getContent());
             InstructionSet is = DA.sensorAgents.get(message.getSender());
-            for (Sensor inReading : sr.getSensors().getSensors()) {
-                for (Sensor inInstructionSet : is.getSensors().getSensors()) {
+            for (Sensor inInstructionSet : is.getSensors().getSensors()) {
+                for (Sensor inReading : sr.getSensors().getSensors()) {
                     if (inReading.getId().equals(inInstructionSet.getId())) {
                         for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
                             DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
