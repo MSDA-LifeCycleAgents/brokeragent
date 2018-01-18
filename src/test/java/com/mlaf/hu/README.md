@@ -15,7 +15,7 @@
 - [ ] Integration Testing.
 
 ## Decision Agent (Done before 22-01-2017):
-- [ ] Abstract class for Communication Agents.
+- [x] Abstract class for Communication Agents.
 - [ ] Integration Testing.
 
 ## Java/JADE Sensor Agent Framework (Done before 22-01-2017):
