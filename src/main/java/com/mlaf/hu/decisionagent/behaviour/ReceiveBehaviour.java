@@ -1,20 +1,27 @@
 package com.mlaf.hu.decisionagent.behaviour;
 
+import com.mlaf.hu.brokeragent.BrokerAgent;
 import com.mlaf.hu.brokeragent.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
+import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.exceptions.ParseException;
+import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.SensorReading;
 import com.mlaf.hu.models.Measurement;
 import com.mlaf.hu.models.Sensor;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.util.Logger;
 
 import javax.xml.bind.JAXB;
 import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 /**
  *  This behaviour will according to the instructionset either wait to receive direct INFORM messages with it's data-package as content
@@ -25,10 +32,13 @@ import java.io.StringWriter;
 
 public class ReceiveBehaviour extends CyclicBehaviour {
     private DecisionAgent DA;
-    private AID brokerAgent;
+    private ServiceDiscovery serviceDiscovery;
+    private LocalDateTime nextExecutionAllowed = LocalDateTime.now().minusSeconds(20);
 
     public ReceiveBehaviour(DecisionAgent da) {
         DA = da;
+        ServiceDescription ba = BrokerAgent.createServiceDescription();
+        this.serviceDiscovery = new ServiceDiscovery(this.DA, ba);
     }
 
     @Override
@@ -38,9 +48,16 @@ public class ReceiveBehaviour extends CyclicBehaviour {
             ACLMessage response = handleDirectMessage(directMessage);
             this.DA.send(response);
         }
-        handleTopicMessaging();
+        if (ChronoUnit.SECONDS.between(this.nextExecutionAllowed, LocalDateTime.now()) % 20 == 0) {
+            try {
+                handleTopicMessaging();
+            } catch (ServiceDiscoveryNotFoundException e) {
+                DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, String.format("%s\nTopic", e.getMessage()));
+                setTimeOut(20);
+            }
+        }
         ACLMessage isSubscribed = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM));
-        if (isSubscribed != null) {
+        if (isSubscribed != null && isSubscribed.getUserDefinedParameter("name") != null) {
             topicIsSubscribed(isSubscribed);
         }
     }
@@ -52,6 +69,10 @@ public class ReceiveBehaviour extends CyclicBehaviour {
                 is.getMessaging().setRegisteredToTopic(true);
             }
         }
+    }
+
+    private void setTimeOut(int timeout_s) {
+        this.nextExecutionAllowed = LocalDateTime.now().plusSeconds(timeout_s);
     }
 
     private ACLMessage handleDirectMessage(ACLMessage message) {
@@ -77,13 +98,13 @@ public class ReceiveBehaviour extends CyclicBehaviour {
         return response;
     }
 
-    private void handleTopicMessaging() {
+    private void handleTopicMessaging() throws ServiceDiscoveryNotFoundException {
         for (InstructionSet is : DA.sensorAgents.values()) {
             if (!is.getMessaging().isDirectToDecisionAgent()) {
                 if (is.getMessaging().isRegisteredToTopic()) {
-                    DA.send(requestFromTopic(this.brokerAgent, is));
+                    DA.send(requestFromTopic(this.serviceDiscovery.getAID(), is));
                 } else {
-                    DA.send(subscribeToTopic(this.brokerAgent, is));
+                    DA.send(subscribeToTopic(this.serviceDiscovery.getAID(), is));
                 }
             }
         }
