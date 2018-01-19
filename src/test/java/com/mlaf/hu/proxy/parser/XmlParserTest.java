@@ -39,9 +39,10 @@ public class XmlParserTest extends TestCase {
     Just testing to see if the parser doesn't throw any exception.
     Comparing parsed content might be added later.
     */
-    public void testParser() throws ParserConfigurationException, SAXException {
+    public void testParser(){
         ACLMessage message = AclXmlParser.parseBody(XML);
 
+        
         assertNotNull(message.getPerformative());
 
         assertNotNull(message.getSender());
