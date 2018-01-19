@@ -5,12 +5,13 @@
  */
 package com.mlaf.hu.proxy.parser;
 
-import java.util.ArrayList;
+
+import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-
+import javax.xml.bind.annotation.XmlType;
 /**
  *
  * @author Hans
@@ -24,11 +25,12 @@ import javax.xml.bind.annotation.XmlRootElement;
  * </sender>
  */
 @XmlRootElement(name = "fipa-message")
+@XmlType(propOrder = {"performative","sender","receiver","content","language","ontology","protocol", "conversationId"})
 public class AclObject {
 
     private String performative;
-    private ArrayList<Sender> sender;
-    private ArrayList<Receiver> receiver;
+    private List<Sender> sender;
+    private List<Receiver> receiver;
     private String content;
     private String language;
     private String ontology;
@@ -45,22 +47,22 @@ public class AclObject {
     }
 
     @XmlElementWrapper(name = "sender")
-    @XmlElement(name = "agent-identifier")
-    public ArrayList<Sender> getSender() {
+    @XmlElement(name = "agent-identifier", type = Sender.class)
+    public List<Sender> getSender() {
         return sender;
     }
 
-    public void setSender(ArrayList<Sender> sender) {
+    public void setSender(List<Sender> sender) {
         this.sender = sender;
     }
 
     @XmlElementWrapper(name = "receiver")
-    @XmlElement(name = "agent-identifier")
-    public ArrayList<Receiver> getReceiver() {
+    @XmlElement(name = "agent-identifier", type = Receiver.class)
+    public List<Receiver> getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(ArrayList<Receiver> receiver) {
+    public void setReceiver(List<Receiver> receiver) {
         this.receiver = receiver;
     }
 

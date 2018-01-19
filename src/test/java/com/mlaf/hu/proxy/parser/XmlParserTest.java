@@ -15,8 +15,8 @@ import org.junit.Test;
  * @author Rogier
  */
 public class XmlParserTest extends TestCase {
-    private static final String XML = "<?xml version=\"1.0\"?>\n" +
-            "<fipa-message communicative-act=\"request\">\n" +
+    private static final String XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+            "<fipa-message communicative-act=\"REQUEST\">\n" +
             "	<sender><agent-identifier><name>See-Sharp-Agent</name><addresses><url>tcp://192.168.178.14:1234</url></addresses></agent-identifier></sender>\n" +
             "	<receiver><agent-identifier><name>MailAgent@192.168.178.14:1099/JADE</name><addresses><url>tcp://192.168.178.14:1099</url></addresses></agent-identifier></receiver>\n" +
             "	<content>\n" +
@@ -92,6 +92,8 @@ public class XmlParserTest extends TestCase {
     @Test
     public void testAclToXml(){
         String xml = AclXmlParser.parseACLToXML(createTestMessage());
+        System.out.println("xml:"+xml);
+        System.out.println("XML:"+XML);
         assertEquals(xml, XML);
     }
 }

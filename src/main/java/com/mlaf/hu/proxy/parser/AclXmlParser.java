@@ -14,6 +14,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.logging.Level;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
@@ -52,18 +53,21 @@ public class AclXmlParser {
         try {
             JAXBContext context = JAXBContext.newInstance(AclObject.class);
             Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING,"UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
             marshaller.marshal(aclObject, marshalledObject);
         } catch (JAXBException ex) {
             java.util.logging.Logger.getLogger(AclXmlParser.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        return marshalledObject.toString();
+        String xml = marshalledObject.toString().replace("&lt;", "<").replace("&gt;",">");
+        return xml;
     }
 
     private static Receiver newReceiver(ACLMessage message) {
         Receiver receiver = new Receiver();
-        while (message.getAllReceiver().hasNext()) {
+        Iterator receiverIterator = message.getAllReceiver();
+        if(receiverIterator.hasNext()) {
 
             AID aid = (AID) message.getAllReceiver().next();
 
@@ -91,6 +95,7 @@ public class AclXmlParser {
     }
 
     public static ACLMessage parseBody(String body) {
+        
         AclObject aclObject = JAXB.unmarshal(new StringReader(body), AclObject.class);
 //        Sender sender = JAXB.unmarshal(new StringReader(body), Sender.class);
 //        Receiver receiver = JAXB.unmarshal(new StringReader(body), Receiver.class);
