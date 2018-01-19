@@ -13,6 +13,7 @@ import jade.util.Logger;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
@@ -67,9 +68,7 @@ public class AclXmlParser {
             AID aid = (AID) message.getAllReceiver().next();
 
             ArrayList<String> adressesReceiver = new ArrayList<>();
-            for (String url : aid.getAddressesArray()) {
-                adressesReceiver.add(url);
-            }
+            adressesReceiver.addAll(Arrays.asList(aid.getAddressesArray()));
             receiver.setName(aid.getName());
             receiver.setAddresses(adressesReceiver);
         }
@@ -80,9 +79,7 @@ public class AclXmlParser {
         Sender sender = new Sender();
         sender.setName(message.getSender().getName());
         ArrayList<String> adressesSender = new ArrayList<>();
-        for (String url : message.getSender().getAddressesArray()) {
-            adressesSender.add(url);
-        }
+        adressesSender.addAll(Arrays.asList(message.getSender().getAddressesArray()));
         sender.setAdresses(adressesSender);
         return sender;
     }
