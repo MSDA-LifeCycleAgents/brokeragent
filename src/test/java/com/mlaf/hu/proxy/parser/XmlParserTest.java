@@ -7,12 +7,8 @@ package com.mlaf.hu.proxy.parser;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
-
 import java.util.Iterator;
-import javax.xml.parsers.ParserConfigurationException;
-
 import junit.framework.TestCase;
-import org.xml.sax.SAXException;
 
 /**
  * @author Rogier

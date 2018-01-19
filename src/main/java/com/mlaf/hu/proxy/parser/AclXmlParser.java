@@ -71,7 +71,7 @@ public class AclXmlParser {
                 adressesReceiver.add(url);
             }
             receiver.setName(aid.getName());
-            receiver.setAdresses(adressesReceiver);
+            receiver.setAddresses(adressesReceiver);
         }
         return receiver;
     }
@@ -98,7 +98,6 @@ public class AclXmlParser {
 //        Sender sender = JAXB.unmarshal(new StringReader(body), Sender.class);
 //        Receiver receiver = JAXB.unmarshal(new StringReader(body), Receiver.class);
         return parseXMLToACL(aclObject);
-
     }
 
     private static ACLMessage parseXMLToACL(AclObject aclObject) {
@@ -114,7 +113,7 @@ public class AclXmlParser {
 
         aclObject.getReceiver().forEach((receiver) -> {
             String receiverName = receiver.getName();
-            String senderUrl = receiver.getAdresses().get(0);
+            String senderUrl = receiver.getAddresses().get(0);
             AID receiverAid = new AID();
             receiverAid.setName(receiverName);
             receiverAid.addAddresses(senderUrl);
