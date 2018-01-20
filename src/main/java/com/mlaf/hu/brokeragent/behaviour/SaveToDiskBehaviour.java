@@ -3,10 +3,10 @@ package com.mlaf.hu.brokeragent.behaviour;
 import com.mlaf.hu.brokeragent.BrokerAgent;
 import jade.core.behaviours.TickerBehaviour;
 
-public class SaveBehaviour extends TickerBehaviour {
+public class SaveToDiskBehaviour extends TickerBehaviour {
     private final BrokerAgent brokerAgent;
 
-    public SaveBehaviour(BrokerAgent broker) {
+    public SaveToDiskBehaviour(BrokerAgent broker) {
         super(broker, BrokerAgent.STORE_INTERVAL_IN_MS);
         this.brokerAgent = broker;
     }
