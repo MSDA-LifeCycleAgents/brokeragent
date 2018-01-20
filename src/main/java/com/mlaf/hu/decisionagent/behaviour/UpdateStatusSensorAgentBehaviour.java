@@ -36,11 +36,15 @@ public class UpdateStatusSensorAgentBehaviour extends TickerBehaviour {
     private void checkForInactivity() {
         for (InstructionSet localInstructionSet : this.DA.sensorAgents.values()) {
             if (localInstructionSet.getLastReceivedDataPackageAt() != null) {
-                if (ChronoUnit.SECONDS.between(localInstructionSet.getLastReceivedDataPackageAt(), LocalDateTime.now()) / localInstructionSet.getHighestIntervalFromSensors() >= localInstructionSet.getAmountOfMissedDataPackages()) {
+                long passedTime = ChronoUnit.SECONDS.between(localInstructionSet.getLastReceivedDataPackageAt(), LocalDateTime.now());
+                int missedDataPackages = (int) (passedTime / localInstructionSet.getHighestIntervalFromSensors());
+                if (missedDataPackages >= localInstructionSet.getAmountOfMissedDataPackages()) {
                     localInstructionSet.setInActive();
                 }
             } else if (localInstructionSet.getRegisteredAt() != null) {
-                if (ChronoUnit.SECONDS.between(localInstructionSet.getRegisteredAt(), LocalDateTime.now()) / localInstructionSet.getHighestIntervalFromSensors() >= localInstructionSet.getAmountOfMissedDataPackages()) {
+                long passedTime = ChronoUnit.SECONDS.between(localInstructionSet.getRegisteredAt(), LocalDateTime.now());
+                int missedDataPackages = (int) (passedTime / localInstructionSet.getHighestIntervalFromSensors());
+                if (missedDataPackages >= localInstructionSet.getAmountOfMissedDataPackages()) {
                     localInstructionSet.setInActive();
                 }
             }
