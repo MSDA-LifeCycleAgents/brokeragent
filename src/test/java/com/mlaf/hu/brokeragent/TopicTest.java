@@ -48,7 +48,7 @@ public class TopicTest extends TestCase {
     public void testGetLastMessageEmpty() {
         Topic t = new Topic();
         System.out.println(t.toString());
-        assertEquals(new Message("No more messages in this queue."), t.getOldestMessage());
+        assertEquals(null, t.getOldestMessage());
     }
 
     public void testGetOldestMessage() throws Exception {
