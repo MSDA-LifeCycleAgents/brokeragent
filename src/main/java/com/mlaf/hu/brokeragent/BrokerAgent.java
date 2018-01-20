@@ -145,6 +145,9 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
         try {
             Topic topic = this.getTopicByAID(topicAID);
             if (topic.getSubscriber(subscriber) != null) {
+                if (topic.getOldestMessage() == null) {
+                    return null;
+                }
                 Message oldestMessage = topic.getOldestMessage();
                 message.setContent(oldestMessage.getContent());
                 message.setSender(oldestMessage.getPublisher());

@@ -86,7 +86,7 @@ public class Topic implements Serializable {
             return lastMessage;
         }
         catch (NullPointerException | IndexOutOfBoundsException ignored) {
-            return new Message("No more messages in this queue.");
+            return null;
         }
     }
 
