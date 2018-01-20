@@ -3,10 +3,11 @@ package com.mlaf.hu.models;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 @XmlRootElement(name = "messaging")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Messaging {
+public class Messaging implements Serializable {
     private boolean directToDecisionAgent;
     private Topic topic;
     private boolean registeredToTopic = false;

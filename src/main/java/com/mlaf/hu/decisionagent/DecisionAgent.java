@@ -2,9 +2,9 @@ package com.mlaf.hu.decisionagent;
 
 import com.mlaf.hu.decisionagent.behaviour.ReceiveBehaviour;
 import com.mlaf.hu.decisionagent.behaviour.RegisterSensorAgentBehaviour;
+import com.mlaf.hu.decisionagent.behaviour.SaveToDiskBehaviour;
 import com.mlaf.hu.decisionagent.behaviour.UpdateStatusSensorAgentBehaviour;
 import com.mlaf.hu.helpers.DFServices;
-import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.*;
@@ -16,13 +16,19 @@ import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class DecisionAgent extends Agent {
     private static final String SERVICE_NAME = "DECISION-AGENT";
     public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
     public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
+    private static final String STORAGE_BASEPATH = "C:/DecisionAgent/"; //FIXME needs config
+    public static final long STORE_INTERVAL_IN_MS = 5000; //FIXME needs config
+    private static final String STORAGE_FILENAME = "sensoragents"; //FIXME needs config
+    private static final boolean STORE_SENSOR_AGENTS_ON_DISK = true; //FIXME needs config
 
     public DecisionAgent() {
         super();
@@ -30,6 +36,13 @@ public abstract class DecisionAgent extends Agent {
 
     @Override
     protected void setup() {
+        if(STORE_SENSOR_AGENTS_ON_DISK) {
+            boolean success = createDirectoryStructure();
+            if (new File(STORAGE_BASEPATH).exists() || success) {
+                loadSensorAgents();
+                addBehaviour(new SaveToDiskBehaviour(this));
+            }
+        }
         DFServices.registerAsService(createServiceDescription(), this);
         addBehaviour(new RegisterSensorAgentBehaviour(this));
         addBehaviour(new ReceiveBehaviour(this));
@@ -109,5 +122,40 @@ public abstract class DecisionAgent extends Agent {
     }
 
     public abstract void executePlanCallback(Plan plan);
+
+     public void storeSensorAgents() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
+            decisionAgentLogger.log(Logger.INFO, String.format("Writing the following Sensor Agents w. Instruction Sets to disk: \n%s", HashMapToString()));
+            oos.writeObject(this.sensorAgents);
+            decisionAgentLogger.log(Logger.INFO, String.format("Written all Sensor Agents w. Instruction Sets to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            decisionAgentLogger.log(Logger.SEVERE, "Could not write Sensor Agents w. Instruction Sets to disk.");
+        }
+    }
+
+    private void loadSensorAgents() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
+            this.sensorAgents = (HashMap) ois.readObject();
+            decisionAgentLogger.log(Logger.INFO, String.format("Found serialized Sensor Agents w. Instruction Sets: \n%s", HashMapToString()));
+        } catch (FileNotFoundException e) {
+            decisionAgentLogger.log(Logger.INFO, String.format("Could not find serialized Sensor Agents w. Instruction Sets on disk: %s. Starting fresh.", e.getMessage()));
+        } catch (IOException | ClassNotFoundException e) {
+            decisionAgentLogger.log(Logger.INFO, String.format("Could not load file, IO Error: %s. Starting fresh.", e.getMessage()));
+        }
+    }
+
+    private String HashMapToString() {
+        StringBuilder toString = new StringBuilder();
+        for (Map.Entry<AID, InstructionSet> entry : this.sensorAgents.entrySet()) {
+            toString.append(entry.getKey()).append(" \n");
+        }
+        return toString.toString();
+    }
+
+    private static boolean createDirectoryStructure() {
+        return (new File(STORAGE_BASEPATH).mkdirs()); // Return success
+    }
+
 
 }

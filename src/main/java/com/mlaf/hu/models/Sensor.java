@@ -1,10 +1,11 @@
 package com.mlaf.hu.models;
 
 import javax.xml.bind.annotation.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @XmlRootElement(name = "sensor")
-public class Sensor {
+public class Sensor implements Serializable {
     private String id;
     private String label;
     private int intervalInSeconds;

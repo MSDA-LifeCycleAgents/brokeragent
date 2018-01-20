@@ -108,10 +108,8 @@ public class Topic implements Serializable {
         Topic rsh = (Topic) obj;
 
         return new EqualsBuilder()
-//                .appendSuper(super.equals(obj)) //FIXME
                 .append(jadeTopic, rsh.jadeTopic)
                 .append(subscribers, rsh.subscribers)
-//                .append(messages, rsh.messages) //FIXME
                 .append(daysToKeepMessages, rsh.daysToKeepMessages)
                 .isEquals();
     }
