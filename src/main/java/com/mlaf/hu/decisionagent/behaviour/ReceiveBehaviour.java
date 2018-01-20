@@ -87,11 +87,11 @@ public class ReceiveBehaviour extends CyclicBehaviour {
                 }
             }
         } catch (ParseException e) {
-            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, e.getMessage());
+            DecisionAgent.decisionAgentLogger.log(Logger.WARNING, e.getMessage());
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Composition: wrong, check documentation.");
         } catch (SensorNotFoundException e) {
-            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE,"InstructionSet misses sensor from sensor reading: " + e.getMessage());
+            DecisionAgent.decisionAgentLogger.log(Logger.WARNING,"InstructionSet misses sensor from sensor reading: " + e.getMessage());
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("InstructionSet misses sensor from sensor reading: " + e.getMessage());
         }
