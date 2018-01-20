@@ -1,5 +1,7 @@
 package com.mlaf.hu.models;
 
+import com.mlaf.hu.helpers.exceptions.SensorNotFoundException;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ public class InstructionSet {
     private boolean mallformed = false;
     private LocalDateTime lastReceivedDataPackageAt;
     private int amountOfMissedDataPackages = 5;
+    private LocalDateTime registeredAt;
 
     @XmlElement(name = "identifier")
     public String getIdentifier() {
@@ -145,5 +148,22 @@ public class InstructionSet {
             }
         }
         return highestInterval;
+    }
+
+    public LocalDateTime getRegisteredAt() {
+        return registeredAt;
+    }
+
+    public void setRegisteredAt(LocalDateTime registeredAt) {
+        this.registeredAt = registeredAt;
+    }
+
+     public Sensor getSensor(String sensorId) throws SensorNotFoundException {
+        for(Sensor sensor: sensors.getSensors()) {
+            if (sensor.getId().equals(sensorId)) {
+                return sensor;
+            }
+        }
+        throw new SensorNotFoundException(sensorId);
     }
 }

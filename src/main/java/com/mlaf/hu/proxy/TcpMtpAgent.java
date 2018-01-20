@@ -44,21 +44,7 @@ public class TcpMtpAgent extends Agent {
                 amsad.setName(aid);
                 amsad.setState(AMSAgentDescription.ACTIVE);
                 
-                AMSService.register(TcpMtpAgent.this, amsad);
-                
-                ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-                request.addReceiver(aid);
-                request.setContent("(instructions )");
-                send(request);
-                ACLMessage response = receive();
-                
-                TcpMtpAgent.this.addBehaviour(new HeartbeatBehaviour(TcpMtpAgent.this, 20000, aid) {
-                    @Override
-                    protected void onUnavailable() {
-                        // Insert remove agent logic here..
-                    }
-                });
-                
+                AMSService.register(TcpMtpAgent.this, amsad);          
             } catch (FIPAException ex) {
                 logger.log(Level.WARNING, "Could not register " + agentName, ex);
             }

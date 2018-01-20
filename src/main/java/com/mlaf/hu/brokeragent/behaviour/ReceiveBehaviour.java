@@ -26,6 +26,7 @@ public class ReceiveBehaviour extends CyclicBehaviour {
                 brokerAgent.storeMessage(new Message(topicMessage.getContent(), topicMessage.getSender(), LocalDateTime.now()), topicPair.getKey());
             } else {
                 block();
+                return;
             }
             Topic topic = topicPair.getValue();
             topic.removeOldMessages();
