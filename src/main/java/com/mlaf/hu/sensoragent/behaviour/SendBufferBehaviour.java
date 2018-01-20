@@ -6,9 +6,12 @@ import jade.core.ServiceException;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.util.Logger;
 
+import java.time.LocalDateTime;
+
 
 public class SendBufferBehaviour extends CyclicBehaviour {
     private final SensorAgent sensorAgent;
+    private LocalDateTime continueAfter;
 
     public SendBufferBehaviour(SensorAgent sa) {
         super(sa);
@@ -18,14 +21,12 @@ public class SendBufferBehaviour extends CyclicBehaviour {
     @Override
     public void action() {
         try {
-            sensorAgent.sendSensorReadings();
+            if(LocalDateTime.now().isAfter(continueAfter)) {
+                sensorAgent.sendSensorReadings();
+            }
         } catch (ServiceDiscoveryNotFoundException | ServiceException e) {
             SensorAgent.sensorAgentLogger.log(Logger.SEVERE, "Stop sending and waiting 20 seconds: " + e.getMessage());
-            try {
-                Thread.sleep(20000L);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
+            continueAfter = LocalDateTime.now().plusSeconds(20);
         }
 
     }
