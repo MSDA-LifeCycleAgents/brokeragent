@@ -1,10 +1,7 @@
 package com.mlaf.hu.models;
 
-import com.mlaf.hu.brokeragent.Topic;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "messaging")

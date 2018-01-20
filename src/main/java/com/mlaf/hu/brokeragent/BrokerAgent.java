@@ -6,6 +6,8 @@ import com.mlaf.hu.brokeragent.behaviour.SendBehaviour;
 import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
 import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.models.Message;
+import com.mlaf.hu.models.Topic;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.messaging.TopicManagementHelper;
@@ -31,10 +33,10 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     @Override
     protected void setup() {
         try {
-            boolean succes = createDirectoryStructure();
+            boolean success = createDirectoryStructure();
             DFServices.registerAsService(createServiceDescription(), this);
             topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
-            if (succes) {
+            if (success) {
                 loadTopics();
                 addBehaviour(new SaveBehaviour(this));
             }

@@ -1,7 +1,7 @@
 package com.mlaf.hu.decisionagent.behaviour;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
-import com.mlaf.hu.brokeragent.Topic;
+import com.mlaf.hu.models.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.exceptions.ParseException;
@@ -20,7 +20,6 @@ import jade.util.Logger;
 
 import javax.xml.bind.JAXB;
 import java.io.StringWriter;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 

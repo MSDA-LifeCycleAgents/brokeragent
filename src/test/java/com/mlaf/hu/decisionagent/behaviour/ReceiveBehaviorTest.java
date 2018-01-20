@@ -1,6 +1,6 @@
 package com.mlaf.hu.decisionagent.behaviour;
 
-import com.mlaf.hu.brokeragent.Topic;
+import com.mlaf.hu.models.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.InstructionSet;
