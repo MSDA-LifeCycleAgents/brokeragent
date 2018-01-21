@@ -30,19 +30,22 @@ public class AclXmlParser {
 
     public static String parseACLToXML(ACLMessage message) {
         StringWriter marshalledObject = new StringWriter();
-        
+
         AclObject aclObject = new AclObject();
         ArrayList<Receiver> receiverList = new ArrayList<>();
         ArrayList<Sender> senderList = new ArrayList<>();
-
+        ArrayList<ReplyTo> replyToList = new ArrayList<>();
         Sender sender = newSender(message);
         Receiver receiver = newReceiver(message);
-        
+        ReplyTo replyTo = newReplyTo(message);
+
         receiverList.add(receiver);
         senderList.add(sender);
-        
+        replyToList.add(replyTo);
+
         aclObject.setPerformative("" + getPerformative(message.getPerformative()));
         aclObject.setSender(senderList);
+        aclObject.setReplyTo(replyToList);
         aclObject.setReceiver(receiverList);
         aclObject.setContent(message.getContent());
         aclObject.setLanguage(message.getLanguage());
@@ -53,28 +56,28 @@ public class AclXmlParser {
         try {
             JAXBContext context = JAXBContext.newInstance(AclObject.class);
             Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_ENCODING,"UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
             marshaller.marshal(aclObject, marshalledObject);
         } catch (JAXBException ex) {
             java.util.logging.Logger.getLogger(AclXmlParser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String xml = marshalledObject.toString().replace("&lt;", "<").replace("&gt;",">");
+        String xml = marshalledObject.toString().replace("&lt;", "<").replace("&gt;", ">");
         return xml;
     }
 
     private static Receiver newReceiver(ACLMessage message) {
         Receiver receiver = new Receiver();
         Iterator receiverIterator = message.getAllReceiver();
-        if(receiverIterator.hasNext()) {
+        if (receiverIterator.hasNext()) {
 
             AID aid = (AID) message.getAllReceiver().next();
 
-            ArrayList<String> adressesReceiver = new ArrayList<>();
-            adressesReceiver.addAll(Arrays.asList(aid.getAddressesArray()));
+            ArrayList<String> addressesReceiver = new ArrayList<>();
+            addressesReceiver.addAll(Arrays.asList(aid.getAddressesArray()));
             receiver.setName(aid.getName());
-            receiver.setAddresses(adressesReceiver);
+            receiver.setAddresses(addressesReceiver);
         }
         return receiver;
     }
@@ -82,20 +85,35 @@ public class AclXmlParser {
     private static Sender newSender(ACLMessage message) {
         Sender sender = new Sender();
         sender.setName(message.getSender().getName());
-        ArrayList<String> adressesSender = new ArrayList<>();
-        adressesSender.addAll(Arrays.asList(message.getSender().getAddressesArray()));
-        sender.setAdresses(adressesSender);
+        ArrayList<String> addressesSender = new ArrayList<>();
+        addressesSender.addAll(Arrays.asList(message.getSender().getAddressesArray()));
+        sender.setAddresses(addressesSender);
         return sender;
     }
 
-    public static ACLMessage parse(String xml, Envelope envelope){
+    private static ReplyTo newReplyTo(ACLMessage message) {
+        ReplyTo replyTo = new ReplyTo();
+        Iterator receiverIterator = message.getAllReplyTo();
+        if (receiverIterator.hasNext()) {
+
+            AID aid = (AID) message.getAllReplyTo().next();
+
+            ArrayList<String> adressesReplyTo = new ArrayList<>();
+            adressesReplyTo.addAll(Arrays.asList(aid.getAddressesArray()));
+            replyTo.setName(aid.getName());
+            replyTo.setAddresses(adressesReplyTo);
+        }
+        return replyTo;
+    }
+
+    public static ACLMessage parse(String xml, Envelope envelope) {
         ACLMessage message = parseBody(xml);
         message.setEnvelope(envelope);
         return message;
     }
 
     public static ACLMessage parseBody(String body) {
-        
+
         AclObject aclObject = JAXB.unmarshal(new StringReader(body), AclObject.class);
 //        Sender sender = JAXB.unmarshal(new StringReader(body), Sender.class);
 //        Receiver receiver = JAXB.unmarshal(new StringReader(body), Receiver.class);
@@ -115,13 +133,22 @@ public class AclXmlParser {
 
         aclObject.getReceiver().forEach((receiver) -> {
             String receiverName = receiver.getName();
-            String senderUrl = receiver.getAddresses().get(0);
+            String receiverUrl = receiver.getAddresses().get(0);
             AID receiverAid = new AID();
             receiverAid.setName(receiverName);
-            receiverAid.addAddresses(senderUrl);
+            receiverAid.addAddresses(receiverUrl);
             message.addReceiver(receiverAid);
         });
-
+        
+        aclObject.getReplyTo().forEach((replyTo) -> {
+            String replyToName = replyTo.getName();
+            String replyToUrl = replyTo.getAddresses().get(0);
+            AID replyToAid = new AID();
+            replyToAid.setName(replyToName);
+            replyToAid.addAddresses(replyToUrl);
+            message.addReplyTo(replyToAid);
+        });
+        
         String content = aclObject.getContent();
         String language = aclObject.getLanguage();
         String ontology = aclObject.getOntology();

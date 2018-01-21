@@ -5,19 +5,17 @@
  */
 package com.mlaf.hu.proxy.parser;
 
-import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-
 
 /**
  *
  * @author Hans
  */
-public class Receiver {
-
+public class ReplyTo {
     private String name;
-    private ArrayList<String> addresses;
+    private List<String> addresses;
 
     @XmlElement
     public String getName() {
@@ -30,11 +28,11 @@ public class Receiver {
 
     @XmlElementWrapper(name = "addresses")
     @XmlElement(name = "url")
-    public ArrayList<String> getAddresses() {
+    public List<String> getAddresses() {
         return addresses;
     }
 
-    public void setAddresses(ArrayList<String> addresses) {
+    public void setAddresses(List<String> addresses) {
         this.addresses = addresses;
     }
 }

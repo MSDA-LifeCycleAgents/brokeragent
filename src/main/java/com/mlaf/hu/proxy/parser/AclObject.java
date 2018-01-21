@@ -5,32 +5,33 @@
  */
 package com.mlaf.hu.proxy.parser;
 
-
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
 /**
  *
  * @author Hans
  * <sender>
  * <agent-identifier> list
  * <name>>See-Sharp-Agent</name>
- * <adresses> list
+ * <addresses> list
  * <url>tcp://192.168.178.14:1234</url>
- * </adresses>
+ * </addresses>
  * </agent-identifier>
  * </sender>
  */
 @XmlRootElement(name = "fipa-message")
-@XmlType(propOrder = {"performative","sender","receiver","content","language","ontology","protocol", "conversationId"})
+@XmlType(propOrder = {"performative", "sender", "receiver", "replyTo", "content", "language", "ontology", "protocol", "conversationId"})
 public class AclObject {
 
     private String performative;
     private List<Sender> sender;
     private List<Receiver> receiver;
+    private List<ReplyTo> replyTo;
     private String content;
     private String language;
     private String ontology;
@@ -64,6 +65,16 @@ public class AclObject {
 
     public void setReceiver(List<Receiver> receiver) {
         this.receiver = receiver;
+    }
+
+    @XmlElementWrapper(name = "replyTo")
+    @XmlElement(name = "agent-identifier", type = ReplyTo.class)
+    public List<ReplyTo> getReplyTo() {
+        return replyTo;
+    }
+
+    public void setReplyTo(List<ReplyTo> replyTo) {
+        this.replyTo = replyTo;
     }
 
     @XmlElement

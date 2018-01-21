@@ -19,6 +19,7 @@ public class XmlParserTest extends TestCase {
             "<fipa-message communicative-act=\"REQUEST\">\n" +
             "	<sender><agent-identifier><name>See-Sharp-Agent</name><addresses><url>tcp://192.168.178.14:1234</url></addresses></agent-identifier></sender>\n" +
             "	<receiver><agent-identifier><name>MailAgent@192.168.178.14:1099/JADE</name><addresses><url>tcp://192.168.178.14:1099</url></addresses></agent-identifier></receiver>\n" +
+            "	<replyTo><agent-identifier><name>MailAgent@192.168.178.14:1099/JADE</name><addresses><url>tcp://192.168.178.14:1099</url></addresses></agent-identifier></replyTo>\n" +
             "	<content>\n" +
             "		<message>\n" +
             "			<content>Insert e-mail body here</content>\n" +
@@ -44,6 +45,10 @@ public class XmlParserTest extends TestCase {
         receiver.setName("MailAgent@192.168.178.14:1099/JADE");
         receiver.addAddresses("tcp://192.168.178.14:1099");
         
+        AID replyTo = new AID();
+        replyTo.setName("MailAgent@192.168.178.14:1099/JADE");
+        replyTo.addAddresses("tcp://192.168.178.14:1099");
+        
         message.setContent("<message>\n" +
             "			<content>Insert e-mail body here</content>\n" +
             "			<subject>Insert subject here</subject>	\n" +
@@ -52,6 +57,7 @@ public class XmlParserTest extends TestCase {
         
         message.setSender(sender);
         message.addReceiver(receiver);
+        message.addReplyTo(replyTo);
         
         message.setLanguage("fipa-s10");
         message.setOntology("fipa-agent-management");
@@ -81,6 +87,17 @@ public class XmlParserTest extends TestCase {
             numberOfReceivers++;
         }
         assertEquals(numberOfReceivers, 1);
+        
+        int numberOfReplyTo = 0;
+        Iterator replyToIt = message.getAllReplyTo();
+
+        while (replyToIt.hasNext()) {
+            AID replyTo = (AID) replyToIt.next();
+            assertNotNull(replyTo.getName());
+            assertEquals(replyTo.getAddressesArray().length, 1);
+            numberOfReplyTo++;
+        }
+        assertEquals(numberOfReplyTo, 1);
 
         assertNotNull(message.getContent());
         assertNotNull(message.getLanguage());

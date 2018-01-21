@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 public class Sender {
 
     private String name;
-    private ArrayList<String> adresses;
+    private ArrayList<String> addresses;
 
     @XmlElement
     public String getName() {
@@ -28,14 +28,14 @@ public class Sender {
         this.name = name;
     }
 
-    @XmlElementWrapper(name = "adresses")
+    @XmlElementWrapper(name = "addresses")
     @XmlElement(name = "url")
-    public ArrayList<String> getAdresses() {
-        return adresses;
+    public ArrayList<String> getAddresses() {
+        return addresses;
     }
 
-    public void setAdresses(ArrayList<String> adresses) {
-        this.adresses = adresses;
+    public void setAddresses(ArrayList<String> addresses) {
+        this.addresses = addresses;
     }
 
 }
