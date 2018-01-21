@@ -1,5 +1,6 @@
 package com.mlaf.hu.brokeragent;
 
+import com.mlaf.hu.models.Message;
 import jade.core.AID;
 import junit.framework.TestCase;
 

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 public class SendBufferBehaviour extends CyclicBehaviour {
     private final SensorAgent sensorAgent;
-    private LocalDateTime continueAfter;
+    private LocalDateTime continueAfter = LocalDateTime.now();
 
     public SendBufferBehaviour(SensorAgent sa) {
         super(sa);

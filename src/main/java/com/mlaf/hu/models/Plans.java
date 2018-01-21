@@ -5,11 +5,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @XmlRootElement(name = "plans")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Plans {
+public class Plans implements Serializable {
     @XmlElement(name = "plan")
     private ArrayList<Plan> plans = null;
 

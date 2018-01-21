@@ -1,6 +1,8 @@
 package com.mlaf.hu.models;
 
-public class Fallback {
+import java.io.Serializable;
+
+public class Fallback implements Serializable{
     private String via;
     private String to;
 
