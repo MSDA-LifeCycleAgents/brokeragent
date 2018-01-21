@@ -4,9 +4,13 @@ import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
 import com.mlaf.hu.sensoragent.SensorAgent;
 import jade.core.ServiceException;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.util.Logger;
 
 import java.time.LocalDateTime;
+
+import static jade.lang.acl.MessageTemplate.MatchPerformative;
 
 
 public class SendBufferBehaviour extends CyclicBehaviour {
@@ -20,6 +24,7 @@ public class SendBufferBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
+        ACLMessage notRegisteredAnymore = myAgent.receive();
         try {
             if(LocalDateTime.now().isAfter(continueAfter)) {
                 sensorAgent.sendSensorReadings();
