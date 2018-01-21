@@ -4,9 +4,11 @@ import javax.xml.bind.annotation.*;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
+import java.io.Serializable;
+
 
 @XmlRootElement(name = "measurement")
-public class Measurement {
+public class Measurement  implements Serializable {
     private String id;
     private Plans plans;
     private int min, max;

@@ -4,9 +4,10 @@ import com.mlaf.hu.helpers.exceptions.SensorNotFoundException;
 import com.mlaf.hu.models.Sensors;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 @XmlRootElement (name = "sensorreading")
-public class SensorReading {
+public class SensorReading implements Serializable {
     private Sensors sensors;
 
     public SensorReading() {

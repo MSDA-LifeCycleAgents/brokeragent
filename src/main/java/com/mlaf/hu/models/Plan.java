@@ -1,6 +1,8 @@
 package com.mlaf.hu.models;
 
-public class Plan {
+import java.io.Serializable;
+
+public class Plan implements Serializable {
     private double below;
     private double above;
     private String message;

@@ -4,10 +4,11 @@ import com.mlaf.hu.helpers.exceptions.SensorNotFoundException;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @XmlRootElement(name = "instructions")
-public class InstructionSet {
+public class InstructionSet implements Serializable {
     private String identifier;
     private Messaging messaging;
     private Sensors sensors;

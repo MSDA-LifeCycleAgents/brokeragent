@@ -1,4 +1,4 @@
-package com.mlaf.hu.brokeragent;
+package com.mlaf.hu.models;
 
 import jade.core.AID;
 

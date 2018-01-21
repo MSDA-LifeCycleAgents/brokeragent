@@ -1,11 +1,13 @@
 package com.mlaf.hu.brokeragent;
 
 import com.mlaf.hu.brokeragent.behaviour.ReceiveBehaviour;
-import com.mlaf.hu.brokeragent.behaviour.SaveBehaviour;
+import com.mlaf.hu.brokeragent.behaviour.SaveToDiskBehaviour;
 import com.mlaf.hu.brokeragent.behaviour.SendBehaviour;
 import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
 import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.models.Message;
+import com.mlaf.hu.models.Topic;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.messaging.TopicManagementHelper;
@@ -24,6 +26,7 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     private final static String STORAGE_BASEPATH = "C:/BrokerAgent/"; //TODO still waiting for configuration singleton
     private final static String STORAGE_FILENAME = "topics"; //TODO still waiting for configuration singleton
     public static final int STORE_INTERVAL_IN_MS = 3000; //TODO still waiting for configuration singleton
+    public static final boolean STORE_TOPICS_ON_DISK = true; //TODO still waiting for configuration singleton
     static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
     public HashMap<AID, Topic> topics = new HashMap<>();
     private TopicManagementHelper topicHelper;
@@ -31,13 +34,15 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
     @Override
     protected void setup() {
         try {
-            boolean succes = createDirectoryStructure();
+            if (STORE_TOPICS_ON_DISK) {
+                boolean success = createDirectoryStructure();
+                if (new File(STORAGE_BASEPATH).exists() || success) {
+                    loadTopics();
+                    addBehaviour(new SaveToDiskBehaviour(this));
+                }
+            }
             DFServices.registerAsService(createServiceDescription(), this);
             topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
-            if (succes) {
-                loadTopics();
-                addBehaviour(new SaveBehaviour(this));
-            }
             addBehaviour(new SendBehaviour(this, topicHelper));
             addBehaviour(new ReceiveBehaviour(this));
         } catch (Exception e) {
@@ -140,6 +145,9 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
         try {
             Topic topic = this.getTopicByAID(topicAID);
             if (topic.getSubscriber(subscriber) != null) {
+                if (topic.getOldestMessage() == null) {
+                    return null;
+                }
                 Message oldestMessage = topic.getOldestMessage();
                 message.setContent(oldestMessage.getContent());
                 message.setSender(oldestMessage.getPublisher());

@@ -4,11 +4,12 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @XmlRootElement(name = "measurements")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Measurements {
+public class Measurements implements Serializable {
     @XmlElement(name = "measurement")
     private ArrayList<Measurement> measurements = null;
 
