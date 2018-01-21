@@ -7,6 +7,7 @@ import com.mlaf.hu.helpers.DFServices;
 import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import com.mlaf.hu.models.*;
 import jade.core.AID;
 import jade.core.Agent;
@@ -33,9 +34,10 @@ public abstract class DecisionAgent extends Agent {
     @Override
     protected void setup() {
         try {
+            decisionAgentLogger.addHandler(new LoggerAgentLogHandler( this, 30));
             DFServices.registerAsService(createServiceDescription(), this);
             addBehaviour(new RegisterSensorAgentBehaviour(this));
-            addBehaviour(new ReceiveBehaviour(this));
+//            addBehaviour(new ReceiveBehaviour(this));
             addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
             ServiceDiscovery sd_decision_agent = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
             AID DA_TEST = sd_decision_agent.ensureAID(20);

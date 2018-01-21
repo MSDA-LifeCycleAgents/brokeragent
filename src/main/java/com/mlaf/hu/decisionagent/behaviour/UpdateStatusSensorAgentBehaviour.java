@@ -11,6 +11,7 @@ import jade.util.Logger;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.logging.Level;
 
 /**
  * This behavior will continuously check if the Sensor Agents are still alive and kicking. It will do this by checking for every InstructionSet
@@ -28,6 +29,7 @@ public class UpdateStatusSensorAgentBehaviour extends TickerBehaviour {
 
     @Override
     protected void onTick() {
+        DA.decisionAgentLogger.log(Level.WARNING, "Test log for LoggerAgent");
         checkForInactivity();
         ACLMessage message = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.PROPAGATE));
         updateToActive(message);

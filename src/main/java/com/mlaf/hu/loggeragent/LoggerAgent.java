@@ -9,6 +9,7 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -21,7 +22,8 @@ public class LoggerAgent extends Agent {
 
     public LoggerAgent() {
         super();
-        DFServices.registerAsService(createServiceDescription(), this);
+        //TODO This fails for some reason?
+        DFServices.registerAsService(this.createServiceDescription(), this);
         incomingLogger = Logger.getLogger("com.mlaf.hu.loggeragent.central");
         addBehaviour(new ReceiveBehaviour(this));
     }
@@ -33,9 +35,10 @@ public class LoggerAgent extends Agent {
         return sd;
     }
 
-    public static CircularFifoQueue<LogRecord> deserializeObject(String s) {
+    public static CircularFifoQueue<LogRecord> deserializeObjectB64(String s) {
         try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(s.getBytes());
+            byte[] decoded = Base64.getDecoder().decode(s);
+            ByteArrayInputStream bis = new ByteArrayInputStream(decoded);
             ObjectInputStream ois = new ObjectInputStream(bis);
             return (CircularFifoQueue<LogRecord>) ois.readObject();
 

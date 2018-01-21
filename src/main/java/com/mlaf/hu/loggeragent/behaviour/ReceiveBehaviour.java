@@ -29,7 +29,7 @@ public class ReceiveBehaviour extends CyclicBehaviour {
     }
 
     private void handleSerializedMessage(ACLMessage message) {
-        CircularFifoQueue<LogRecord> receivedLogs = LoggerAgent.deserializeObject(message.getContent());
+        CircularFifoQueue<LogRecord> receivedLogs = LoggerAgent.deserializeObjectB64(message.getContent());
         if (receivedLogs == null) {
             LoggerAgent.loggerAgentLogger.log(Level.WARNING, "Could not deserialize payload in message received from " + message.getSender());
             return;
