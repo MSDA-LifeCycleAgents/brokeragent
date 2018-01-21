@@ -30,15 +30,10 @@ public abstract class DecisionAgent extends Agent {
 
     @Override
     protected void setup() {
-        try {
-            DFServices.registerAsService(createServiceDescription(), this);
-            addBehaviour(new RegisterSensorAgentBehaviour(this));
-            addBehaviour(new ReceiveBehaviour(this));
-            addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
-        } catch (Exception e) {
-            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
-            System.exit(1);
-        }
+        DFServices.registerAsService(createServiceDescription(), this);
+        addBehaviour(new RegisterSensorAgentBehaviour(this));
+        addBehaviour(new ReceiveBehaviour(this));
+        addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
     }
 
     public ServiceDescription createServiceDescription() {
@@ -55,8 +50,16 @@ public abstract class DecisionAgent extends Agent {
         }
     }
 
+    public boolean sensorAgentExists(AID sensorAgent) {
+        return sensorAgents.get(sensorAgent) != null;
+    }
+
     public void registerSensorAgent(AID sensoragent, InstructionSet instructionset) {
-        this.sensorAgents.put(sensoragent, instructionset);
+        if (!sensorAgentExists(sensoragent)) {
+            instructionset.setRegisteredAt(LocalDateTime.now());
+            this.sensorAgents.put(sensoragent, instructionset);
+            DecisionAgent.decisionAgentLogger.log(Logger.INFO, "New SensorImpl1 Agent added: " + sensoragent);
+        }
     }
 
     public void unregisterSensorAgent(AID sensoragent) {

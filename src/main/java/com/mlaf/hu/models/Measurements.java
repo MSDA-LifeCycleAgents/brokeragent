@@ -12,6 +12,10 @@ public class Measurements {
     @XmlElement(name = "measurement")
     private ArrayList<Measurement> measurements = null;
 
+    public Measurements() {
+        measurements = new ArrayList<>();
+    }
+
     public ArrayList<Measurement> getMeasurements() {
         return measurements;
     }
@@ -28,5 +32,9 @@ public class Measurements {
             }
         }
         return  measurement;
+    }
+
+    public void addMeasurement(Measurement measurement) {
+        this.measurements.add(measurement);
     }
 }

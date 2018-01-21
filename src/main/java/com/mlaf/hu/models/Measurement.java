@@ -13,6 +13,13 @@ public class Measurement {
     private double value;
     private CircularFifoQueue<Double> readings = new CircularFifoQueue<>(100);
 
+    public Measurement() {}
+
+    public Measurement(String id, int value) {
+        this.id = id;
+        this.value = value;
+    }
+
     public Plans getPlans() {
         return plans;
     }
