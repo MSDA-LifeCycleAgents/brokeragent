@@ -32,12 +32,12 @@ public class AclXmlParser {
         StringWriter marshalledObject = new StringWriter();
 
         AclObject aclObject = new AclObject();
-        ArrayList<Receiver> receiverList = new ArrayList<>();
-        ArrayList<Sender> senderList = new ArrayList<>();
-        ArrayList<ReplyTo> replyToList = new ArrayList<>();
-        Sender sender = newSender(message);
-        Receiver receiver = newReceiver(message);
-        ReplyTo replyTo = newReplyTo(message);
+        ArrayList<AidObject> receiverList = new ArrayList<>();
+        ArrayList<AidObject> senderList = new ArrayList<>();
+        ArrayList<AidObject> replyToList = new ArrayList<>();
+        AidObject sender = newSender(message);
+        AidObject receiver = newReceiver(message);
+        AidObject replyTo = newReplyTo(message);
 
         receiverList.add(receiver);
         senderList.add(sender);
@@ -58,7 +58,8 @@ public class AclXmlParser {
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            
             marshaller.marshal(aclObject, marshalledObject);
         } catch (JAXBException ex) {
             java.util.logging.Logger.getLogger(AclXmlParser.class.getName()).log(Level.SEVERE, null, ex);
@@ -67,8 +68,8 @@ public class AclXmlParser {
         return xml;
     }
 
-    private static Receiver newReceiver(ACLMessage message) {
-        Receiver receiver = new Receiver();
+    private static AidObject newReceiver(ACLMessage message) {
+        AidObject receiver = new AidObject();
         Iterator receiverIterator = message.getAllReceiver();
         if (receiverIterator.hasNext()) {
 
@@ -82,8 +83,8 @@ public class AclXmlParser {
         return receiver;
     }
 
-    private static Sender newSender(ACLMessage message) {
-        Sender sender = new Sender();
+    private static AidObject newSender(ACLMessage message) {
+        AidObject sender = new AidObject();
         sender.setName(message.getSender().getName());
         ArrayList<String> addressesSender = new ArrayList<>();
         addressesSender.addAll(Arrays.asList(message.getSender().getAddressesArray()));
@@ -91,8 +92,8 @@ public class AclXmlParser {
         return sender;
     }
 
-    private static ReplyTo newReplyTo(ACLMessage message) {
-        ReplyTo replyTo = new ReplyTo();
+    private static AidObject newReplyTo(ACLMessage message) {
+        AidObject replyTo = new AidObject();
         Iterator receiverIterator = message.getAllReplyTo();
         if (receiverIterator.hasNext()) {
 

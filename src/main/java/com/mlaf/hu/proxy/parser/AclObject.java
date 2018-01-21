@@ -29,9 +29,9 @@ import javax.xml.bind.annotation.XmlType;
 public class AclObject {
 
     private String performative;
-    private List<Sender> sender;
-    private List<Receiver> receiver;
-    private List<ReplyTo> replyTo;
+    private List<AidObject> sender;
+    private List<AidObject> receiver;
+    private List<AidObject> replyTo;
     private String content;
     private String language;
     private String ontology;
@@ -48,32 +48,32 @@ public class AclObject {
     }
 
     @XmlElementWrapper(name = "sender")
-    @XmlElement(name = "agent-identifier", type = Sender.class)
-    public List<Sender> getSender() {
+    @XmlElement(name = "agent-identifier", type = AidObject.class)
+    public List<AidObject> getSender() {
         return sender;
     }
 
-    public void setSender(List<Sender> sender) {
+    public void setSender(List<AidObject> sender) {
         this.sender = sender;
     }
 
     @XmlElementWrapper(name = "receiver")
-    @XmlElement(name = "agent-identifier", type = Receiver.class)
-    public List<Receiver> getReceiver() {
+    @XmlElement(name = "agent-identifier", type = AidObject.class)
+    public List<AidObject> getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(List<Receiver> receiver) {
+    public void setReceiver(List<AidObject> receiver) {
         this.receiver = receiver;
     }
 
-    @XmlElementWrapper(name = "replyTo")
-    @XmlElement(name = "agent-identifier", type = ReplyTo.class)
-    public List<ReplyTo> getReplyTo() {
+    @XmlElementWrapper(name = "reply-to")
+    @XmlElement(name = "agent-identifier", type = AidObject.class)
+    public List<AidObject> getReplyTo() {
         return replyTo;
     }
 
-    public void setReplyTo(List<ReplyTo> replyTo) {
+    public void setReplyTo(List<AidObject> replyTo) {
         this.replyTo = replyTo;
     }
 
