@@ -77,6 +77,10 @@ public class ReceiveBehaviour extends CyclicBehaviour {
 
     private ACLMessage handleDirectMessage(ACLMessage message) {
         ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
+        if (!this.DA.sensorAgentExists(message.getSender())) {
+            response.setPerformative(ACLMessage.DISCONFIRM);
+            response.setContent("Not registered yet.");
+        }
         try {
             SensorReading sr = DA.parseSensorReadingXml(message.getContent());
             InstructionSet is = DA.sensorAgents.get(message.getSender());
