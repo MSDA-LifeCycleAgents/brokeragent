@@ -25,12 +25,12 @@ import java.util.Map;
 public abstract class DecisionAgent extends Agent {
     private static Configuration config = Configuration.getInstance();
     private static final String SERVICE_NAME = config.getProperty("decisionagent.service_name");
-    public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
-    public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
     private static final String STORAGE_BASEPATH = config.getProperty("decisionagent.storage_basepath");
     public static final long STORE_INTERVAL_IN_MS = Long.parseLong(config.getProperty("decisionagent.store_interval_in_ms"));
     private static final String STORAGE_FILENAME = config.getProperty("decisionagent.storage_filename");
-    private static final boolean STORE_SENSOR_AGENTS_ON_DISK = Boolean.parseBoolean(config.getProperty("decisionagent.store_agents_on_disk"));
+    private static final boolean STORE_SENSOR_AGENTS_ON_DISK = Boolean.parseBoolean(config.getProperty("decisionagent.store_sensor_agents_on_disk"));
+    public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
+    public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
 
     public DecisionAgent() {
         super();

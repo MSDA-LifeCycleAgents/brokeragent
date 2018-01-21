@@ -2,6 +2,7 @@ package com.mlaf.hu.models;
 
 import javax.xml.bind.annotation.*;
 
+import com.mlaf.hu.helpers.Configuration;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 import java.io.Serializable;
@@ -9,11 +10,12 @@ import java.io.Serializable;
 
 @XmlRootElement(name = "measurement")
 public class Measurement  implements Serializable {
+    private static Configuration config = Configuration.getInstance();
     private String id;
     private Plans plans;
     private int min, max;
     private double value;
-    private CircularFifoQueue<Double> readings = new CircularFifoQueue<>(100);
+    private CircularFifoQueue<Double> readings = new CircularFifoQueue<>(Integer.parseInt(config.getProperty("instructionset.num_readings_in_memory")));
 
     public Measurement() {}
 
