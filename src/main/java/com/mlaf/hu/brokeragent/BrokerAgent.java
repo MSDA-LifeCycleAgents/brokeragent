@@ -5,6 +5,7 @@ import com.mlaf.hu.brokeragent.behaviour.SaveToDiskBehaviour;
 import com.mlaf.hu.brokeragent.behaviour.SendBehaviour;
 import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
+import com.mlaf.hu.helpers.Configuration;
 import com.mlaf.hu.helpers.DFServices;
 import com.mlaf.hu.models.Message;
 import com.mlaf.hu.models.Topic;
@@ -21,13 +22,14 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan op disk via cli of puur config
-    private final static String SERVICE_NAME = "BROKER"; //TODO still waiting for configuration singleton
-    private final static String STORAGE_BASEPATH = "C:/BrokerAgent/"; //TODO still waiting for configuration singleton
-    private final static String STORAGE_FILENAME = "topics"; //TODO still waiting for configuration singleton
-    public static final int STORE_INTERVAL_IN_MS = 3000; //TODO still waiting for configuration singleton
-    public static final boolean STORE_TOPICS_ON_DISK = true; //TODO still waiting for configuration singleton
-    static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
+public class BrokerAgent extends Agent {
+    private static Configuration config = Configuration.getInstance();
+    private static final String SERVICE_NAME = config.getProperty("brokeragent.service_name");
+    private static final String STORAGE_BASEPATH = config.getProperty("brokeragent.storage_basepath");
+    public static final long STORE_INTERVAL_IN_MS = Long.parseLong(config.getProperty("brokeragent.store_interval_in_ms"));
+    private static final String STORAGE_FILENAME = config.getProperty("brokeragent.storage_filename");
+    private static final boolean STORE_TOPICS_ON_DISK = Boolean.parseBoolean(config.getProperty("brokeragent.store_sensor_agents_on_disk"));
+    private static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
     public HashMap<AID, Topic> topics = new HashMap<>();
     private TopicManagementHelper topicHelper;
 
