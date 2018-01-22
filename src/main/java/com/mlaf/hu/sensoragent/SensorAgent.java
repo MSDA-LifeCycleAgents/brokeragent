@@ -32,10 +32,22 @@ public abstract class SensorAgent extends Agent {
 
     public SensorAgent() {
         instructionSet = readInstructionSet();
-        addBehaviour(new RegisterWithDABehaviour(this, 20000L));
+        addBehaviour(new RegisterWithDABehaviour(this));
         addBehaviour(new ReadSensorsBehaviour(this));
         decisionAgentDiscovery = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
     }
+
+    /**
+     * This function should get the Instruction Set from where ever it is stored.
+     */
+    protected abstract String getInstructionXML();
+
+    /**
+     * When the Decision Agent doesn't accept the Instruction Set XML send in the RegisterWithDABehaviour.
+     * Suggestion for this method implementation: Stop the Sensor Agent to fix the Instruction Set XML according
+     * to the documentation and start the Sensor Agent back up.
+     */
+    public abstract void onReceivingRefuseRegistration();
 
     public void registerWithDA() {
         try {
@@ -55,9 +67,7 @@ public abstract class SensorAgent extends Agent {
         return new ArrayList<>(sensors);
     }
 
-    protected abstract String getInstructionXML();
-
-    public InstructionSet readInstructionSet() {
+    private InstructionSet readInstructionSet() {
         try {
             return XmlParser.parseToObject(InstructionSet.class, getInstructionXML());
         } catch (ParseException e) {

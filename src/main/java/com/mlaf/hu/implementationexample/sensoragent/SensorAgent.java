@@ -120,4 +120,9 @@ public class SensorAgent extends com.mlaf.hu.sensoragent.SensorAgent {
                 "    </fallback>\n" +
                 "</instructions>";
     }
+
+    @Override
+    public void onReceivingRefuseRegistration() {
+        this.doDelete();
+    }
 }
