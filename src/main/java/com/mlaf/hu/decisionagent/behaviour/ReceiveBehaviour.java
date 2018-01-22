@@ -52,7 +52,7 @@ public class ReceiveBehaviour extends CyclicBehaviour {
             try {
                 handleTopicMessaging();
             } catch (ServiceDiscoveryNotFoundException e) {
-                DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, String.format("%s\nTopic", e.getMessage()));
+                DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, e.getMessage());
                 this.continueAfter = LocalDateTime.now().plusSeconds(20);
             }
         }

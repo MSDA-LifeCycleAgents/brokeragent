@@ -2,6 +2,7 @@ package com.mlaf.hu.decisionagent.behaviour;
 
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.models.InstructionSet;
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.logging.Level;
+import java.util.Map;
 
 /**
  * This behaviour will continuously check if the Sensor Agents are still alive and kicking. It will do this by checking for every InstructionSet
@@ -35,18 +37,19 @@ public class UpdateStatusSensorAgentBehaviour extends TickerBehaviour {
     }
 
     private void checkForInactivity() {
-        for (InstructionSet localInstructionSet : this.DA.sensorAgents.values()) {
+        for (Map.Entry<AID, InstructionSet> sensorAgent : this.DA.sensorAgents.entrySet()) {
+            InstructionSet localInstructionSet = sensorAgent.getValue();
             if (localInstructionSet.getLastReceivedDataPackageAt() != null) {
                 long passedTime = ChronoUnit.SECONDS.between(localInstructionSet.getLastReceivedDataPackageAt(), LocalDateTime.now());
                 int missedDataPackages = (int) (passedTime / localInstructionSet.getHighestIntervalFromSensors());
                 if (missedDataPackages >= localInstructionSet.getAmountOfMissedDataPackages()) {
-                    localInstructionSet.setInActive();
+                    this.DA.unregisterSensorAgent(sensorAgent.getKey());
                 }
             } else if (localInstructionSet.getRegisteredAt() != null) {
                 long passedTime = ChronoUnit.SECONDS.between(localInstructionSet.getRegisteredAt(), LocalDateTime.now());
                 int missedDataPackages = (int) (passedTime / localInstructionSet.getHighestIntervalFromSensors());
                 if (missedDataPackages >= localInstructionSet.getAmountOfMissedDataPackages()) {
-                    localInstructionSet.setInActive();
+                    this.DA.unregisterSensorAgent(sensorAgent.getKey());
                 }
             }
         }
