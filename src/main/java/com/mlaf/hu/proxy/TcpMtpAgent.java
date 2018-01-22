@@ -1,6 +1,8 @@
 package com.mlaf.hu.proxy;
 
 import com.mlaf.hu.helpers.Configuration;
+import com.mlaf.hu.helpers.ServiceDiscovery;
+import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
 import com.mlaf.hu.proxy.mtp.TcpMtp;
 import com.mlaf.hu.proxy.mtp.TcpServer;
 import jade.core.AID;
@@ -46,7 +48,16 @@ public class TcpMtpAgent extends Agent {
                 amsad.setName(aid);
                 amsad.setState(AMSAgentDescription.ACTIVE);
                 
-                AMSService.register(TcpMtpAgent.this, amsad);          
+                AMSService.register(TcpMtpAgent.this, amsad);   
+                
+                ACLMessage request;
+                try {
+                    request = createInstructionRequest(aid);
+                    send(request);	
+                } catch (ServiceDiscoveryNotFoundException ex) {
+                    Logger.getLogger(TcpMtpAgent.class.getName()).log(Level.WARNING, "DecisionAgent not found, no instructionset requested: {0}", ex);
+                }
+ 	
             } catch (FIPAException ex) {
                 logger.log(Level.WARNING, "Could not register " + agentName, ex.getACLMessage());
             }
@@ -137,6 +148,18 @@ public class TcpMtpAgent extends Agent {
                
                 }
         });   
+    }
+    
+    protected ACLMessage createInstructionRequest(AID receiver) throws ServiceDiscoveryNotFoundException{
+        ACLMessage request = new ACLMessage(ACLMessage.REQUEST);		
+        request.addReceiver(receiver);		
+        request.setContent("");
+        request.setOntology("sensor-agent-register");
+        
+        ServiceDiscovery decisionAgentDiscovery = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
+        request.addReplyTo(decisionAgentDiscovery.getAID());
+        
+        return request;
     }
 
     /**

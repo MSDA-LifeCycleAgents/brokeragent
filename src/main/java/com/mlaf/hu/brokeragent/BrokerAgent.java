@@ -7,6 +7,7 @@ import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
 import com.mlaf.hu.helpers.Configuration;
 import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import com.mlaf.hu.models.Message;
 import com.mlaf.hu.models.Topic;
 import jade.core.AID;
@@ -35,6 +36,7 @@ public class BrokerAgent extends Agent {
 
     @Override
     protected void setup() {
+        brokerAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
         try {
             if (STORE_TOPICS_ON_DISK) {
                 boolean success = createDirectoryStructure();
