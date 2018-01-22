@@ -118,7 +118,7 @@ public abstract class DecisionAgent extends Agent {
             CircularFifoQueue<Double> readings = measurement.getReadings();
             readings.add(value);
             is.setLastReceivedDataPackageAt(LocalDateTime.now());
-            decide(value, measurement);
+            decide(value, measurement, sensor);
         } catch (NullPointerException npe) {
             decisionAgentLogger.log(Logger.SEVERE, String.format("No measurement found by that ID: %s", measurementId));
         }
