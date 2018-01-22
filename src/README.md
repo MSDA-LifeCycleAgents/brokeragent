@@ -15,7 +15,11 @@
 - [ ] Integration Testing.
 
 ## Decision Agent (Done before 22-01-2017):
-- [ ] Abstract class for Communication Agents.
+- [x] Abstract class for Communication Agents.
+- [x] Behavior for writing HashMap with Sensor Agent to disk.
+- [x] Deregistering Sensor Agents in UpdateStatusSensorAgentBehaviour. Not setting inactive anymore.
+- [ ] Making use of below and above in a proper way.
+- [x] Responding with a useful message to an inactive Sensor Agent that starts sending data again, but is unregistered.
 - [ ] Integration Testing.
 
 ## Java/JADE Sensor Agent Framework (Done before 22-01-2017):

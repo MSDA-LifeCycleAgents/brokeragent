@@ -1,10 +1,11 @@
 package com.mlaf.hu.decisionagent.behaviour;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
-import com.mlaf.hu.brokeragent.Topic;
+import com.mlaf.hu.models.Topic;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.exceptions.ParseException;
+import com.mlaf.hu.helpers.exceptions.SensorNotFoundException;
 import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.SensorReading;
@@ -19,24 +20,23 @@ import jade.util.Logger;
 
 import javax.xml.bind.JAXB;
 import java.io.StringWriter;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
- *  This behaviour will according to the instructionset either wait to receive direct INFORM messages with it's data-package as content
- *  or it will ask the Broker Agent to hand him another datapackage. This second option will result in the Broker Agent sending an INFORM ACLMessage with
- *  a data-package inside, just like with handleDirectMessage. In the end all the data-packages are received by the method
- *  handleDirectMessage.
+ * This behaviour will according to the instructionset either wait to receive direct INFORM messages with it's data-package as content
+ * or it will ask the Broker Agent to hand him another datapackage. This second option will result in the Broker Agent sending an INFORM ACLMessage with
+ * a data-package inside, just like with handleDirectMessage. In the end all the data-packages are received by the method
+ * handleDirectMessage.
  */
 
 public class ReceiveBehaviour extends CyclicBehaviour {
     private DecisionAgent DA;
     private ServiceDiscovery serviceDiscovery;
-    private LocalDateTime nextExecutionAllowed = LocalDateTime.now().minusSeconds(20);
+    private LocalDateTime continueAfter = LocalDateTime.now();
 
     public ReceiveBehaviour(DecisionAgent da) {
-        DA = da;
+        this.DA = da;
         ServiceDescription ba = BrokerAgent.createServiceDescription();
         this.serviceDiscovery = new ServiceDiscovery(this.DA, ba);
     }
@@ -48,12 +48,12 @@ public class ReceiveBehaviour extends CyclicBehaviour {
             ACLMessage response = handleDirectMessage(directMessage);
             this.DA.send(response);
         }
-        if (ChronoUnit.SECONDS.between(this.nextExecutionAllowed, LocalDateTime.now()) % 20 == 0) {
+        if (LocalDateTime.now().isAfter(this.continueAfter)) {
             try {
                 handleTopicMessaging();
             } catch (ServiceDiscoveryNotFoundException e) {
-                DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, String.format("%s\nTopic", e.getMessage()));
-                setTimeOut(20);
+                DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, e.getMessage());
+                this.continueAfter = LocalDateTime.now().plusSeconds(20);
             }
         }
         ACLMessage isSubscribed = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM));
@@ -64,47 +64,48 @@ public class ReceiveBehaviour extends CyclicBehaviour {
 
     private void topicIsSubscribed(ACLMessage isSubscribed) {
         String topicName = isSubscribed.getUserDefinedParameter("name");
-        for (InstructionSet is : DA.sensorAgents.values()) {
+        for (InstructionSet is : this.DA.sensorAgents.values()) {
             if (is.getMessaging().getTopic().getTopicName().equals(topicName)) {
                 is.getMessaging().setRegisteredToTopic(true);
             }
         }
     }
 
-    private void setTimeOut(int timeout_s) {
-        this.nextExecutionAllowed = LocalDateTime.now().plusSeconds(timeout_s);
-    }
-
     private ACLMessage handleDirectMessage(ACLMessage message) {
         ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
+        if (!this.DA.sensorAgentExists(message.getSender())) {
+            response.setPerformative(ACLMessage.DISCONFIRM);
+            response.setOntology("sensor-agent-register");
+            response.setContent("Not registered yet.");
+        }
         try {
-            SensorReading sr = DA.parseSensorReadingXml(message.getContent());
-            InstructionSet is = DA.sensorAgents.get(message.getSender());
+            SensorReading sr = this.DA.parseSensorReadingXml(message.getContent());
+            InstructionSet is = this.DA.sensorAgents.get(message.getSender());
             for (Sensor inReading : sr.getSensors().getSensors()) {
-                for (Sensor inInstructionSet : is.getSensors().getSensors()) {
-                    if (inReading.getId().equals(inInstructionSet.getId())) {
-                        for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
-                            DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
-                        }
-                    }
+                Sensor inInstructionSet = is.getSensor(inReading.getId());
+                for (Measurement ms : inReading.getMeasurements().getMeasurements()) {
+                    DA.handleSensorReading(ms.getValue(), is, inInstructionSet, ms.getId());
                 }
             }
-            response.setContent("Composition: ok");
         } catch (ParseException e) {
-            DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, e.getMessage());
+            DecisionAgent.decisionAgentLogger.log(Logger.WARNING, e.getMessage());
             response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
             response.setContent("Composition: wrong, check documentation.");
+        } catch (SensorNotFoundException e) {
+            DecisionAgent.decisionAgentLogger.log(Logger.WARNING,"InstructionSet misses sensor from sensor reading: " + e.getMessage());
+            response.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+            response.setContent("InstructionSet misses sensor from sensor reading: " + e.getMessage());
         }
         return response;
     }
 
     private void handleTopicMessaging() throws ServiceDiscoveryNotFoundException {
-        for (InstructionSet is : DA.sensorAgents.values()) {
+        for (InstructionSet is : this.DA.sensorAgents.values()) {
             if (!is.getMessaging().isDirectToDecisionAgent()) {
                 if (is.getMessaging().isRegisteredToTopic()) {
-                    DA.send(requestFromTopic(this.serviceDiscovery.getAID(), is));
+                    this.DA.send(requestFromTopic(this.serviceDiscovery.getAID(), is));
                 } else {
-                    DA.send(subscribeToTopic(this.serviceDiscovery.getAID(), is));
+                    this.DA.send(subscribeToTopic(this.serviceDiscovery.getAID(), is));
                 }
             }
         }

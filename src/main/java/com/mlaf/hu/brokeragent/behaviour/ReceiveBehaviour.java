@@ -1,8 +1,8 @@
 package com.mlaf.hu.brokeragent.behaviour;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
-import com.mlaf.hu.brokeragent.Message;
-import com.mlaf.hu.brokeragent.Topic;
+import com.mlaf.hu.models.Message;
+import com.mlaf.hu.models.Topic;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -26,6 +26,7 @@ public class ReceiveBehaviour extends CyclicBehaviour {
                 brokerAgent.storeMessage(new Message(topicMessage.getContent(), topicMessage.getSender(), LocalDateTime.now()), topicPair.getKey());
             } else {
                 block();
+                return;
             }
             Topic topic = topicPair.getValue();
             topic.removeOldMessages();

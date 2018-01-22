@@ -1,4 +1,4 @@
-package com.mlaf.hu.brokeragent;
+package com.mlaf.hu.models;
 
 import jade.core.AID;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,7 +16,7 @@ public class Topic implements Serializable {
     private AID jadeTopic;
     private ArrayList<AID> subscribers = new ArrayList<>();
     private ArrayList<Message> messages =  new ArrayList<>();
-    private Integer daysToKeepMessages = null;
+    private int daysToKeepMessages;
     private String topicName;
 
     public Topic() {}
@@ -54,15 +54,15 @@ public class Topic implements Serializable {
         return this.messages.size();
     }
 
-    void addToSubscribers(AID subscriber) {
+    public void addToSubscribers(AID subscriber) {
         this.subscribers.add(subscriber);
     }
 
-    void addToMessages(Message message) {
+    public void addToMessages(Message message) {
         this.messages.add(message);
     }
 
-    AID getSubscriber(AID subscriber) {
+    public AID getSubscriber(AID subscriber) {
         int indexSubscriber = this.subscribers.indexOf(subscriber);
         try {
             return this.subscribers.get(indexSubscriber);
@@ -79,14 +79,14 @@ public class Topic implements Serializable {
         this.jadeTopic = jadeTopic;
     }
 
-    Message getOldestMessage() {
+    public Message getOldestMessage() {
         try {
             Message lastMessage = this.messages.get(0);
             this.messages.remove(lastMessage);
             return lastMessage;
         }
         catch (NullPointerException | IndexOutOfBoundsException ignored) {
-            return new Message("No more messages in this queue.");
+            return null;
         }
     }
 
@@ -108,10 +108,8 @@ public class Topic implements Serializable {
         Topic rsh = (Topic) obj;
 
         return new EqualsBuilder()
-//                .appendSuper(super.equals(obj)) //FIXME
                 .append(jadeTopic, rsh.jadeTopic)
                 .append(subscribers, rsh.subscribers)
-//                .append(messages, rsh.messages) //FIXME
                 .append(daysToKeepMessages, rsh.daysToKeepMessages)
                 .isEquals();
     }

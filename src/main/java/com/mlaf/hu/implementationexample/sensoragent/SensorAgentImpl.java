@@ -1,25 +1,32 @@
-package com.mlaf.hu.decisionagent;
+package com.mlaf.hu.implementationexample.sensoragent;
+import com.mlaf.hu.sensoragent.InvalidSensorException;
+import com.mlaf.hu.sensoragent.SensorAgent;
+import com.mlaf.hu.sensoragent.Sensor;
+import java.util.logging.Level;
 
-import com.mlaf.hu.helpers.exceptions.ParseException;
-import com.mlaf.hu.models.InstructionSet;
-import com.mlaf.hu.models.Plan;
-import com.mlaf.hu.models.SensorReading;
-import jade.core.AID;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+public class SensorAgentImpl extends SensorAgent {
 
-public class DecisionAgentTest {
-    private String instructionXML;
-    private String sensorReadingXML;
-    private DecisionAgent da;
+    public SensorAgentImpl() {
+        super();
+        Sensor s1 = new SensorImpl1();
+        s1.activate();
+        Sensor s2 = new SensorImpl2();
+        s2.activate();
+        try {
+            addSensor(s1);
+            addSensor(s2);
+        } catch (InvalidSensorException e) {
+            sensorAgentLogger.log(Level.WARNING, "Could not register sensor, reason: " + e.getMessage(), e);
+        }
+    }
 
-
-    @Before
-    public void setUp() throws Exception {
-        this.instructionXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
+    @Override
+    protected String getInstructionXML() {
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
                 "<instructions>\n" +
-                "    <identifier>fVTz7OCaD8WFJE5Jvw7K</identifier>\n" +
+                "    <identifier>\n" +
+                "        fVTz7OCaD8WFJE5Jvw7K\n" +
+                "    </identifier>\n" +
                 "    <messaging>\n" +
                 "        <topic>\n" +
                 "            <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
@@ -29,7 +36,7 @@ public class DecisionAgentTest {
                 "    </messaging>\n" +
                 "    <amountOfMissedDataPackages>5</amountOfMissedDataPackages>\n" +
                 "    <sensors>\n" +
-                "        <sensor id=\"SystolicBloodPressure\">\n" +
+                "        <sensor id=\"DummySensor1\">\n" +
                 "            <label>Systolic Blood Pressure</label>\n" +
                 "            <intervalinseconds>30</intervalinseconds>\n" +
                 "            <unit>mm Hg</unit>\n" +
@@ -40,6 +47,7 @@ public class DecisionAgentTest {
                 "                    <plans>\n" +
                 "                        <plan>\n" +
                 "                            <below>0.6</below>\n" +
+                "                            <above>0.6</above>\n" +
                 "                            <message>Watch out!</message>\n" +
                 "                            <via>ScreenAgent</via>\n" +
                 "                            <to></to>\n" +
@@ -47,6 +55,7 @@ public class DecisionAgentTest {
                 "                        </plan>\n" +
                 "                        <plan>\n" +
                 "                            <below>0.4</below>\n" +
+                "                            <above>0.4</above>\n" +
                 "                            <message>Panic!</message>\n" +
                 "                            <via>MailAgent</via>\n" +
                 "                            <to>brian.vanderbijl@hu.nl</to>\n" +
@@ -77,7 +86,7 @@ public class DecisionAgentTest {
                 "            </measurements>\n" +
                 "            <amountOfBackupMeasurements>20</amountOfBackupMeasurements>\n" +
                 "        </sensor>\n" +
-                "        <sensor id=\"HeartRate\">\n" +
+                "        <sensor id=\"DummySensor2\">\n" +
                 "            <label>Heart Rate</label>\n" +
                 "            <unit>bpm</unit>\n" +
                 "            <intervalinseconds>30</intervalinseconds>\n" +
@@ -111,55 +120,10 @@ public class DecisionAgentTest {
                 "        <to></to>\n" +
                 "    </fallback>\n" +
                 "</instructions>";
-        this.sensorReadingXML = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
-                                "<sensorreading>\n" +
-                                "\t<sensors>\n" +
-                                "\t\t<sensor id=\"HeartRate\">\n" +
-                                "\t\t\t<value>133</value>\n" +
-                                "\t\t</sensor>\n" +
-                                "\t\t<sensor id=\"SystolicBloodPressure\">\n" +
-                                "\t\t\t<value>113</value>\n" +
-                                "\t\t</sensor>\n" +
-                                "\t</sensors>\n" +
-                                "</sensorreading>";
-        this.da = new DecisionAgent() {
-
-            @Override
-            public void unregisterSensorAgentCallback(AID sensoragent) {
-
-            }
-
-            @Override
-            public void storeReading(double value) {
-
-            }
-
-
-            @Override
-            public void executePlanCallback(Plan plan) {
-
-            }
-
-        };
     }
 
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void parseInstructionXml() throws ParseException {
-        assert this.instructionXML != null;
-        InstructionSet is = this.da.parseInstructionXml(this.instructionXML);
-        assert is.getIdentifier().equals("fVTz7OCaD8WFJE5Jvw7K");
-        assert is.getSensors().getSensors().get(1).getLabel().equals("Heart Rate");
-        assert is.getSensors().getSensors().get(0).getMeasurements().getMeasurements().get(0).getPlans().getPlans().get(1).getVia().equals("MailAgent");
-    }
-
-    @Test
-    public void parseSensorReadingXml() throws ParseException {
-        assert this.sensorReadingXML != null;
-        SensorReading sr = this.da.parseSensorReadingXml(this.sensorReadingXML);
-        assert sr.getSensors().getSensors().get(0).getId().equals("HeartRate");
+    @Override
+    public void onReceivingRefuseRegistration() {
+        this.doDelete();
     }
 }
