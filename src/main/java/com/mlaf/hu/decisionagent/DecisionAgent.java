@@ -39,6 +39,7 @@ public abstract class DecisionAgent extends Agent {
 
     @Override
     protected void setup() {
+        decisionAgentLogger.addHandler(new LoggerAgentLogHandler(this, 30));
         if(STORE_SENSOR_AGENTS_ON_DISK) {
             boolean success = createDirectoryStructure();
             if (new File(STORAGE_BASEPATH).exists() || success) {

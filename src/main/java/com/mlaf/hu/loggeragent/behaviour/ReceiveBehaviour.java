@@ -18,8 +18,11 @@ public class ReceiveBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        ACLMessage receivedMessage = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-        //TODO Check more specific than performative
+        MessageTemplate mt = MessageTemplate.and(
+                MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                MessageTemplate.MatchOntology("logger-agent-logrecords")
+        );
+        ACLMessage receivedMessage = myAgent.receive(mt);
         if (receivedMessage == null) {
             block();
         } else {

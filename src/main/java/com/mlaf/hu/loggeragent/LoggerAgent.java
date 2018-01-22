@@ -25,8 +25,6 @@ public class LoggerAgent extends Agent {
     public LoggerAgent() {
         super();
         incomingLogger = Logger.getLogger("com.mlaf.hu.loggeragent.central");
-        ConsoleHandler handler = new ConsoleHandler();
-        incomingLogger.addHandler(handler);
     }
 
     @Override

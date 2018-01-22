@@ -76,6 +76,7 @@ public class LoggerAgentLogHandler extends Handler {
                 return;
             }
             message.setContent(serialized);
+            message.setOntology("logger-agent-logrecords");
             this.queue.clear();
             agent.send(message);
             lastUpdateSent = LocalDateTime.now();
