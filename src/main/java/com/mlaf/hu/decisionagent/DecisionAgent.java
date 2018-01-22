@@ -45,10 +45,11 @@ public abstract class DecisionAgent extends Agent {
                 addBehaviour(new SaveToDiskBehaviour(this));
             }
         }
-        DFServices.registerAsService(createServiceDescription(), this);
-        addBehaviour(new RegisterSensorAgentBehaviour(this));
-        addBehaviour(new ReceiveBehaviour(this));
-        addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
+        if (DFServices.registerAsService(createServiceDescription(), this)) {
+            addBehaviour(new RegisterSensorAgentBehaviour(this));
+            addBehaviour(new ReceiveBehaviour(this));
+            addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
+        }
     }
 
     public ServiceDescription createServiceDescription() {

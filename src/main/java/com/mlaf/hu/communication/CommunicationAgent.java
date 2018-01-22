@@ -18,23 +18,24 @@ public abstract class CommunicationAgent extends Agent{
     
     @Override
     public void setup(){
-        DFServices.registerAsService(createServiceDescription(), this);
-        addBehaviour(
-            new CyclicBehaviour(){
-                @Override
-                public void action(){ 
-                    ACLMessage aclMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-                    if (aclMessage != null) {
-                        String message = aclMessage.getContent();
-                        String to = aclMessage.getUserDefinedParameter("to");
-                        if (message != null && to != null)
-                                send(message, to);
-                        else
-                            LOGGER.log(Level.WARNING, "Failed to send message: invalid request: {0}", message);
+        if (DFServices.registerAsService(createServiceDescription(), this)) {
+            addBehaviour(
+                    new CyclicBehaviour() {
+                        @Override
+                        public void action() {
+                            ACLMessage aclMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+                            if (aclMessage != null) {
+                                String message = aclMessage.getContent();
+                                String to = aclMessage.getUserDefinedParameter("to");
+                                if (message != null && to != null)
+                                    send(message, to);
+                                else
+                                    LOGGER.log(Level.WARNING, "Failed to send message: invalid request: {0}", message);
+                            }
+                        }
                     }
-                }
-            }
-        );
+            );
+        }
     }
     
     @Override
