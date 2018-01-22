@@ -113,7 +113,7 @@ public abstract class SensorAgent extends Agent {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.addReceiver(destination);
         msg.setLanguage("XML");
-        msg.setOntology("MLAF-Sensor-XML");
+        msg.setOntology("sensor-agent-reading");
         msg.setContent(readingXml);
         send(msg);
         sensorAgentLogger.log(Level.INFO, String.format("New reading sent for sensor: %s", sensorReading.getSensors().getSensors().get(0).getId()));
