@@ -1,7 +1,6 @@
 package com.mlaf.hu.proxy.mtp;
 
 import com.mlaf.hu.proxy.parser.AclXmlParser;
-import jade.core.AID;
 import jade.core.Profile;
 import jade.domain.FIPAAgentManagement.Envelope;
 import jade.lang.acl.ACLMessage;
@@ -17,7 +16,6 @@ import java.io.StringReader;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -221,12 +219,10 @@ public class TcpMtp implements MTP {
         try {
             StringReader msgReader = new StringReader(new String(aclMessage));
             ACLMessage msg = ACLParser.create().parse(msgReader);
-            String result = AclXmlParser.parse(msg);
+            String result = AclXmlParser.parseACLToXML(msg);
             return (result + "\r\n\n").getBytes();
         } catch (ParseException ex) {
             Logger.getLogger(TcpMtp.class.getName()).log(Level.WARNING, "Parser Exception: ", ex);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(TcpMtp.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

@@ -1,15 +1,16 @@
 package com.mlaf.hu.implementationexample.sensoragent;
 import com.mlaf.hu.sensoragent.InvalidSensorException;
-
+import com.mlaf.hu.sensoragent.SensorAgent;
+import com.mlaf.hu.sensoragent.Sensor;
 import java.util.logging.Level;
 
-public class SensorAgent extends com.mlaf.hu.sensoragent.SensorAgent {
+public class SensorAgentImpl extends SensorAgent {
 
-    public SensorAgent() {
+    public SensorAgentImpl() {
         super();
-        com.mlaf.hu.sensoragent.Sensor s1 = new SensorImpl1();
+        Sensor s1 = new SensorImpl1();
         s1.activate();
-        com.mlaf.hu.sensoragent.Sensor s2 = new SensorImpl2();
+        Sensor s2 = new SensorImpl2();
         s2.activate();
         try {
             addSensor(s1);
@@ -119,5 +120,10 @@ public class SensorAgent extends com.mlaf.hu.sensoragent.SensorAgent {
                 "        <to></to>\n" +
                 "    </fallback>\n" +
                 "</instructions>";
+    }
+
+    @Override
+    public void onReceivingRefuseRegistration() {
+        this.doDelete();
     }
 }

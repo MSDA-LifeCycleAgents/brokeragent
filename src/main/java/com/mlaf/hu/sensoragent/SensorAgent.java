@@ -32,10 +32,22 @@ public abstract class SensorAgent extends Agent {
 
     public SensorAgent() {
         instructionSet = readInstructionSet();
-        addBehaviour(new RegisterWithDABehaviour(this, 20000L));
+        addBehaviour(new RegisterWithDABehaviour(this));
         addBehaviour(new ReadSensorsBehaviour(this));
         decisionAgentDiscovery = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
     }
+
+    /**
+     * This function should get the Instruction Set from where ever it is stored.
+     */
+    protected abstract String getInstructionXML();
+
+    /**
+     * When the Decision Agent doesn't accept the Instruction Set XML send in the RegisterWithDABehaviour.
+     * Suggestion for this method implementation: Stop the Sensor Agent to fix the Instruction Set XML according
+     * to the documentation and start the Sensor Agent back up.
+     */
+    public abstract void onReceivingRefuseRegistration();
 
     public void registerWithDA() {
         try {
@@ -55,9 +67,7 @@ public abstract class SensorAgent extends Agent {
         return new ArrayList<>(sensors);
     }
 
-    protected abstract String getInstructionXML();
-
-    public InstructionSet readInstructionSet() {
+    private InstructionSet readInstructionSet() {
         try {
             return XmlParser.parseToObject(InstructionSet.class, getInstructionXML());
         } catch (ParseException e) {
@@ -70,7 +80,7 @@ public abstract class SensorAgent extends Agent {
     protected void addSensor(Sensor newSensor) throws InvalidSensorException {
         for (Sensor s : sensors) {
             if (s.getSensorID().equals(newSensor.getSensorID())) {
-                throw new InvalidSensorException("SensorImpl1 " + newSensor.getSensorID() + " is alreay registered");
+                throw new InvalidSensorException("Sensor " + newSensor.getSensorID() + " is alreay registered");
             }
         }
         boolean foundInInstructionset = false;
@@ -81,7 +91,7 @@ public abstract class SensorAgent extends Agent {
             }
         }
         if (!foundInInstructionset) {
-            throw new InvalidSensorException("SensorImpl1 " + newSensor.getSensorID() + " is not found in instructionset");
+            throw new InvalidSensorException("Sensor " + newSensor.getSensorID() + " is not found in instructionset");
         }
         sensors.add(newSensor);
     }
@@ -104,7 +114,7 @@ public abstract class SensorAgent extends Agent {
         try {
             readingXml = XmlParser.parseToXml(sensorReading);
         } catch (ParseException e) {
-            sensorAgentLogger.log(Level.SEVERE, "Could not marshall the SensorImpl1 Reading.");
+            sensorAgentLogger.log(Level.SEVERE, "Could not marshall the Sensor Reading.");
         }
         if (readingXml == null) {
             sensorAgentLogger.log(Level.SEVERE, "Got empty XML for sensor reading.");
@@ -113,7 +123,7 @@ public abstract class SensorAgent extends Agent {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.addReceiver(destination);
         msg.setLanguage("XML");
-        msg.setOntology("MLAF-SensorImpl1-XML");
+        msg.setOntology("sensor-agent-reading");
         msg.setContent(readingXml);
         send(msg);
         sensorAgentLogger.log(Level.INFO, String.format("New reading sent for sensor: %s", sensorReading.getSensors().getSensors().get(0).getId()));

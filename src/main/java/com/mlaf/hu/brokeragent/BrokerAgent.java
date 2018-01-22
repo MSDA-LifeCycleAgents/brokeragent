@@ -43,10 +43,11 @@ public class BrokerAgent extends Agent {
                     addBehaviour(new SaveToDiskBehaviour(this));
                 }
             }
-            DFServices.registerAsService(createServiceDescription(), this);
-            topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
-            addBehaviour(new SendBehaviour(this, topicHelper));
-            addBehaviour(new ReceiveBehaviour(this));
+            if (DFServices.registerAsService(createServiceDescription(), this)) {
+                topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
+                addBehaviour(new SendBehaviour(this, topicHelper));
+                addBehaviour(new ReceiveBehaviour(this));
+            }
         } catch (Exception e) {
             brokerAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);

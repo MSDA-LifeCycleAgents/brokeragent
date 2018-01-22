@@ -81,7 +81,7 @@ public class ServiceDiscovery {
     public static ServiceDescription SD_BROKER_AGENT() {
         ServiceDescription sd = new ServiceDescription();
         sd.setType("message-broker");
-        sd.setName("BROKER");
+        sd.setName("BROKER-AGENT");
         return sd;
     }
 
@@ -97,5 +97,13 @@ public class ServiceDiscovery {
         sd.setType("MailAgent");
         sd.setName("MailAgent");
         return sd;
+    }
+
+    public static ServiceDescription SD_LOGGER_AGENT() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName("LoggerAgent");
+        sd.setType("LoggerAgent");
+        return sd;
+
     }
 }
