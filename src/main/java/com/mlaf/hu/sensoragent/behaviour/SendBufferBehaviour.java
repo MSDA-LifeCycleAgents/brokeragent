@@ -24,7 +24,6 @@ public class SendBufferBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        ACLMessage notRegisteredAnymore = myAgent.receive();
         try {
             if(LocalDateTime.now().isAfter(continueAfter)) {
                 sensorAgent.sendSensorReadings();
