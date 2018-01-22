@@ -10,12 +10,23 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 public class ReceiveBehaviour extends CyclicBehaviour {
+    /**
+     * This behaviour will receive the messages sent by LoggerAgentLogHandlers, deserialize them and add them to the
+     * LoggerAgent.incomingLogger.
+     */
+
     private LoggerAgent agent;
 
     public ReceiveBehaviour(LoggerAgent agent){
         this.agent = agent;
     }
 
+
+    /**
+     * Receives messages matching Performative:INFORM AND Ontology:logger-agent-logrecords.
+     * Received messages will be sent to handleSerializedMessage().
+     * Blocks if no message is received.
+     */
     @Override
     public void action() {
         MessageTemplate mt = MessageTemplate.and(
@@ -31,6 +42,11 @@ public class ReceiveBehaviour extends CyclicBehaviour {
 
     }
 
+    /**
+     * Handles the received serialized message.
+     * Deserializes the message and submits all the messages to loggerAgent.incomingLogger
+     * @param message ACL Message to be deserialized and processed.
+     */
     private void handleSerializedMessage(ACLMessage message) {
         CircularFifoQueue<LogRecord> receivedLogs = LoggerAgent.deserializeObjectB64(message.getContent());
         if (receivedLogs == null) {

@@ -19,6 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+/**
+ * LogHandler which can be added to Java loggers. Messages published to this handler will be sent to the LoggerAgent.
+ */
 public class LoggerAgentLogHandler extends Handler {
     private Agent agent;
     private CircularFifoQueue<LogRecord> queue;
@@ -30,6 +33,11 @@ public class LoggerAgentLogHandler extends Handler {
     private Timer timer;
 
 
+    /**
+     * LogHandler which can be added to Java loggers. Messages published to this handler will be sent to the LoggerAgent.
+     * @param agent The agent to which the log handler is connected.
+     * @param maxSendDelaySeconds Max interval between sending the log message buffer to the logger agent.
+     */
     public LoggerAgentLogHandler(Agent agent, int maxSendDelaySeconds) {
         this.agent = agent;
         this.queue = new CircularFifoQueue<>();
@@ -65,6 +73,9 @@ public class LoggerAgentLogHandler extends Handler {
         this.queue.add(record);
     }
 
+    /**
+     * Send the current buffer to the LoggerAgent.
+     */
     private void sendBuffer() {
         try {
             ACLMessage message = new ACLMessage(ACLMessage.INFORM);
@@ -85,10 +96,16 @@ public class LoggerAgentLogHandler extends Handler {
         }
     }
 
+
     private boolean shouldSendBuffer() {
         return (LocalDateTime.now().isAfter(this.lastUpdateSent.plusSeconds(maxSendDelay)));
     }
 
+    /**
+     * Serialize and Base64 encode a CircularFifoQueue of LogRecords
+     * @param o Queue to be encoded.
+     * @return Base64 encoded string containing the Queue
+     */
     private String serializeObjectB64(CircularFifoQueue<LogRecord> o) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

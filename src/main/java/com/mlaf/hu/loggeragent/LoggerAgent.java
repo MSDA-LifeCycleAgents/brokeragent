@@ -27,16 +27,28 @@ public class LoggerAgent extends Agent {
         incomingLogger = Logger.getLogger("com.mlaf.hu.loggeragent.central");
     }
 
+    /**
+     * Setup the agent and register to the DF.s
+     */
     @Override
     protected void setup(){
         DFServices.registerAsService(this.createServiceDescription(), this);
         addBehaviour(new ReceiveBehaviour(this));
     }
 
+    /**
+     * Get the serviceDescription to be used when registering the Service
+     * @return ServiceDescriptior to be used when registering the Service
+     */
     public ServiceDescription createServiceDescription() {
         return ServiceDiscovery.SD_LOGGER_AGENT();
     }
 
+    /**
+     * Deserialize the _BASE64_ encoded and serialized content sent received by the agent.
+     * @param s Base64 Encoded Serialized CircularFifoQueue<LogRecord>
+     * @return CircularFifoQueue<LogRecord> decoded from param s
+     */
     public static CircularFifoQueue<LogRecord> deserializeObjectB64(String s) {
         try {
             byte[] decoded = Base64.getDecoder().decode(s);
@@ -50,6 +62,11 @@ public class LoggerAgent extends Agent {
         return null;
     }
 
+
+    /**
+     * Add the incoming logrecord to the incomingLogger.
+     * @param lr LogRecord to be added
+     */
     public void logIncommingRecord(LogRecord lr) {
         this.incomingLogger.log(lr);
     }
