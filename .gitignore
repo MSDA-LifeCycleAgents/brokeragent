@@ -13,3 +13,5 @@ nbactions\.xml
 C:/
 
 *.ser
+
+.DS_Store
