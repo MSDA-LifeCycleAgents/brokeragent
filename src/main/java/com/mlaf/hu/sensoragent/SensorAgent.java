@@ -8,6 +8,7 @@ import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.Messaging;
 import com.mlaf.hu.models.SensorReading;
+import com.mlaf.hu.models.Topic;
 import com.mlaf.hu.sensoragent.behaviour.ReadSensorsBehaviour;
 import com.mlaf.hu.sensoragent.behaviour.RegisterWithDABehaviour;
 import com.mlaf.hu.sensoragent.behaviour.SendBufferBehaviour;
@@ -137,7 +138,8 @@ public abstract class SensorAgent extends Agent {
             return decisionAgentDiscovery.getAID();
         } else {
             TopicManagementHelper topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
-            return topicHelper.createTopic(messaging.getTopic().getTopicName());
+            Topic topic = messaging.getTopic();
+            return topicHelper.createTopic(topic.getTopicName());
         }
     }
 
