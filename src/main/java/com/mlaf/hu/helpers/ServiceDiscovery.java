@@ -98,4 +98,12 @@ public class ServiceDiscovery {
         sd.setName("MailAgent");
         return sd;
     }
+
+    public static ServiceDescription SD_LOGGER_AGENT() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName("LoggerAgent");
+        sd.setType("LoggerAgent");
+        return sd;
+
+    }
 }

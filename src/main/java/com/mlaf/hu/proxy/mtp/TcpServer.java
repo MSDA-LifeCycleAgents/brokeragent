@@ -209,14 +209,9 @@ public class TcpServer {
                             } catch (ParseException ex) {
                                 logger.log(Level.WARNING, "Could not parse ACL message: ", ex);
                             } catch (TokenMgrError e){
-                                try {
-                                    // this means it has encountered an unexpected token, like '<'. So we'll try to parse the message to XML.
-                                    ACLMessage msg = AclXmlParser.parse(msgString, env);
-                                    msgString = msg.toString();
-                                } catch (ParserConfigurationException | SAXException ex) {
-                                    logger.log(Level.WARNING, "Could not parse ACL message to XML: ", ex);
-                                    return;
-                                }
+                                // this means it has encountered an unexpected token, like '<'. So we'll try to parse the message to XML.
+                                ACLMessage msg = AclXmlParser.parse(msgString, env);
+                                msgString = msg.toString();
                             }
 
                             logger.log(Level.INFO, "Dispatching message string: {0}", msgString);
