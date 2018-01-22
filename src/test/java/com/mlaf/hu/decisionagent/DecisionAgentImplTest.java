@@ -1,15 +1,13 @@
 package com.mlaf.hu.decisionagent;
 
 import com.mlaf.hu.helpers.exceptions.ParseException;
-import com.mlaf.hu.models.InstructionSet;
-import com.mlaf.hu.models.Plan;
-import com.mlaf.hu.models.SensorReading;
+import com.mlaf.hu.models.*;
 import jade.core.AID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DecisionAgentTest {
+public class DecisionAgentImplTest {
     private String instructionXML;
     private String sensorReadingXML;
     private DecisionAgent da;
@@ -137,6 +135,11 @@ public class DecisionAgentTest {
 
             @Override
             public void executePlanCallback(Plan plan) {
+
+            }
+
+            @Override
+            protected void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading) {
 
             }
 

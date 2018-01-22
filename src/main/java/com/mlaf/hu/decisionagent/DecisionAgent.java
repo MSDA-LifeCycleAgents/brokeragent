@@ -54,6 +54,25 @@ public abstract class DecisionAgent extends Agent {
         }
     }
 
+    /**
+     * After unregistering the Sensor Agent this method will be executed. Any other cleaning of left overs by the
+     * Sensor Agent should be done in here.
+     */
+    public abstract void unregisterSensorAgentCallback(AID sensoragent);
+
+    /**
+     * The readings will be saved in memory. In the Measurement of the Instruction Set there is a CircularFifoQueue.
+     * The amount of readings in memory is changable in the config.properties. storeReading will be executed after
+     * the reading is stored in memory. This method is created so the reading could be stored elsewhere as well.
+     */
+    public abstract void storeReading(double value);
+
+    /**
+     * After executing the executePlan method, which is set up using the properties in the Instruction Set, this
+     * method will be executed.
+     */
+    public abstract void executePlanCallback(Plan plan);
+
     public ServiceDescription createServiceDescription() {
         ServiceDescription sd = new ServiceDescription();
         sd.setName(SERVICE_NAME);
@@ -85,8 +104,6 @@ public abstract class DecisionAgent extends Agent {
         unregisterSensorAgentCallback(sensoragent);
     }
 
-    public abstract void unregisterSensorAgentCallback(AID sensoragent);
-
     public InstructionSet parseInstructionXml(String xml) throws ParseException {
         return XmlParser.parseToObject(InstructionSet.class, xml);
     }
@@ -101,22 +118,30 @@ public abstract class DecisionAgent extends Agent {
             CircularFifoQueue<Double> readings = measurement.getReadings();
             readings.add(value);
             is.setLastReceivedDataPackageAt(LocalDateTime.now());
-            decide(value, measurement);
+            decide(value, measurement, sensor);
         } catch (NullPointerException npe) {
             decisionAgentLogger.log(Logger.SEVERE, String.format("No measurement found by that ID: %s", measurementId));
         }
         storeReading(value);
     }
 
-    public abstract void storeReading(double value);
-
-    public void decide(double reading, Measurement measurement) {
+    private void decide(double reading, Measurement measurement, Sensor sensor) {
         for (Plan plan : measurement.getPlans().getPlans()) {
+            if (measurement.getMax() > reading || measurement.getMin() > reading) {
+                executeSensorReadingWarning(sensor, measurement, reading);
+            }
             if ((measurement.getMax() * plan.getAbove() < reading) || (reading < measurement.getMax() * plan.getBelow())) {
                 executePlan(plan);
             }
+
         }
     }
+
+    /**
+     * Whenever the reading exceeds the minimum value or maximum value specified in the Instruction Set XML, this
+     * method will be executed.
+     */
+    protected abstract void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading);
 
     private void executePlan(Plan plan) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
@@ -127,9 +152,10 @@ public abstract class DecisionAgent extends Agent {
         executePlanCallback(plan);
     }
 
-    public abstract void executePlanCallback(Plan plan);
-
-     public void storeSensorAgents() {
+    /**
+     * This method will only be executed when the decisionagent.store_sensor_agents_on_disk=true
+     */
+    public void storeSensorAgents() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
             decisionAgentLogger.log(Logger.INFO, String.format("Writing the following Sensor Agents w. Instruction Sets to disk: \n%s", HashMapToString()));
             oos.writeObject(this.sensorAgents);
