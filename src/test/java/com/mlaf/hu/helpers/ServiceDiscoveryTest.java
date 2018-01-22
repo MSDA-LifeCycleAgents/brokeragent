@@ -1,6 +1,7 @@
 package com.mlaf.hu.helpers;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
+import com.mlaf.hu.communication.CommunicationAgent;
 import com.mlaf.hu.communication.MailAgent;
 import com.mlaf.hu.communication.SlackAgent;
 import com.mlaf.hu.decisionagent.DecisionAgent;
@@ -49,7 +50,7 @@ public class ServiceDiscoveryTest {
 
     @Test
     public void SD_COMM_SLACK_AGENT() {
-        SlackAgent sa = new SlackAgent();
+        CommunicationAgent sa = new SlackAgent();
         ServiceDescription saServiceDescription = sa.createServiceDescription();
         ServiceDescription sdServiceDescription = ServiceDiscovery.SD_COMM_SLACK_AGENT();
         assertEquals(saServiceDescription.getName(), sdServiceDescription.getName());
@@ -58,7 +59,7 @@ public class ServiceDiscoveryTest {
 
     @Test
     public void SD_COMM_MAIL_AGENT() {
-        MailAgent ma = new MailAgent();
+        CommunicationAgent ma = new MailAgent();
         ServiceDescription maServiceDescription = ma.createServiceDescription();
         ServiceDescription sdServiceDescription = ServiceDiscovery.SD_COMM_MAIL_AGENT();
         assertEquals(maServiceDescription.getName(), sdServiceDescription.getName());

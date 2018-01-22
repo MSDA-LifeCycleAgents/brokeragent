@@ -1,16 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mlaf.hu.communication;
 
-import com.mlaf.hu.helpers.DFServices;
-import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.lang.acl.ACLMessage;
 
 import java.util.Properties;
 import java.util.logging.Level;
@@ -25,51 +15,24 @@ import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
 import com.mlaf.hu.helpers.Configuration;
-import jade.lang.acl.MessageTemplate;
 
 /**
  *
  * @author Rogier
  */
-public class MailAgent extends Agent{
+public class MailAgent extends CommunicationAgent{
     private static final Logger logger = Logger.getLogger(MailAgent.class.getName());
     
     @Override
-    public void setup(){
-        DFServices.registerAsService(createServiceDescription(), this);
-        addBehaviour(
-            new CyclicBehaviour(){
-                @Override
-                public void action(){ 
-                    ACLMessage aclMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-                    if (aclMessage != null) {
-                        String message = aclMessage.getContent();
-                        String to = aclMessage.getUserDefinedParameter("to");
-                        if (message != null && to != null)
-                                sendMail(message, to);
-                        else
-                            logger.log(Level.WARNING, "Failed to send message: invalid request");
-                    }
-                }
-            }
-        );
-    }
     public ServiceDescription createServiceDescription() {
         ServiceDescription sd = new ServiceDescription();
         sd.setName("MailAgent");
         sd.setType("MailAgent");
         return sd;
     }
-
-
-    protected void takeDown() {
-        try {
-            DFService.deregister(this);
-        } catch (Exception ignore) {
-        }
-    }
-
-    private void sendMail(String message, String to){
+    
+    @Override
+    protected void send(String message, String to){
         Configuration config = Configuration.getInstance();
         String host = config.getProperty("mail.host");
         String from = config.getProperty("mail.from");

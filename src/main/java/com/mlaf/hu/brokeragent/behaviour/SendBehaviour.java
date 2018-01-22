@@ -1,11 +1,11 @@
 package com.mlaf.hu.brokeragent.behaviour;
 
 import com.mlaf.hu.brokeragent.BrokerAgent;
-import com.mlaf.hu.brokeragent.Topic;
-import jade.core.AID;
+import com.mlaf.hu.models.Topic;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 public class SendBehaviour extends CyclicBehaviour {
     private final BrokerAgent brokerAgent;
@@ -18,25 +18,23 @@ public class SendBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        ACLMessage subscriberMessage = brokerAgent.receive(); //FIXME use messagetemplates for better code quality
-        if (subscriberMessage == null) {
-            block();
-            return;
+        ACLMessage subscriberMessage = brokerAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE));
+        ACLMessage getContentMessage = brokerAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+        ACLMessage responseSubscription = null;
+        ACLMessage responseGetContent = null;
+        if (subscriberMessage != null) {
+            Topic representationTopic = brokerAgent.unmarshalTopic(subscriberMessage.getContent());
+            responseSubscription = brokerAgent.addSubscriberToTopic(subscriberMessage.getSender(), representationTopic, topicHelper);
         }
-        AID subscriber = subscriberMessage.getSender();
-        int incomingPerformative = subscriberMessage.getPerformative();
-        ACLMessage message = null;
-        Topic representationTopic = brokerAgent.unmarshalTopic(subscriberMessage.getContent());
-        if (incomingPerformative == ACLMessage.SUBSCRIBE) {
-            message = brokerAgent.addSubscriberToTopic(subscriber, representationTopic, topicHelper);
-        } else if (incomingPerformative == ACLMessage.REQUEST) {
-            message = brokerAgent.getMessageFromBuffer(subscriber, representationTopic, topicHelper);
-        } else {
-            block();
-            return;
+        if (getContentMessage != null) {
+            Topic representationTopic = brokerAgent.unmarshalTopic(getContentMessage.getContent());
+            responseGetContent = brokerAgent.getMessageFromBuffer(getContentMessage.getSender(), representationTopic, topicHelper);
         }
-        if (message != null) {
-            brokerAgent.send(message);
+        if (responseSubscription != null) {
+            brokerAgent.send(responseSubscription);
+        }
+        if (responseGetContent != null) {
+            brokerAgent.send(responseGetContent);
         }
     }
 }

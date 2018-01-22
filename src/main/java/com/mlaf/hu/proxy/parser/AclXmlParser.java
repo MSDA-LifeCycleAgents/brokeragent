@@ -10,11 +10,19 @@ import jade.domain.FIPAAgentManagement.Envelope;
 import jade.lang.acl.ACLMessage;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -26,8 +34,36 @@ import org.xml.sax.SAXException;
  * @author Rogier
  */
 public class AclXmlParser {
-        private static final Logger logger = Logger.getLogger(AclXmlParser.class.getName());
+    private static final Logger logger = Logger.getLogger(AclXmlParser.class.getName());
     
+    public static String parse(ACLMessage message) throws ParserConfigurationException{
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
+        
+        Element root = doc.createElement("fipa-message");
+        root.setAttribute("communicative-act", getPerformative(message.getPerformative()));
+        doc.appendChild(root);
+        
+        Element sender = doc.createElement("sender");
+        Element receiver = doc.createElement("receiver");
+        root.appendChild(sender);
+        root.appendChild(receiver);
+        
+        addAIDToElement(doc, sender, message.getSender());
+        Iterator recIterator = message.getAllReceiver();
+        if(recIterator.hasNext())
+            addAIDToElement(doc, receiver, (AID) recIterator.next());
+        
+        appendTextElement(doc, root, "content", message.getContent());
+        appendTextElement(doc, root, "language", message.getLanguage());
+        appendTextElement(doc, root, "ontology", message.getOntology());
+        appendTextElement(doc, root, "protocol", message.getProtocol());
+        appendTextElement(doc, root, "conversation-id", message.getConversationId());
+        
+        return docToString(doc);
+    }    
+        
     public static ACLMessage parse(String xml, Envelope envelope) throws ParserConfigurationException, SAXException{
         ACLMessage message = parseBody(xml);
         message.setEnvelope(envelope);
@@ -99,6 +135,10 @@ public class AclXmlParser {
         return -1;
     }
     
+    private static String getPerformative(int performative){
+        return ACLMessage.getAllPerformativeNames()[performative];
+    }
+    
     private static Document loadXMLFromString(String xml) throws ParserConfigurationException, SAXException, IOException
     {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -114,6 +154,41 @@ public class AclXmlParser {
             if (subList != null && subList.getLength() > 0) {
                 return subList.item(0).getNodeValue();
             }
+        }
+        return null;
+    }
+    
+    private static void addAIDToElement(Document doc, Element element, AID aid){
+        Element identifier = doc.createElement("agent-identifier");
+        appendTextElement(doc, identifier, "name", aid.getName());
+
+        Element addresses = doc.createElement("addresses");
+        for(String url : aid.getAddressesArray()){
+            appendTextElement(doc, addresses, "url", url);
+        }
+        identifier.appendChild(addresses);
+        element.appendChild(identifier);
+    }
+    
+    private static void appendTextElement(Document doc, Element parent, String elementName, String value){
+        Element content = doc.createElement(elementName);
+        String contentValue = value != null ? value : "";
+        content.appendChild(doc.createTextNode(contentValue));
+        parent.appendChild(content);
+    }
+    
+    private static String docToString(Document doc){
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer;
+        try {
+            transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            StringWriter writer = new StringWriter();
+            transformer.transform(new DOMSource(doc), new StreamResult(writer));
+            String output = writer.getBuffer().toString();
+            return output;
+        } catch (TransformerException e) {
+            logger.log(Level.WARNING, "Parser Exception: ", e);
         }
         return null;
     }
