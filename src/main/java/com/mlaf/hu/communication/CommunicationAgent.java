@@ -1,6 +1,7 @@
 package com.mlaf.hu.communication;
 
 import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -15,6 +16,11 @@ import java.util.logging.Logger;
  */
 public abstract class CommunicationAgent extends Agent{
     private static final Logger LOGGER = Logger.getLogger(CommunicationAgent.class.getName());
+
+    public CommunicationAgent() {
+        super();
+        LOGGER.addHandler(new LoggerAgentLogHandler(this, 60));
+    }
     
     @Override
     public void setup(){

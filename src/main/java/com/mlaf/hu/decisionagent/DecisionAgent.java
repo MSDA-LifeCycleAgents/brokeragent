@@ -35,6 +35,7 @@ public abstract class DecisionAgent extends Agent {
 
     public DecisionAgent() {
         super();
+        decisionAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
     }
 
     @Override
