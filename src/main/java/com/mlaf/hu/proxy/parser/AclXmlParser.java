@@ -116,8 +116,6 @@ public class AclXmlParser {
     public static ACLMessage parseBody(String body) {
 
         AclObject aclObject = JAXB.unmarshal(new StringReader(body), AclObject.class);
-//        Sender sender = JAXB.unmarshal(new StringReader(body), Sender.class);
-//        Receiver receiver = JAXB.unmarshal(new StringReader(body), Receiver.class);
         return parseXMLToACL(aclObject);
     }
 
