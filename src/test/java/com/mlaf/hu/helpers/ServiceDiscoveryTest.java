@@ -5,6 +5,7 @@ import com.mlaf.hu.communication.CommunicationAgent;
 import com.mlaf.hu.communication.MailAgent;
 import com.mlaf.hu.communication.SlackAgent;
 import com.mlaf.hu.decisionagent.DecisionAgent;
+import com.mlaf.hu.loggeragent.LoggerAgent;
 import com.mlaf.hu.models.Plan;
 import jade.core.AID;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -63,5 +64,14 @@ public class ServiceDiscoveryTest {
         ServiceDescription sdServiceDescription = ServiceDiscovery.SD_COMM_MAIL_AGENT();
         assertEquals(maServiceDescription.getName(), sdServiceDescription.getName());
         assertEquals(maServiceDescription.getType(), sdServiceDescription.getType());
+    }
+
+    @Test
+    public void SD_LOGGER_AGENT() {
+        LoggerAgent la = new LoggerAgent();
+        ServiceDescription laServiceDescription = la.createServiceDescription();
+        ServiceDescription sdServiceDescription = ServiceDiscovery.SD_LOGGER_AGENT();
+        assertEquals(laServiceDescription.getName(), sdServiceDescription.getName());
+        assertEquals(laServiceDescription.getType(), sdServiceDescription.getType());
     }
 }

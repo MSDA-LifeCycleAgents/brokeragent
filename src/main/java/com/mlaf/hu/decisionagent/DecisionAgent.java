@@ -8,6 +8,7 @@ import com.mlaf.hu.helpers.Configuration;
 import com.mlaf.hu.helpers.DFServices;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import com.mlaf.hu.models.*;
 import jade.core.AID;
 import jade.core.Agent;
@@ -38,6 +39,7 @@ public abstract class DecisionAgent extends Agent {
 
     @Override
     protected void setup() {
+        decisionAgentLogger.addHandler(new LoggerAgentLogHandler(this, 30));
         if(STORE_SENSOR_AGENTS_ON_DISK) {
             boolean success = createDirectoryStructure();
             if (new File(STORAGE_BASEPATH).exists() || success) {
