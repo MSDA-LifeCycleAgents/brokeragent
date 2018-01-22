@@ -28,7 +28,7 @@ public class LoggerAgent extends Agent {
     }
 
     /**
-     * Setup the agent and register to the DF.s
+     * Setup the agent and register to the DF
      */
     @Override
     protected void setup(){
