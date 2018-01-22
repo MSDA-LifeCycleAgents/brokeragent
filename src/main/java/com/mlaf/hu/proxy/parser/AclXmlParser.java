@@ -7,189 +7,176 @@ package com.mlaf.hu.proxy.parser;
 
 import jade.core.AID;
 import jade.domain.FIPAAgentManagement.Envelope;
+import javax.xml.bind.JAXBException;
 import jade.lang.acl.ACLMessage;
-import java.io.IOException;
+import jade.util.Logger;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 
 /**
  *
- * @author Rogier
+ * @author Hans
  */
 public class AclXmlParser {
-    private static final Logger logger = Logger.getLogger(AclXmlParser.class.getName());
-    
-    public static String parse(ACLMessage message) throws ParserConfigurationException{
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Element root = doc.createElement("fipa-message");
-        root.setAttribute("communicative-act", getPerformative(message.getPerformative()));
-        doc.appendChild(root);
-        
-        Element sender = doc.createElement("sender");
-        Element receiver = doc.createElement("receiver");
-        root.appendChild(sender);
-        root.appendChild(receiver);
-        
-        addAIDToElement(doc, sender, message.getSender());
-        Iterator recIterator = message.getAllReceiver();
-        if(recIterator.hasNext())
-            addAIDToElement(doc, receiver, (AID) recIterator.next());
-        
-        appendTextElement(doc, root, "content", message.getContent());
-        appendTextElement(doc, root, "language", message.getLanguage());
-        appendTextElement(doc, root, "ontology", message.getOntology());
-        appendTextElement(doc, root, "protocol", message.getProtocol());
-        appendTextElement(doc, root, "conversation-id", message.getConversationId());
-        
-        return docToString(doc);
-    }    
-        
-    public static ACLMessage parse(String xml, Envelope envelope) throws ParserConfigurationException, SAXException{
+
+    private static java.util.logging.Logger XmlParserLogger = Logger.getLogger("XmlParserLogger");
+
+    public static String parseACLToXML(ACLMessage message) {
+        StringWriter marshalledObject = new StringWriter();
+
+        AclObject aclObject = new AclObject();
+        ArrayList<AidObject> receiverList = new ArrayList<>();
+        ArrayList<AidObject> senderList = new ArrayList<>();
+        ArrayList<AidObject> replyToList = new ArrayList<>();
+        AidObject sender = newSender(message);
+        AidObject receiver = newReceiver(message);
+        AidObject replyTo = newReplyTo(message);
+
+        receiverList.add(receiver);
+        senderList.add(sender);
+        replyToList.add(replyTo);
+
+        aclObject.setPerformative("" + getPerformative(message.getPerformative()));
+        aclObject.setSender(senderList);
+        aclObject.setReplyTo(replyToList);
+        aclObject.setReceiver(receiverList);
+        aclObject.setContent(message.getContent());
+        aclObject.setLanguage(message.getLanguage());
+        aclObject.setOntology(message.getOntology());
+        aclObject.setProtocol(message.getProtocol());
+        aclObject.setConversationId(message.getConversationId());
+
+        try {
+            JAXBContext context = JAXBContext.newInstance(AclObject.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            
+            marshaller.marshal(aclObject, marshalledObject);
+        } catch (JAXBException ex) {
+            java.util.logging.Logger.getLogger(AclXmlParser.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        String xml = marshalledObject.toString().replace("&lt;", "<").replace("&gt;", ">");
+        return xml;
+    }
+
+    private static AidObject newReceiver(ACLMessage message) {
+        AidObject receiver = new AidObject();
+        Iterator receiverIterator = message.getAllReceiver();
+        if (receiverIterator.hasNext()) {
+
+            AID aid = (AID) message.getAllReceiver().next();
+
+            ArrayList<String> addressesReceiver = new ArrayList<>();
+            addressesReceiver.addAll(Arrays.asList(aid.getAddressesArray()));
+            receiver.setName(aid.getName());
+            receiver.setAddresses(addressesReceiver);
+        }
+        return receiver;
+    }
+
+    private static AidObject newSender(ACLMessage message) {
+        AidObject sender = new AidObject();
+        sender.setName(message.getSender().getName());
+        ArrayList<String> addressesSender = new ArrayList<>();
+        addressesSender.addAll(Arrays.asList(message.getSender().getAddressesArray()));
+        sender.setAddresses(addressesSender);
+        return sender;
+    }
+
+    private static AidObject newReplyTo(ACLMessage message) {
+        AidObject replyTo = new AidObject();
+        Iterator receiverIterator = message.getAllReplyTo();
+        if (receiverIterator.hasNext()) {
+
+            AID aid = (AID) message.getAllReplyTo().next();
+
+            ArrayList<String> adressesReplyTo = new ArrayList<>();
+            adressesReplyTo.addAll(Arrays.asList(aid.getAddressesArray()));
+            replyTo.setName(aid.getName());
+            replyTo.setAddresses(adressesReplyTo);
+        }
+        return replyTo;
+    }
+
+    public static ACLMessage parse(String xml, Envelope envelope) {
         ACLMessage message = parseBody(xml);
         message.setEnvelope(envelope);
         return message;
     }
-    
-    public static ACLMessage parseBody(String body) throws ParserConfigurationException, SAXException{
-        try {
-            Document xml = loadXMLFromString(body);
-            Element root = xml.getDocumentElement();
-            return mapElementToACL(root);
-        } catch (IOException ex) {
-            // this error should never be thrown, as there is no reading from disk involved
-            logger.log(Level.WARNING, "IOException: {0}", ex.getMessage());
-            return null;
-        }
+
+    public static ACLMessage parseBody(String body) {
+
+        AclObject aclObject = JAXB.unmarshal(new StringReader(body), AclObject.class);
+//        Sender sender = JAXB.unmarshal(new StringReader(body), Sender.class);
+//        Receiver receiver = JAXB.unmarshal(new StringReader(body), Receiver.class);
+        return parseXMLToACL(aclObject);
     }
-    
-    private static ACLMessage mapElementToACL(Element root){
-        String performative = root.getAttribute("communicative-act");
-        ACLMessage message = new ACLMessage(getPerformative(performative));
+
+    private static ACLMessage parseXMLToACL(AclObject aclObject) {
+
+        ACLMessage message = new ACLMessage(getPerformative(aclObject.getPerformative()));
+
+        String senderName = aclObject.getSender().get(0).getName();
+
+        AID senderAid = new AID();
+        senderAid.setName(senderName);
+        senderAid.addAddresses(senderName);
+        message.setSender(senderAid);
+
+        aclObject.getReceiver().forEach((receiver) -> {
+            String receiverName = receiver.getName();
+            String receiverUrl = receiver.getAddresses().get(0);
+            AID receiverAid = new AID();
+            receiverAid.setName(receiverName);
+            receiverAid.addAddresses(receiverUrl);
+            message.addReceiver(receiverAid);
+        });
         
-        // should only be one
-        Element senderElement = (Element) root.getElementsByTagName("sender").item(0);
-        AID sender = elementToAID((Element) senderElement.getFirstChild());
-        message.setSender(sender);
+        aclObject.getReplyTo().forEach((replyTo) -> {
+            String replyToName = replyTo.getName();
+            String replyToUrl = replyTo.getAddresses().get(0);
+            AID replyToAid = new AID();
+            replyToAid.setName(replyToName);
+            replyToAid.addAddresses(replyToUrl);
+            message.addReplyTo(replyToAid);
+        });
         
-        NodeList receiverElements = root.getElementsByTagName("receiver").item(0).getChildNodes();
-        for(int i = 0; i < receiverElements.getLength(); i++){
-            AID receiver = elementToAID((Element) receiverElements.item(i));
-            message.addReceiver(receiver);
-        }
-        
-        String content = getString("content", root);
-        String language = getString("language", root);
-        String ontology = getString("ontology", root);
-        String protocol = getString("protocol", root);
-        String conversationID = getString("conversation-id", root);
-        
+        String content = aclObject.getContent();
+        String language = aclObject.getLanguage();
+        String ontology = aclObject.getOntology();
+        String protocol = aclObject.getProtocol();
+        String conversationID = aclObject.getConversationId();
+
         message.setContent(content);
         message.setLanguage(language);
         message.setOntology(ontology);
         message.setProtocol(protocol);
         message.setConversationId(conversationID);
-        
+
         return message;
     }
-    
-    private static AID elementToAID(Element identifier){
-        String agentName = getString("name", identifier);
-        NodeList addresses = identifier.getElementsByTagName("addresses");
-        
-        AID aid = new AID(agentName, true);
-        
-        for(int i = 0; i < addresses.getLength(); i++){
-            String address = getString("url", (Element) addresses.item(i));
-            aid.addAddresses(address);
-        }
-        
-        return aid;
-    }
-    
-    private static int getPerformative(String performative){
+
+    private static int getPerformative(String performative) {
         String[] performatives = ACLMessage.getAllPerformativeNames();
-        for(int i = 0; i < performatives.length; i++){
-            if(performatives[i].equals(performative.toUpperCase()))
+        for (int i = 0; i < performatives.length; i++) {
+            if (performatives[i].equals(performative.toUpperCase())) {
                 return i;
+            }
         }
         return -1;
     }
-    
-    private static String getPerformative(int performative){
+
+    private static String getPerformative(int performative) {
         return ACLMessage.getAllPerformativeNames()[performative];
     }
-    
-    private static Document loadXMLFromString(String xml) throws ParserConfigurationException, SAXException, IOException
-    {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        InputSource is = new InputSource(new StringReader(xml));
-        return builder.parse(is);
-    }
-    
-    private static String getString(String tagName, Element element) {
-        NodeList list = element.getElementsByTagName(tagName);
-        if (list != null && list.getLength() > 0) {
-            NodeList subList = list.item(0).getChildNodes();
-            if (subList != null && subList.getLength() > 0) {
-                return subList.item(0).getNodeValue();
-            }
-        }
-        return null;
-    }
-    
-    private static void addAIDToElement(Document doc, Element element, AID aid){
-        Element identifier = doc.createElement("agent-identifier");
-        appendTextElement(doc, identifier, "name", aid.getName());
 
-        Element addresses = doc.createElement("addresses");
-        for(String url : aid.getAddressesArray()){
-            appendTextElement(doc, addresses, "url", url);
-        }
-        identifier.appendChild(addresses);
-        element.appendChild(identifier);
-    }
-    
-    private static void appendTextElement(Document doc, Element parent, String elementName, String value){
-        Element content = doc.createElement(elementName);
-        String contentValue = value != null ? value : "";
-        content.appendChild(doc.createTextNode(contentValue));
-        parent.appendChild(content);
-    }
-    
-    private static String docToString(Document doc){
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer;
-        try {
-            transformer = tf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            StringWriter writer = new StringWriter();
-            transformer.transform(new DOMSource(doc), new StreamResult(writer));
-            String output = writer.getBuffer().toString();
-            return output;
-        } catch (TransformerException e) {
-            logger.log(Level.WARNING, "Parser Exception: ", e);
-        }
-        return null;
-    }
 }
