@@ -1,10 +1,8 @@
 package com.mlaf.hu.decisionagent.behaviour;
 
-import com.mlaf.hu.models.Topic;
+import com.mlaf.hu.models.*;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.helpers.exceptions.ParseException;
-import com.mlaf.hu.models.InstructionSet;
-import com.mlaf.hu.models.Plan;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import junit.framework.TestCase;
@@ -103,6 +101,11 @@ public class ReceiveBehaviorTest extends TestCase {
             @Override
             public void executePlanCallback(Plan plan) {
 
+            }
+
+            @Override
+            protected void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading) {
+                
             }
 
         };
