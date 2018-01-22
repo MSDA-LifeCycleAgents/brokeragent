@@ -136,7 +136,8 @@ public class TcpMtpAgent extends Agent {
     protected ACLMessage createInstructionRequest(AID receiver) throws ServiceDiscoveryNotFoundException{
         ACLMessage request = new ACLMessage(ACLMessage.REQUEST);		
         request.addReceiver(receiver);		
-        request.setContent("request-instructionset");
+        request.setContent("");
+        request.setOntology("sensor-agent-register");
         
         ServiceDiscovery decisionAgentDiscovery = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
         request.addReplyTo(decisionAgentDiscovery.getAID());

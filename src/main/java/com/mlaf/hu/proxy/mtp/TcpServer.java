@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import com.mlaf.hu.proxy.parser.AclXmlParser;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
 
 /**
  * A TcpServer that listens for incoming envelopes and forwards them
@@ -36,7 +37,7 @@ public class TcpServer {
     /**
      * The XML parser implementation class.
      */
-    public static final String XML_PARSER_CLASS = "org.apache.crimson.parser.XMLReaderImpl";
+    public static final String XML_PARSER_CLASS = "org.apache.xerces.parsers.SAXParser";
     /**
      * The Logger.
      */
@@ -210,6 +211,7 @@ public class TcpServer {
                                 logger.log(Level.WARNING, "Could not parse ACL message: ", ex);
                             } catch (TokenMgrError e){
                                 // this means it has encountered an unexpected token, like '<'. So we'll try to parse the message to XML.
+                                logger.log(Level.INFO, "Parsing as ACL failed. Trying to parse message as XML.");
                                 ACLMessage msg = AclXmlParser.parse(msgString, env);
                                 msgString = msg.toString();
                             }

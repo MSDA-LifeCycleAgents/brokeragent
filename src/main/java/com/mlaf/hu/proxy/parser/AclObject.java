@@ -5,6 +5,7 @@
  */
 package com.mlaf.hu.proxy.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -29,9 +30,9 @@ import javax.xml.bind.annotation.XmlType;
 public class AclObject {
 
     private String performative;
-    private List<AidObject> sender;
-    private List<AidObject> receiver;
-    private List<AidObject> replyTo;
+    private List<AidObject> sender = new ArrayList<>();
+    private List<AidObject> receiver = new ArrayList<>();
+    private List<AidObject> replyTo = new ArrayList<>();
     private String content;
     private String language;
     private String ontology;
