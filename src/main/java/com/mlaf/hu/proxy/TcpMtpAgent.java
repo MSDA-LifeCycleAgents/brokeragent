@@ -5,11 +5,13 @@ import com.mlaf.hu.proxy.mtp.TcpMtp;
 import com.mlaf.hu.proxy.mtp.TcpServer;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.AMSService;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.mtp.MTPException;
 import jade.wrapper.StaleProxyException;
 import java.io.IOException;
@@ -46,7 +48,7 @@ public class TcpMtpAgent extends Agent {
                 
                 AMSService.register(TcpMtpAgent.this, amsad);          
             } catch (FIPAException ex) {
-                logger.log(Level.WARNING, "Could not register " + agentName, ex);
+                logger.log(Level.WARNING, "Could not register " + agentName, ex.getACLMessage());
             }
         }
 
@@ -119,6 +121,22 @@ public class TcpMtpAgent extends Agent {
 
         logger.log(Level.INFO, "TcpMtpAgent {0}: starting", getLocalName());
         this.addBehaviour(new AgentJMDNSRegisterBehaviour(jmdnsManager));
+        this.addBehaviour(new CyclicBehaviour(){
+                @Override
+                public void action(){ 
+                    ACLMessage message = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+                    
+                    if(message == null || !message.getContent().equals("restart-jmdns"))
+                        return;
+                    
+                    try {
+                        jmdnsManager.restart();
+                    } catch (IOException ex) {
+                        Logger.getLogger(TcpMtpAgent.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+               
+                }
+        });   
     }
 
     /**
