@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DecisionAgentTest {
+public class DecisionAgentImplTest {
     private String instructionXML;
     private String sensorReadingXML;
     private DecisionAgent da;
