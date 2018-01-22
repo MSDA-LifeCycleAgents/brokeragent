@@ -34,14 +34,13 @@ public abstract class DecisionAgent extends Agent {
     @Override
     protected void setup() {
         try {
-            decisionAgentLogger.addHandler(new LoggerAgentLogHandler( this, 30));
+            decisionAgentLogger.addHandler(new LoggerAgentLogHandler( this, 5));
             DFServices.registerAsService(createServiceDescription(), this);
             addBehaviour(new RegisterSensorAgentBehaviour(this));
-//            addBehaviour(new ReceiveBehaviour(this));
+            addBehaviour(new ReceiveBehaviour(this));
             addBehaviour(new UpdateStatusSensorAgentBehaviour(this, 5000L));
             ServiceDiscovery sd_decision_agent = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
             AID DA_TEST = sd_decision_agent.ensureAID(20);
-            System.out.println(DA_TEST);
         } catch (Exception e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);

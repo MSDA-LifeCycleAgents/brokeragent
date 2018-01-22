@@ -29,7 +29,6 @@ public class UpdateStatusSensorAgentBehaviour extends TickerBehaviour {
 
     @Override
     protected void onTick() {
-        DA.decisionAgentLogger.log(Level.WARNING, "Test log for LoggerAgent");
         checkForInactivity();
         ACLMessage message = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.PROPAGATE));
         updateToActive(message);

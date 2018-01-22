@@ -41,21 +41,18 @@ public class LoggerAgentLogHandler extends Handler {
             boolean lock = false;
             @Override
             public void run() {
-                if (!lock && shouldSendBuffer()) {
+                if (lock) { return; }
+                if (shouldSendBuffer()) {
                     lock = true;
                     try {
-                        System.out.println("Scheduling send buffer");
                         sendBuffer();
                         // Clean up unnecessarily scheduled tasks;
                         timer.purge();
-                        System.out.println("Done sending");
                     } catch (Exception e) {
-                        lock = false;
                         logger.log(Level.SEVERE, "Could not send buffer, releasing lock", e);
+                    } finally {
+                        lock = false;
                     }
-
-                } else {
-                    System.out.println("Not scheduling yet!");
                 }
             }
         };
@@ -69,11 +66,9 @@ public class LoggerAgentLogHandler extends Handler {
     }
 
     private void sendBuffer() {
-        System.out.println("Trying to send buffer");
         try {
             ACLMessage message = new ACLMessage(ACLMessage.INFORM);
             AID loggerAgent = sdLoggerAgent.ensureAID(20);
-            System.out.println("Logger Agent AID: " + loggerAgent);
             message.addReceiver(loggerAgent);
             String serialized = serializeObjectB64(this.queue);
             if (serialized == null) {

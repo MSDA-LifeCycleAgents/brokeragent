@@ -1,6 +1,7 @@
 package com.mlaf.hu.loggeragent;
 
 import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.loggeragent.behaviour.ReceiveBehaviour;
 import jade.core.Agent;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -10,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Base64;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -22,17 +24,19 @@ public class LoggerAgent extends Agent {
 
     public LoggerAgent() {
         super();
-        //TODO This fails for some reason?
-        DFServices.registerAsService(this.createServiceDescription(), this);
         incomingLogger = Logger.getLogger("com.mlaf.hu.loggeragent.central");
+        ConsoleHandler handler = new ConsoleHandler();
+        incomingLogger.addHandler(handler);
+    }
+
+    @Override
+    protected void setup(){
+        DFServices.registerAsService(this.createServiceDescription(), this);
         addBehaviour(new ReceiveBehaviour(this));
     }
 
     public ServiceDescription createServiceDescription() {
-        ServiceDescription sd = new ServiceDescription();
-        sd.setName(SERVICE_NAME);
-        sd.setType("logger-agent");
-        return sd;
+        return ServiceDiscovery.SD_LOGGER_AGENT();
     }
 
     public static CircularFifoQueue<LogRecord> deserializeObjectB64(String s) {
