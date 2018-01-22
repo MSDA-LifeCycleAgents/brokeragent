@@ -130,7 +130,8 @@ public abstract class DecisionAgent extends Agent {
             if (measurement.getMax() > reading || measurement.getMin() > reading) {
                 executeSensorReadingWarning(sensor, measurement, reading);
             }
-            if ((measurement.getMax() * plan.getAbove() < reading) || (reading < measurement.getMax() * plan.getBelow())) {
+
+            if (plan.getAbove() != 0.0 && (measurement.getMax() * plan.getAbove() < reading) || plan.getBelow() != 0.0 &&(reading < measurement.getMax() * plan.getBelow())) {
                 executePlan(plan);
             }
 
