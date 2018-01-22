@@ -6,7 +6,9 @@ import com.mlaf.hu.communication.MailAgent;
 import com.mlaf.hu.communication.SlackAgent;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.loggeragent.LoggerAgent;
+import com.mlaf.hu.models.Measurement;
 import com.mlaf.hu.models.Plan;
+import com.mlaf.hu.models.Sensor;
 import jade.core.AID;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import org.junit.Test;
@@ -30,6 +32,11 @@ public class ServiceDiscoveryTest {
 
             @Override
             public void executePlanCallback(Plan plan) {
+
+            }
+
+            @Override
+            protected void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading) {
 
             }
         };
