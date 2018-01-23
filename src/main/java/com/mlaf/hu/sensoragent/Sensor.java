@@ -1,5 +1,6 @@
 package com.mlaf.hu.sensoragent;
 
+import com.mlaf.hu.helpers.exceptions.SensorReadException;
 import com.mlaf.hu.models.Measurements;
 
 import java.time.LocalDateTime;

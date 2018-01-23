@@ -21,7 +21,7 @@ public class Configuration {
     
     private static Configuration configuration;
     private final Properties properties;
-    private static final String PROP_FILE_NAME = "src/main/resource/config.properties";
+    private static final String PROP_FILE_NAME = "src/main/resources/config.properties";
     
     private Configuration(){
         properties = new Properties();

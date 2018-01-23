@@ -16,6 +16,18 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <formats>
+                        <format>html</format>
+                        <format>xml</format>
+                    </formats>
+                    <check />
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <packaging>jar</packaging>
@@ -44,7 +56,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/jade-main-container.properties</argument>
+                                <argument>src/main/resources/jade-main-container.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -73,7 +85,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/broker-agent.properties</argument>
+                                <argument>src/main/resources/broker-agent.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -92,7 +104,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/sensor-agent.properties</argument>
+                                <argument>src/main/resources/sensor-agent.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -111,7 +123,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/topic-subscriber.properties</argument>
+                                <argument>src/main/resources/topic-subscriber.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -130,7 +142,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/topic-publisher.properties</argument>
+                                <argument>src/main/resources/topic-publisher.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -149,7 +161,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/decision-agent.properties</argument>
+                                <argument>src/main/resources/decision-agent.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -187,7 +199,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/monitoring-service.properties</argument>
+                                <argument>src/main/resources/monitoring-service.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
@@ -213,7 +225,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/proxy-agent.properties</argument>
+                                <argument>src/main/resources/proxy-agent.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>
