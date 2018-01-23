@@ -30,23 +30,25 @@ public abstract class DecisionAgent extends Agent {
     public static final long STORE_INTERVAL_IN_MS = Long.parseLong(config.getProperty("decisionagent.store_interval_in_ms"));
     private static final String STORAGE_FILENAME = config.getProperty("decisionagent.storage_filename");
     private static final boolean STORE_SENSOR_AGENTS_ON_DISK = Boolean.parseBoolean(config.getProperty("decisionagent.store_sensor_agents_on_disk"));
+    private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("decisionagent.logger_handler"));
     public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
     public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
 
     public DecisionAgent() {
         super();
-        decisionAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
     }
 
     @Override
     protected void setup() {
-        decisionAgentLogger.addHandler(new LoggerAgentLogHandler(this, 30));
-        if(STORE_SENSOR_AGENTS_ON_DISK) {
+        if (STORE_SENSOR_AGENTS_ON_DISK) {
             boolean success = createDirectoryStructure();
             if (new File(STORAGE_BASEPATH).exists() || success) {
                 loadSensorAgents();
                 addBehaviour(new SaveToDiskBehaviour(this));
             }
+        }
+        if (LOGGER_HANDLER) {
+            decisionAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
         }
         if (DFServices.registerAsService(createServiceDescription(), this)) {
             addBehaviour(new RegisterSensorAgentBehaviour(this));
@@ -97,6 +99,8 @@ public abstract class DecisionAgent extends Agent {
             instructionset.setRegisteredAt(LocalDateTime.now());
             this.sensorAgents.put(sensoragent, instructionset);
             DecisionAgent.decisionAgentLogger.log(Logger.INFO, "New Sensor Agent added: " + sensoragent);
+        } else {
+            this.sensorAgents.put(sensoragent, instructionset);
         }
     }
 
@@ -128,14 +132,16 @@ public abstract class DecisionAgent extends Agent {
 
     private void decide(double reading, Measurement measurement, Sensor sensor) {
         for (Plan plan : measurement.getPlans().getPlans()) {
-            if (measurement.getMax() > reading || measurement.getMin() > reading) {
-                executeSensorReadingWarning(sensor, measurement, reading);
-            }
+            if (plan.getCurrentLimit() < plan.getLimit()) {
+                if (measurement.getMax() < reading || measurement.getMin() > reading) {
+                    executeSensorReadingWarning(sensor, measurement, reading);
+                }
 
-            if (plan.getAbove() != 0.0 && (measurement.getMax() * plan.getAbove() < reading) || plan.getBelow() != 0.0 &&(reading < measurement.getMax() * plan.getBelow())) {
-                executePlan(plan);
+                if (plan.getAbove() != 0.0 && (measurement.getMax() * plan.getAbove() < reading) || plan.getBelow() != 0.0 && (reading < measurement.getMax() * plan.getBelow())) {
+                    executePlan(plan, reading);
+                    plan.setCurrentLimit(plan.getCurrentLimit() + 1);
+                }
             }
-
         }
     }
 
@@ -145,9 +151,9 @@ public abstract class DecisionAgent extends Agent {
      */
     protected abstract void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading);
 
-    private void executePlan(Plan plan) {
+    private void executePlan(Plan plan, double reading) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent(plan.getMessage());
+        message.setContent(String.format("%s %s", plan.getMessage(), reading));
         message.addReceiver(DFServices.getService(plan.getVia(), this));
         message.addUserDefinedParameter("to", plan.getTo());
         this.send(message);
@@ -159,7 +165,7 @@ public abstract class DecisionAgent extends Agent {
      */
     public void storeSensorAgents() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
-            decisionAgentLogger.log(Logger.INFO, String.format("Writing the following Sensor Agents w. Instruction Sets to disk: \n%s", HashMapToString()));
+            decisionAgentLogger.log(Logger.INFO, String.format("Writing %s Sensor Agents w. Instruction Sets to disk.", this.sensorAgents.size()));
             oos.writeObject(this.sensorAgents);
             decisionAgentLogger.log(Logger.INFO, String.format("Written all Sensor Agents w. Instruction Sets to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
         } catch (IOException e) {
@@ -171,20 +177,12 @@ public abstract class DecisionAgent extends Agent {
     private void loadSensorAgents() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
             this.sensorAgents = (HashMap) ois.readObject();
-            decisionAgentLogger.log(Logger.INFO, String.format("Found serialized Sensor Agents w. Instruction Sets: \n%s", HashMapToString()));
+            decisionAgentLogger.log(Logger.INFO, String.format("Found %s serialized Sensor Agents w. Instruction Sets.", this.sensorAgents.size()));
         } catch (FileNotFoundException e) {
             decisionAgentLogger.log(Logger.INFO, String.format("Could not find serialized Sensor Agents w. Instruction Sets on disk: %s. Starting fresh.", e.getMessage()));
         } catch (IOException | ClassNotFoundException e) {
             decisionAgentLogger.log(Logger.INFO, String.format("Could not load file, IO Error: %s. Starting fresh.", e.getMessage()));
         }
-    }
-
-    private String HashMapToString() {
-        StringBuilder toString = new StringBuilder();
-        for (Map.Entry<AID, InstructionSet> entry : this.sensorAgents.entrySet()) {
-            toString.append(entry.getKey()).append(" \n");
-        }
-        return toString.toString();
     }
 
     private static boolean createDirectoryStructure() {

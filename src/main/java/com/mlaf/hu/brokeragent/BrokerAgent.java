@@ -30,13 +30,16 @@ public class BrokerAgent extends Agent {
     public static final long STORE_INTERVAL_IN_MS = Long.parseLong(config.getProperty("brokeragent.store_interval_in_ms"));
     private static final String STORAGE_FILENAME = config.getProperty("brokeragent.storage_filename");
     private static final boolean STORE_TOPICS_ON_DISK = Boolean.parseBoolean(config.getProperty("brokeragent.store_sensor_agents_on_disk"));
+    private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("brokeragent.logger_handler"));
     private static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
     public HashMap<AID, Topic> topics = new HashMap<>();
     private TopicManagementHelper topicHelper;
 
     @Override
     protected void setup() {
-        brokerAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
+        if (LOGGER_HANDLER) {
+            brokerAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
+        }
         try {
             if (STORE_TOPICS_ON_DISK) {
                 boolean success = createDirectoryStructure();
@@ -182,7 +185,6 @@ public class BrokerAgent extends Agent {
     }
 
     private Topic getTopicByAID(AID aid) throws InvallidTopicException, TopicNotManagedException {
-        //TODO Let all methods use this to get topic
         if (!topicHelper.isTopic(aid)) {
             throw new InvallidTopicException(aid.getName() + " is not a valid topic AID");
         }
@@ -204,7 +206,7 @@ public class BrokerAgent extends Agent {
     private void loadTopics() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
             this.topics = (HashMap) ois.readObject();
-            brokerAgentLogger.log(Logger.INFO, String.format("Found serialized topics: \n%s.", HashMapToString()));
+            brokerAgentLogger.log(Logger.INFO, String.format("Found serialized topics: \n%s", HashMapToString()));
         } catch (FileNotFoundException e) {
             brokerAgentLogger.log(Logger.INFO, String.format("Could not find serialized topics on disk: %s. Starting fresh.", e.getMessage()));
         } catch (IOException | ClassNotFoundException e) {
