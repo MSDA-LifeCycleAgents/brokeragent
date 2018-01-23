@@ -1,6 +1,7 @@
 package com.mlaf.hu.communication;
 
 import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
@@ -15,26 +16,32 @@ import java.util.logging.Logger;
  */
 public abstract class CommunicationAgent extends Agent{
     private static final Logger LOGGER = Logger.getLogger(CommunicationAgent.class.getName());
+
+    public CommunicationAgent() {
+        super();
+        LOGGER.addHandler(new LoggerAgentLogHandler(this, 60));
+    }
     
     @Override
     public void setup(){
-        DFServices.registerAsService(createServiceDescription(), this);
-        addBehaviour(
-            new CyclicBehaviour(){
-                @Override
-                public void action(){ 
-                    ACLMessage aclMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-                    if (aclMessage != null) {
-                        String message = aclMessage.getContent();
-                        String to = aclMessage.getUserDefinedParameter("to");
-                        if (message != null && to != null)
-                                send(message, to);
-                        else
-                            LOGGER.log(Level.WARNING, "Failed to send message: invalid request: {0}", message);
+        if (DFServices.registerAsService(createServiceDescription(), this)) {
+            addBehaviour(
+                    new CyclicBehaviour() {
+                        @Override
+                        public void action() {
+                            ACLMessage aclMessage = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+                            if (aclMessage != null) {
+                                String message = aclMessage.getContent();
+                                String to = aclMessage.getUserDefinedParameter("to");
+                                if (message != null && to != null)
+                                    send(message, to);
+                                else
+                                    LOGGER.log(Level.WARNING, "Failed to send message: invalid request: {0}", message);
+                            }
+                        }
                     }
-                }
-            }
-        );
+            );
+        }
     }
     
     @Override

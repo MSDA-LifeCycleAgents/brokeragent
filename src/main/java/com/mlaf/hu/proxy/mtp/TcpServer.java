@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import com.mlaf.hu.proxy.parser.AclXmlParser;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
 
 /**
  * A TcpServer that listens for incoming envelopes and forwards them
@@ -36,7 +37,7 @@ public class TcpServer {
     /**
      * The XML parser implementation class.
      */
-    public static final String XML_PARSER_CLASS = "org.apache.crimson.parser.XMLReaderImpl";
+    public static final String XML_PARSER_CLASS = "org.apache.xerces.parsers.SAXParser";
     /**
      * The Logger.
      */
@@ -209,14 +210,10 @@ public class TcpServer {
                             } catch (ParseException ex) {
                                 logger.log(Level.WARNING, "Could not parse ACL message: ", ex);
                             } catch (TokenMgrError e){
-                                try {
-                                    // this means it has encountered an unexpected token, like '<'. So we'll try to parse the message to XML.
-                                    ACLMessage msg = AclXmlParser.parse(msgString, env);
-                                    msgString = msg.toString();
-                                } catch (ParserConfigurationException | SAXException ex) {
-                                    logger.log(Level.WARNING, "Could not parse ACL message to XML: ", ex);
-                                    return;
-                                }
+                                // this means it has encountered an unexpected token, like '<'. So we'll try to parse the message to XML.
+                                logger.log(Level.INFO, "Parsing as ACL failed. Trying to parse message as XML.");
+                                ACLMessage msg = AclXmlParser.parse(msgString, env);
+                                msgString = msg.toString();
                             }
 
                             logger.log(Level.INFO, "Dispatching message string: {0}", msgString);

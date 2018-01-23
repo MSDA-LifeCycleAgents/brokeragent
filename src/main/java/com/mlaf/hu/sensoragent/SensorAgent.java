@@ -4,9 +4,11 @@ import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.Messaging;
 import com.mlaf.hu.models.SensorReading;
+import com.mlaf.hu.models.Topic;
 import com.mlaf.hu.sensoragent.behaviour.ReadSensorsBehaviour;
 import com.mlaf.hu.sensoragent.behaviour.RegisterWithDABehaviour;
 import com.mlaf.hu.sensoragent.behaviour.SendBufferBehaviour;
@@ -31,11 +33,24 @@ public abstract class SensorAgent extends Agent {
     private boolean registered = false;
 
     public SensorAgent() {
+        sensorAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
         instructionSet = readInstructionSet();
-        addBehaviour(new RegisterWithDABehaviour(this, 20000L));
+        addBehaviour(new RegisterWithDABehaviour(this));
         addBehaviour(new ReadSensorsBehaviour(this));
         decisionAgentDiscovery = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
     }
+
+    /**
+     * This function should get the Instruction Set from where ever it is stored.
+     */
+    protected abstract String getInstructionXML();
+
+    /**
+     * When the Decision Agent doesn't accept the Instruction Set XML send in the RegisterWithDABehaviour.
+     * Suggestion for this method implementation: Stop the Sensor Agent to fix the Instruction Set XML according
+     * to the documentation and start the Sensor Agent back up.
+     */
+    public abstract void onReceivingRefuseRegistration();
 
     public void registerWithDA() {
         try {
@@ -55,9 +70,7 @@ public abstract class SensorAgent extends Agent {
         return new ArrayList<>(sensors);
     }
 
-    protected abstract String getInstructionXML();
-
-    public InstructionSet readInstructionSet() {
+    private InstructionSet readInstructionSet() {
         try {
             return XmlParser.parseToObject(InstructionSet.class, getInstructionXML());
         } catch (ParseException e) {
@@ -70,7 +83,7 @@ public abstract class SensorAgent extends Agent {
     protected void addSensor(Sensor newSensor) throws InvalidSensorException {
         for (Sensor s : sensors) {
             if (s.getSensorID().equals(newSensor.getSensorID())) {
-                throw new InvalidSensorException("SensorImpl1 " + newSensor.getSensorID() + " is alreay registered");
+                throw new InvalidSensorException("Sensor " + newSensor.getSensorID() + " is alreay registered");
             }
         }
         boolean foundInInstructionset = false;
@@ -81,7 +94,7 @@ public abstract class SensorAgent extends Agent {
             }
         }
         if (!foundInInstructionset) {
-            throw new InvalidSensorException("SensorImpl1 " + newSensor.getSensorID() + " is not found in instructionset");
+            throw new InvalidSensorException("Sensor " + newSensor.getSensorID() + " is not found in instructionset");
         }
         sensors.add(newSensor);
     }
@@ -104,7 +117,7 @@ public abstract class SensorAgent extends Agent {
         try {
             readingXml = XmlParser.parseToXml(sensorReading);
         } catch (ParseException e) {
-            sensorAgentLogger.log(Level.SEVERE, "Could not marshall the SensorImpl1 Reading.");
+            sensorAgentLogger.log(Level.SEVERE, "Could not marshall the Sensor Reading.");
         }
         if (readingXml == null) {
             sensorAgentLogger.log(Level.SEVERE, "Got empty XML for sensor reading.");
@@ -113,7 +126,7 @@ public abstract class SensorAgent extends Agent {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         msg.addReceiver(destination);
         msg.setLanguage("XML");
-        msg.setOntology("MLAF-SensorImpl1-XML");
+        msg.setOntology("sensor-agent-reading");
         msg.setContent(readingXml);
         send(msg);
         sensorAgentLogger.log(Level.INFO, String.format("New reading sent for sensor: %s", sensorReading.getSensors().getSensors().get(0).getId()));
@@ -125,7 +138,8 @@ public abstract class SensorAgent extends Agent {
             return decisionAgentDiscovery.getAID();
         } else {
             TopicManagementHelper topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
-            return topicHelper.createTopic(messaging.getTopic().getTopicName());
+            Topic topic = messaging.getTopic();
+            return topicHelper.createTopic(topic.getTopicName());
         }
     }
 

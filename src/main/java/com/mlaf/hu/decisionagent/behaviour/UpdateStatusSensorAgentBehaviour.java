@@ -12,12 +12,13 @@ import jade.util.Logger;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.logging.Level;
 import java.util.Map;
 
 /**
- * This behaviour will continuously check if the SensorImpl1 Agents are still alive and kicking. It will do this by checking for every InstructionSet
+ * This behaviour will continuously check if the Sensor Agents are still alive and kicking. It will do this by checking for every InstructionSet
  * if the difference in the lastReceivedDataPackageAt and the time at that moment in seconds divided by the highest interval (in seconds) of all Sensors in the InstructionSet
- * is equal or higher than amountOfMissedDataPackages. If so the SensorImpl1 will be set to inactive.
+ * is equal or higher than amountOfMissedDataPackages. If so the Sensor will be set to inactive.
  */
 
 public class UpdateStatusSensorAgentBehaviour extends TickerBehaviour {

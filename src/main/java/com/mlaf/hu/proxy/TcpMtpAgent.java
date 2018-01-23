@@ -1,15 +1,19 @@
 package com.mlaf.hu.proxy;
 
 import com.mlaf.hu.helpers.Configuration;
+import com.mlaf.hu.helpers.ServiceDiscovery;
+import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
 import com.mlaf.hu.proxy.mtp.TcpMtp;
 import com.mlaf.hu.proxy.mtp.TcpServer;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.AMSService;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.mtp.MTPException;
 import jade.wrapper.StaleProxyException;
 import java.io.IOException;
@@ -44,9 +48,18 @@ public class TcpMtpAgent extends Agent {
                 amsad.setName(aid);
                 amsad.setState(AMSAgentDescription.ACTIVE);
                 
-                AMSService.register(TcpMtpAgent.this, amsad);          
+                AMSService.register(TcpMtpAgent.this, amsad);   
+                
+                ACLMessage request;
+                try {
+                    request = createInstructionRequest(aid);
+                    send(request);	
+                } catch (ServiceDiscoveryNotFoundException ex) {
+                    Logger.getLogger(TcpMtpAgent.class.getName()).log(Level.WARNING, "DecisionAgent not found, no instructionset requested: {0}", ex);
+                }
+ 	
             } catch (FIPAException ex) {
-                logger.log(Level.WARNING, "Could not register " + agentName, ex);
+                logger.log(Level.WARNING, "Could not register " + agentName, ex.getACLMessage());
             }
         }
 
@@ -119,6 +132,34 @@ public class TcpMtpAgent extends Agent {
 
         logger.log(Level.INFO, "TcpMtpAgent {0}: starting", getLocalName());
         this.addBehaviour(new AgentJMDNSRegisterBehaviour(jmdnsManager));
+        this.addBehaviour(new CyclicBehaviour(){
+                @Override
+                public void action(){ 
+                    ACLMessage message = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
+                    
+                    if(message == null || !message.getContent().equals("restart-jmdns"))
+                        return;
+                    
+                    try {
+                        jmdnsManager.restart();
+                    } catch (IOException ex) {
+                        Logger.getLogger(TcpMtpAgent.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+               
+                }
+        });   
+    }
+    
+    protected ACLMessage createInstructionRequest(AID receiver) throws ServiceDiscoveryNotFoundException{
+        ACLMessage request = new ACLMessage(ACLMessage.REQUEST);		
+        request.addReceiver(receiver);		
+        request.setContent("");
+        request.setOntology("sensor-agent-register");
+        
+        ServiceDiscovery decisionAgentDiscovery = new ServiceDiscovery(this, ServiceDiscovery.SD_DECISION_AGENT());
+        request.addReplyTo(decisionAgentDiscovery.getAID());
+        
+        return request;
     }
 
     /**

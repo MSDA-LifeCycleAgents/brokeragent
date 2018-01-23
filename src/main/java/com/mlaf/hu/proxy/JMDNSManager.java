@@ -41,10 +41,11 @@ public class JMDNSManager {
      */
     private static final Logger logger = Logger.getLogger(JMDNSManager.class.getName());
 
-    private final JmDNS jmdns;
+    private JmDNS jmdns;
     private final InetAddress inetAddress;
     private final int jadeSocketPort;
-
+    private ServiceListener listener;
+    
     public static InetAddress getLocalIPv4Address() throws SocketException {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
@@ -85,7 +86,18 @@ public class JMDNSManager {
         this.jadeSocketPort = rockProxyMTSPort;
         // Get the eth0 v4 address
         this.inetAddress = getLocalIPv4Address();
-
+        this.listener = listener;
+        
+        start();
+    }
+    
+    public void restart() throws IOException{
+        logger.log(Level.INFO, "Restarting JMDNS");
+        jmdns.close();
+        start();
+    }
+    
+    private void start() throws IOException{
         jmdns = JmDNS.create(inetAddress);
         if (listener != null) {
             jmdns.addServiceListener(JMDNS_TYPE, listener);
