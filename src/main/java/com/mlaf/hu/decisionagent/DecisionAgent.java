@@ -149,7 +149,9 @@ public abstract class DecisionAgent extends Agent {
      * Whenever the reading exceeds the minimum value or maximum value specified in the Instruction Set XML, this
      * method will be executed.
      */
-    protected abstract void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading);
+    private void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading) {
+        DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, String.format("Measurement %s from Sensor %s has exceeded the min or max value: %s", measurement.getId(), sensor.getId(), reading));
+    }
 
     private void executePlan(Plan plan, double reading) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);

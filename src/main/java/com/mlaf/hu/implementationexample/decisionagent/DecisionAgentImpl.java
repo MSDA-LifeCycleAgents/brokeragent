@@ -25,9 +25,4 @@ public class DecisionAgentImpl extends DecisionAgent {
 
     }
 
-    @Override
-    protected void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading) {
-        DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, String.format("Measurement %s from Sensor %s has exceeded the min or max value: %s", measurement.getId(), sensor.getId(), reading));
-    }
-
 }

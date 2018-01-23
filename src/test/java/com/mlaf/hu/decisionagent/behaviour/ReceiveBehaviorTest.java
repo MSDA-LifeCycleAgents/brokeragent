@@ -94,18 +94,13 @@ public class ReceiveBehaviorTest extends TestCase {
             }
 
             @Override
-            public void storeReading(double value) {
+            public void storeReading(double value, InstructionSet is, Sensor sensor, String measurementId) {
 
             }
 
             @Override
             public void executePlanCallback(Plan plan) {
 
-            }
-
-            @Override
-            protected void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading) {
-                
             }
 
         };

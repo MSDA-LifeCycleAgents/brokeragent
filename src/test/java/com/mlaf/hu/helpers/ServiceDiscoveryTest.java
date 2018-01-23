@@ -6,6 +6,7 @@ import com.mlaf.hu.communication.MailAgent;
 import com.mlaf.hu.communication.SlackAgent;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.loggeragent.LoggerAgent;
+import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.Measurement;
 import com.mlaf.hu.models.Plan;
 import com.mlaf.hu.models.Sensor;
@@ -26,17 +27,13 @@ public class ServiceDiscoveryTest {
             }
 
             @Override
-            public void storeReading(double value) {
+            public void storeReading(double value, InstructionSet is, Sensor sensor, String measurementId) {
 
             }
+
 
             @Override
             public void executePlanCallback(Plan plan) {
-
-            }
-
-            @Override
-            protected void executeSensorReadingWarning(Sensor sensor, Measurement measurement, double reading) {
 
             }
         };
