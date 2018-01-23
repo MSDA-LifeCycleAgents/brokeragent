@@ -107,8 +107,10 @@ public class ReceiveBehaviour extends CyclicBehaviour {
             if (!is.getMessaging().isDirectToDecisionAgent()) {
                 if (is.getMessaging().isRegisteredToTopic()) {
                     this.DA.send(requestFromTopic(this.serviceDiscovery.getAID(), is));
-                } else {
+                }
+                if (LocalDateTime.now().isAfter(this.continueAfter)) {
                     this.DA.send(subscribeToTopic(this.serviceDiscovery.getAID(), is));
+                    this.continueAfter = LocalDateTime.now().plusSeconds(30);
                 }
             }
         }
