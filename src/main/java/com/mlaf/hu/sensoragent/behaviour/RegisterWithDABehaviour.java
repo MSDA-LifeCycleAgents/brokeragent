@@ -1,14 +1,16 @@
 package com.mlaf.hu.sensoragent.behaviour;
 
 import com.mlaf.hu.sensoragent.SensorAgent;
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.util.Logger;
+import jade.util.leap.Iterator;
 
 import java.time.LocalDateTime;
 
-public class RegisterWithDABehaviour extends CyclicBehaviour{
+public class RegisterWithDABehaviour extends CyclicBehaviour {
     private final SensorAgent sa;
     private LocalDateTime continueAfter = LocalDateTime.now();
 
@@ -24,6 +26,7 @@ public class RegisterWithDABehaviour extends CyclicBehaviour{
             SensorAgent.sensorAgentLogger.log(Logger.WARNING, "Reason for refusing: \n" + refuseSubscription.getContent());
             this.sa.onReceivingRefuseRegistration();
         }
+        onSubscribe();
         if (!this.sa.isRegistered() && LocalDateTime.now().isAfter(continueAfter)) {
             handleRegistration();
 
@@ -33,8 +36,8 @@ public class RegisterWithDABehaviour extends CyclicBehaviour{
     }
 
     private void checkIfUnregistered() {
-        MessageTemplate performative  = MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM);
-        MessageTemplate ontology  = MessageTemplate.MatchOntology("sensor-agent-register");
+        MessageTemplate performative = MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM);
+        MessageTemplate ontology = MessageTemplate.MatchOntology("sensor-agent-register");
         ACLMessage unsubscribed = myAgent.receive(MessageTemplate.and(performative, ontology));
         if (unsubscribed != null) {
             this.sa.setRegistered(false);
@@ -43,10 +46,17 @@ public class RegisterWithDABehaviour extends CyclicBehaviour{
 
     private void handleRegistration() {
         this.sa.registerWithDA();
+    }
+
+    private void onSubscribe() {
         ACLMessage subscribed = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM));
         if (subscribed == null) {
             this.continueAfter = LocalDateTime.now().plusSeconds(20);
-            this.restart();
+            return;
+        }
+        Iterator it = subscribed.getAllReplyTo();
+        while(it.hasNext()) {
+            this.sa.setDestination((AID)it.next());
         }
         this.sa.setRegistered(true);
         SensorAgent.sensorAgentLogger.log(Logger.INFO, "Registered with the Decision Agent.\nStarting to send data from buffer.");

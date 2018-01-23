@@ -31,6 +31,7 @@ public abstract class SensorAgent extends Agent {
     private transient InstructionSet instructionSet;
     private ServiceDiscovery decisionAgentDiscovery;
     private boolean registered = false;
+    private AID destination;
 
     public SensorAgent() {
         sensorAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
@@ -107,8 +108,6 @@ public abstract class SensorAgent extends Agent {
     }
 
     public void sendSensorReadings() throws ServiceDiscoveryNotFoundException, ServiceException{
-        AID destination = null;
-        destination = getDestination();
         SensorReading sensorReading = sensorReadingQueue.poll();
         if (sensorReading == null) {
             return;
@@ -132,17 +131,6 @@ public abstract class SensorAgent extends Agent {
         sensorAgentLogger.log(Level.INFO, String.format("New reading sent for sensor: %s", sensorReading.getSensors().getSensors().get(0).getId()));
     }
 
-    private AID getDestination() throws ServiceDiscoveryNotFoundException, ServiceException {
-        Messaging messaging = instructionSet.getMessaging();
-        if (messaging.isDirectToDecisionAgent()) {
-            return decisionAgentDiscovery.getAID();
-        } else {
-            TopicManagementHelper topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
-            Topic topic = messaging.getTopic();
-            return topicHelper.createTopic(topic.getTopicName());
-        }
-    }
-
     public boolean isRegistered() {
         return registered;
     }
@@ -151,4 +139,11 @@ public abstract class SensorAgent extends Agent {
         this.registered = registered;
     }
 
+    public void setDestination(AID destination) {
+        this.destination = destination;
+    }
+
+    public AID getDestination() {
+        return destination;
+    }
 }
