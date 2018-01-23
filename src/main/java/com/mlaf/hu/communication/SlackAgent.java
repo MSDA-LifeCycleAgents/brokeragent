@@ -1,5 +1,6 @@
 package com.mlaf.hu.communication;
 
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import com.ullink.slack.simpleslackapi.SlackChannel;
 import com.ullink.slack.simpleslackapi.SlackSession;
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
@@ -15,7 +16,16 @@ import com.mlaf.hu.helpers.Configuration;
  * @author Rogier
  */
 public class SlackAgent extends CommunicationAgent {
-    private static final Logger logger = Logger.getLogger(SlackAgent.class.getName());
+    private static final java.util.logging.Logger logger = jade.util.Logger.getLogger(SlackAgent.class.getName());
+    private static Configuration config = Configuration.getInstance();
+    private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("slack.logger_handler"));
+
+    public SlackAgent() {
+        super();
+        if (LOGGER_HANDLER) {
+            logger.addHandler(new LoggerAgentLogHandler(this, 60));
+        }
+    }
 
     @Override
     public ServiceDescription createServiceDescription() {

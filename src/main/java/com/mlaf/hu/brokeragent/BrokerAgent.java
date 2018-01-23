@@ -141,6 +141,7 @@ public class BrokerAgent extends Agent {
 
     public ACLMessage getMessageFromBuffer(AID subscriber, Topic representationTopic, TopicManagementHelper helper) {
         ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology("sensor-agent-reading");
         if (representationTopic.getTopicName() == null) {
             String content = "The BrokerAgent needs a topic name. Use the following format for requesting:\n" +
                              "<name></name>";

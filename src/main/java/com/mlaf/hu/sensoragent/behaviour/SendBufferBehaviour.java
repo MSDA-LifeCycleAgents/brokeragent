@@ -24,12 +24,10 @@ public class SendBufferBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        try {
-            if(LocalDateTime.now().isAfter(continueAfter)) {
-                sensorAgent.sendSensorReadings();
-            }
-        } catch (ServiceDiscoveryNotFoundException | ServiceException e) {
-            SensorAgent.sensorAgentLogger.log(Logger.SEVERE, "Stop sending and waiting 20 seconds: " + e.getMessage());
+        if (LocalDateTime.now().isAfter(continueAfter) && sensorAgent.getDestination() != null) {
+            sensorAgent.sendSensorReadings();
+        } else if (sensorAgent.getDestination() == null) {
+            SensorAgent.sensorAgentLogger.log(Logger.SEVERE, "Stop sending and waiting 20 seconds. Destination unclear.");
             continueAfter = LocalDateTime.now().plusSeconds(20);
         }
 

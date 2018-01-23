@@ -1,10 +1,10 @@
 package com.mlaf.hu.communication;
 
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 import java.util.Properties;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -15,14 +15,24 @@ import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
 
 import com.mlaf.hu.helpers.Configuration;
+import jade.util.Logger;
 
 /**
  *
  * @author Rogier
  */
 public class MailAgent extends CommunicationAgent{
-    private static final Logger logger = Logger.getLogger(MailAgent.class.getName());
-    
+    private static final java.util.logging.Logger logger = Logger.getLogger(MailAgent.class.getName());
+    private static Configuration config = Configuration.getInstance();
+    private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("mailagent.logger_handler"));
+
+    public MailAgent() {
+        super();
+        if (LOGGER_HANDLER) {
+            logger.addHandler(new LoggerAgentLogHandler(this, 60));
+        }
+    }
+
     @Override
     public ServiceDescription createServiceDescription() {
         ServiceDescription sd = new ServiceDescription();
@@ -51,7 +61,7 @@ public class MailAgent extends CommunicationAgent{
 	    sysProps.setProperty("mail.smtp.starttls.enable", "true");
         sysProps.setProperty("mail.smtp.host", host);
         sysProps.setProperty("mail.smtp.port", port);
-        
+
         Session session = Session.getInstance(sysProps, new Authenticator(){
             @Override
             protected PasswordAuthentication  getPasswordAuthentication(){
@@ -66,6 +76,7 @@ public class MailAgent extends CommunicationAgent{
             mime.setSubject(subject);
             mime.setText(message);
             Transport.send(mime);
+            logger.log(Logger.INFO, "Send e-mail to " + to + " with message:\n" + message);
         }catch(MessagingException e){
             logger.log(Level.WARNING, "Failed to send message: {0}", e.toString());
         }

@@ -19,7 +19,6 @@ public abstract class CommunicationAgent extends Agent{
 
     public CommunicationAgent() {
         super();
-        LOGGER.addHandler(new LoggerAgentLogHandler(this, 60));
     }
     
     @Override

@@ -1,5 +1,6 @@
 package com.mlaf.hu.sensoragent;
 
+import com.mlaf.hu.helpers.Configuration;
 import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
@@ -25,6 +26,8 @@ import java.util.concurrent.LinkedTransferQueue;
 import java.util.logging.Level;
 
 public abstract class SensorAgent extends Agent {
+    private static Configuration config = Configuration.getInstance();
+    private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("sensoragent.logger_handler"));
     public static java.util.logging.Logger sensorAgentLogger = Logger.getLogger("SensorAgentLogger");
     private ArrayList<Sensor> sensors = new ArrayList<>();
     private LinkedTransferQueue<SensorReading> sensorReadingQueue = new LinkedTransferQueue<>();
@@ -34,7 +37,9 @@ public abstract class SensorAgent extends Agent {
     private AID destination;
 
     public SensorAgent() {
-        sensorAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
+        if (LOGGER_HANDLER) {
+            sensorAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
+        }
         instructionSet = readInstructionSet();
         addBehaviour(new RegisterWithDABehaviour(this));
         addBehaviour(new ReadSensorsBehaviour(this));
@@ -107,7 +112,7 @@ public abstract class SensorAgent extends Agent {
         sensorReadingQueue.add(sensorReading);
     }
 
-    public void sendSensorReadings() throws ServiceDiscoveryNotFoundException, ServiceException{
+    public void sendSensorReadings(){
         SensorReading sensorReading = sensorReadingQueue.poll();
         if (sensorReading == null) {
             return;
@@ -128,7 +133,7 @@ public abstract class SensorAgent extends Agent {
         msg.setOntology("sensor-agent-reading");
         msg.setContent(readingXml);
         send(msg);
-        sensorAgentLogger.log(Level.INFO, String.format("New reading sent for sensor: %s", sensorReading.getSensors().getSensors().get(0).getId()));
+        sensorAgentLogger.log(Level.INFO, String.format("New reading sent to %s for sensor: %s", destination, sensorReading.getSensors().getSensors().get(0).getId()));
     }
 
     public boolean isRegistered() {
@@ -139,11 +144,12 @@ public abstract class SensorAgent extends Agent {
         this.registered = registered;
     }
 
+
     public void setDestination(AID destination) {
         this.destination = destination;
     }
 
     public AID getDestination() {
-        return destination;
+        return this.destination;
     }
 }
