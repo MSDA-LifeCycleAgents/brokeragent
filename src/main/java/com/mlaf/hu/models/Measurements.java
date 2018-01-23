@@ -38,4 +38,8 @@ public class Measurements implements Serializable {
     public void addMeasurement(Measurement measurement) {
         this.measurements.add(measurement);
     }
+
+    public boolean isEmpty() {
+        return this.measurements.isEmpty();
+    }
 }

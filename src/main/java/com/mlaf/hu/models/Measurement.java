@@ -21,7 +21,7 @@ public class Measurement  implements Serializable {
         this.readings = new CircularFifoQueue<>(Integer.parseInt(config.getProperty("instructionset.num_readings_in_memory")));
     }
 
-    public Measurement(String id, int value) {
+    public Measurement(String id, double value) {
         this.readings = new CircularFifoQueue<>(Integer.parseInt(config.getProperty("instructionset.num_readings_in_memory")));
         this.id = id;
         this.value = value;

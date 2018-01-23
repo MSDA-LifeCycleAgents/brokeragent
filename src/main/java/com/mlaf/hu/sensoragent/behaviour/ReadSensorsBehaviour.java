@@ -5,6 +5,8 @@ import com.mlaf.hu.sensoragent.Sensor;
 import com.mlaf.hu.sensoragent.SensorAgent;
 import jade.core.behaviours.CyclicBehaviour;
 
+import java.util.logging.Level;
+
 
 public class ReadSensorsBehaviour extends CyclicBehaviour {
     private final SensorAgent sensorAgent;
@@ -20,6 +22,11 @@ public class ReadSensorsBehaviour extends CyclicBehaviour {
         for (Sensor sensor: sensorAgent.getSensors()) {
             if (sensor.mustBeRead()) {
                 com.mlaf.hu.models.Sensor dataSensor = sensor.toDataSensor();
+                if (dataSensor.isEmpty()) {
+                    SensorAgent.sensorAgentLogger.log(Level.WARNING,
+                            "Measurements for sensor " + sensor.getSensorID() + " are empty.");
+                    continue;
+                }
                 sensorReading.addSensor(dataSensor);
                 sensor.markRead();
             }

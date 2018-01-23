@@ -55,4 +55,8 @@ public class Sensor implements Serializable {
     public void setMeasurements(Measurements measurements) {
         this.measurements = measurements;
     }
+
+    public boolean isEmpty() {
+        return this.measurements.isEmpty();
+    }
 }
