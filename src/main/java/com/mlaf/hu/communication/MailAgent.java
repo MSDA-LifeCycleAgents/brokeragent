@@ -61,12 +61,10 @@ public class MailAgent extends CommunicationAgent{
         
         try{
             MimeMessage mime = new MimeMessage(session);
-            
             mime.setFrom(new InternetAddress(from));
             mime.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             mime.setSubject(subject);
             mime.setText(message);
-            
             Transport.send(mime);
         }catch(MessagingException e){
             logger.log(Level.WARNING, "Failed to send message: {0}", e.toString());

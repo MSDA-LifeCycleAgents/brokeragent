@@ -32,9 +32,9 @@ public class SensorAgentImpl extends SensorAgent {
                 "            <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
                 "            <daysToKeepMessages>1</daysToKeepMessages>\n" +
                 "        </topic>\n" +
-                "        <directToDecisionAgent>false</directToDecisionAgent>\n" +
+                "        <directToDecisionAgent>true</directToDecisionAgent>\n" +
                 "    </messaging>\n" +
-                "    <amountOfMissedDataPackages>5</amountOfMissedDataPackages>\n" +
+                "    <amountOfMissedDataPackages>1</amountOfMissedDataPackages>\n" +
                 "    <sensors>\n" +
                 "        <sensor id=\"DummySensor1\">\n" +
                 "            <label>Systolic Blood Pressure</label>\n" +
@@ -49,17 +49,17 @@ public class SensorAgentImpl extends SensorAgent {
                 "                            <below>0.6</below>\n" +
                 "                            <above>0.6</above>\n" +
                 "                            <message>Watch out!</message>\n" +
-                "                            <via>ScreenAgent</via>\n" +
+                "                            <via>SlackAgent</via>\n" +
                 "                            <to></to>\n" +
-                "                            <limit>30</limit>\n" +
+                "                            <limit>3</limit>\n" +
                 "                        </plan>\n" +
                 "                        <plan>\n" +
                 "                            <below>0.4</below>\n" +
                 "                            <above>0.4</above>\n" +
-                "                            <message>Panic!</message>\n" +
+                "                            <message>Panic! Measurement Y, Sensor: DummySensor1, Value: </message>\n" +
                 "                            <via>MailAgent</via>\n" +
-                "                            <to>brian.vanderbijl@hu.nl</to>\n" +
-                "                            <limit>3600</limit>\n" +
+                "                            <to>rogierpijpers1992@gmail.com</to>\n" +
+                "                            <limit>3</limit>\n" +
                 "                        </plan>\n" +
                 "                    </plans>\n" +
                 "                </measurement>\n" +
@@ -70,16 +70,16 @@ public class SensorAgentImpl extends SensorAgent {
                 "                        <plan>\n" +
                 "                            <below>0.6</below>\n" +
                 "                            <message>Watch out!</message>\n" +
-                "                            <via>ScreenAgent</via>\n" +
-                "                            <to></to>\n" +
+                "                            <via>SlackAgent</via>\n" +
+                "                            <to>#general</to>\n" +
                 "                            <limit>30</limit>\n" +
                 "                        </plan>\n" +
                 "                        <plan>\n" +
                 "                            <below>0.4</below>\n" +
-                "                            <message>Panic!</message>\n" +
+                "                            <message>Panic! Measurement X, Sensor: DummySensor1, Value: </message>\n" +
                 "                            <via>MailAgent</via>\n" +
-                "                            <to>brian.vanderbijl@hu.nl</to>\n" +
-                "                            <limit>3600</limit>\n" +
+                "                            <to>rogierpijpers1992@gmail.com</to>\n" +
+                "                            <limit>3</limit>\n" +
                 "                        </plan>\n" +
                 "                    </plans>\n" +
                 "                </measurement>\n" +
@@ -98,16 +98,16 @@ public class SensorAgentImpl extends SensorAgent {
                 "                        <plan>\n" +
                 "                            <below>0.6</below>\n" +
                 "                            <message>Watch out!</message>\n" +
-                "                            <via>ScreenAgent</via>\n" +
-                "                            <to></to>\n" +
+                "                            <via>SlackAgent</via>\n" +
+                "                            <to>#general</to>\n" +
                 "                            <limit>30</limit>\n" +
                 "                        </plan>\n" +
                 "                        <plan>\n" +
                 "                            <below>0.4</below>\n" +
-                "                            <message>Panic!</message>\n" +
+                "                            <message>Panic! Measurement only, Sensor: DummySensor2, Value: </message>\n" +
                 "                            <via>MailAgent</via>\n" +
-                "                            <to>brian.vanderbijl@hu.nl</to>\n" +
-                "                            <limit>3600</limit>\n" +
+                "                            <to>rogierpijpers1992@gmail.com</to>\n" +
+                "                            <limit>3</limit>\n" +
                 "                        </plan>\n" +
                 "                    </plans>\n" +
                 "                </measurement>\n" +
@@ -116,8 +116,8 @@ public class SensorAgentImpl extends SensorAgent {
                 "        </sensor>\n" +
                 "    </sensors>\n" +
                 "    <fallback>\n" +
-                "        <via>ScreenAgent</via>\n" +
-                "        <to></to>\n" +
+                "        <via>SlackAgent</via>\n" +
+                "        <to>#general</to>\n" +
                 "    </fallback>\n" +
                 "</instructions>";
     }

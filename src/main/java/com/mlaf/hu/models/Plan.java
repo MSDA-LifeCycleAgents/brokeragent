@@ -9,6 +9,7 @@ public class Plan implements Serializable {
     private String via; //FIXME should be class
     private String to;
     private int limit;
+    private int currentLimit;
 
     public Plan() {}
 
@@ -58,5 +59,13 @@ public class Plan implements Serializable {
 
     public void setAbove(double above) {
         this.above = above;
+    }
+
+    public int getCurrentLimit() {
+        return currentLimit;
+    }
+
+    public void setCurrentLimit(int currentLimit) {
+        this.currentLimit = currentLimit;
     }
 }

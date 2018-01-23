@@ -46,12 +46,12 @@ public class RegisterWithDABehaviour extends CyclicBehaviour {
 
     private void handleRegistration() {
         this.sa.registerWithDA();
+        this.continueAfter = LocalDateTime.now().plusSeconds(20);
     }
 
     private void onSubscribe() {
         ACLMessage subscribed = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM));
         if (subscribed == null) {
-            this.continueAfter = LocalDateTime.now().plusSeconds(20);
             return;
         }
         Iterator it = subscribed.getAllReplyTo();
