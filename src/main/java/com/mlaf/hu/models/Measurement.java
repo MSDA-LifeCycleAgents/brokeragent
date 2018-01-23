@@ -10,16 +10,19 @@ import java.io.Serializable;
 
 @XmlRootElement(name = "measurement")
 public class Measurement  implements Serializable {
-    private static Configuration config = Configuration.getInstance();
+    private transient static Configuration config = Configuration.getInstance();
     private String id;
     private Plans plans;
     private int min, max;
     private double value;
-    private CircularFifoQueue<Double> readings = new CircularFifoQueue<>(Integer.parseInt(config.getProperty("instructionset.num_readings_in_memory")));
+    private CircularFifoQueue<Double> readings;
 
-    public Measurement() {}
+    public Measurement() {
+        this.readings = new CircularFifoQueue<>(Integer.parseInt(config.getProperty("instructionset.num_readings_in_memory")));
+    }
 
     public Measurement(String id, int value) {
+        this.readings = new CircularFifoQueue<>(Integer.parseInt(config.getProperty("instructionset.num_readings_in_memory")));
         this.id = id;
         this.value = value;
     }

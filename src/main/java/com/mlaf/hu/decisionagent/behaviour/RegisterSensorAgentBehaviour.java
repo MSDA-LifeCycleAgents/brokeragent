@@ -3,7 +3,11 @@ package com.mlaf.hu.decisionagent.behaviour;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.models.InstructionSet;
+import com.mlaf.hu.models.Topic;
+import jade.core.AID;
+import jade.core.ServiceException;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.util.Logger;
@@ -35,11 +39,27 @@ public class RegisterSensorAgentBehaviour extends CyclicBehaviour {
             response.setPerformative(ACLMessage.DISCONFIRM);
             if (!is.isMallformed()) {
                 response.setPerformative(ACLMessage.CONFIRM);
+                response.addReplyTo(getDestination(is));
                 DA.registerSensorAgent(message.getSender(), is);
             }
             DA.send(response);
         } catch (ParseException e) {
             DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, e.getMessage());
+        }
+    }
+
+    private AID getDestination(InstructionSet is) {
+        if (is.getMessaging().isDirectToDecisionAgent()) {
+            return this.DA.getAID();
+        } else {
+            try {
+                TopicManagementHelper topicHelper = (TopicManagementHelper) myAgent.getHelper(TopicManagementHelper.SERVICE_NAME);
+                Topic topic = is.getMessaging().getTopic();
+                return topicHelper.createTopic(topic.getTopicName());
+            } catch (ServiceException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 
