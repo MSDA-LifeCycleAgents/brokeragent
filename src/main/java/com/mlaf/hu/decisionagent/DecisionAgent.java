@@ -161,12 +161,13 @@ public abstract class DecisionAgent extends Agent {
         executePlanCallback(plan);
     }
 
-    public void executeFallback(InstructionSet is) {
+    public void executeFallback(Map.Entry<AID, InstructionSet> sensorAgent) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+        InstructionSet is = sensorAgent.getValue();
         Fallback fallback = is.getFallback();
         String fallbackMessage = fallback.getMessage();
         if (fallbackMessage == null) {
-            fallbackMessage = "Unregistered sensor agent: " + is.getIdentifier();
+            fallbackMessage = "Unregistered sensor agent: " + sensorAgent.getKey();
         }
         message.setContent(fallbackMessage);
         message.addReceiver(DFServices.getService(fallback.getVia(), this));

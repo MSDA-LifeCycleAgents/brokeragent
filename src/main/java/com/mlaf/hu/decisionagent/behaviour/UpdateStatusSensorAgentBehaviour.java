@@ -44,7 +44,7 @@ public class UpdateStatusSensorAgentBehaviour extends TickerBehaviour {
                 int missedDataPackages = (int) (passedTime / localInstructionSet.getHighestIntervalFromSensors());
                 if (missedDataPackages >= localInstructionSet.getAmountOfMissedDataPackages()) {
                     this.DA.unregisterSensorAgent(sensorAgent.getKey());
-                    this.DA.executeFallback(localInstructionSet);
+                    this.DA.executeFallback(sensorAgent);
                     DecisionAgent.decisionAgentLogger.log(Logger.INFO, "Removed/Unregistered Sensor Agent:\n" + sensorAgent.getKey());
                 }
             } else if (localInstructionSet.getRegisteredAt() != null) {
@@ -52,7 +52,7 @@ public class UpdateStatusSensorAgentBehaviour extends TickerBehaviour {
                 int missedDataPackages = (int) (passedTime / localInstructionSet.getHighestIntervalFromSensors());
                 if (missedDataPackages >= localInstructionSet.getAmountOfMissedDataPackages()) {
                     this.DA.unregisterSensorAgent(sensorAgent.getKey());
-                    this.DA.executeFallback(localInstructionSet);
+                    this.DA.executeFallback(sensorAgent);
                     DecisionAgent.decisionAgentLogger.log(Logger.INFO, "Removed/Unregistered Sensor Agent:\n" + sensorAgent.getKey());
                 }
             }
