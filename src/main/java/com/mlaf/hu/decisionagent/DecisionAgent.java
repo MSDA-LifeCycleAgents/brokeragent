@@ -136,7 +136,6 @@ public abstract class DecisionAgent extends Agent {
                 if (measurement.getMax() < reading || measurement.getMin() > reading) {
                     executeSensorReadingWarning(sensor, measurement, reading);
                 }
-
                 if (plan.getAbove() != 0.0 && (measurement.getMax() * plan.getAbove() < reading) || plan.getBelow() != 0.0 && (reading < measurement.getMax() * plan.getBelow())) {
                     executePlan(plan, reading);
                     plan.setCurrentLimit(plan.getCurrentLimit() + 1);
@@ -160,6 +159,19 @@ public abstract class DecisionAgent extends Agent {
         message.addUserDefinedParameter("to", plan.getTo());
         this.send(message);
         executePlanCallback(plan);
+    }
+
+    public void executeFallback(InstructionSet is) {
+        ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+        Fallback fallback = is.getFallback();
+        String fallbackMessage = fallback.getMessage();
+        if (fallbackMessage == null) {
+            fallbackMessage = "Unregistered sensor agent: " + is.getIdentifier();
+        }
+        message.setContent(fallbackMessage);
+        message.addReceiver(DFServices.getService(fallback.getVia(), this));
+        message.addUserDefinedParameter("to", fallback.getTo());
+        this.send(message);
     }
 
     /**

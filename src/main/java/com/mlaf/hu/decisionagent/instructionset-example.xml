@@ -92,7 +92,7 @@
         </sensor>
     </sensors>
     <fallback>
-        <via>ScreenAgent</via>
+        <via>MailAgent</via>
         <to></to>
     </fallback>
 </instructions>

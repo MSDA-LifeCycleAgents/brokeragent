@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Fallback implements Serializable{
     private String via;
     private String to;
+    private String message;
 
     public String getVia() {
         return via;
@@ -20,5 +21,13 @@ public class Fallback implements Serializable{
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

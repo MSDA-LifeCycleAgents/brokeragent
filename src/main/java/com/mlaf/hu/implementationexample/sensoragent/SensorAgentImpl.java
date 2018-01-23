@@ -116,8 +116,9 @@ public class SensorAgentImpl extends SensorAgent {
                 "        </sensor>\n" +
                 "    </sensors>\n" +
                 "    <fallback>\n" +
-                "        <via>SlackAgent</via>\n" +
-                "        <to>#general</to>\n" +
+                "        <message>This is the fallback message. \\nThe sensor_agent#fVTz7OCaD8WFJE5Jvw7K is unregistered.</message>" +
+                "        <via>MailAgent</via>\n" +
+                "        <to>thijs.gelton@hotmail.com</to>\n" +
                 "    </fallback>\n" +
                 "</instructions>";
     }
