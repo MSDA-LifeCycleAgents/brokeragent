@@ -32,7 +32,7 @@ public class SensorAgentImpl extends SensorAgent {
                 "            <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>\n" +
                 "            <daysToKeepMessages>1</daysToKeepMessages>\n" +
                 "        </topic>\n" +
-                "        <directToDecisionAgent>true</directToDecisionAgent>\n" +
+                "        <directToDecisionAgent>false</directToDecisionAgent>\n" +
                 "    </messaging>\n" +
                 "    <amountOfMissedDataPackages>5</amountOfMissedDataPackages>\n" +
                 "    <sensors>\n" +
