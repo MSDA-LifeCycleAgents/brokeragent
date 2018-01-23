@@ -4,6 +4,7 @@ import com.mlaf.hu.helpers.ServiceDiscovery;
 import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.Messaging;
 import com.mlaf.hu.models.SensorReading;
@@ -32,6 +33,7 @@ public abstract class SensorAgent extends Agent {
     private boolean registered = false;
 
     public SensorAgent() {
+        sensorAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
         instructionSet = readInstructionSet();
         addBehaviour(new RegisterWithDABehaviour(this));
         addBehaviour(new ReadSensorsBehaviour(this));
