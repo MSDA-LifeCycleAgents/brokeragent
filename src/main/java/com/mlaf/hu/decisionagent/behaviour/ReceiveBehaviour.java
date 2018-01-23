@@ -43,7 +43,10 @@ public class ReceiveBehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
-        ACLMessage directMessage = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.INFORM));
+        ACLMessage directMessage = myAgent.receive(MessageTemplate.and(
+                MessageTemplate.MatchPerformative(ACLMessage.INFORM),
+                MessageTemplate.MatchOntology("sensor-agent-reading")
+        ));
         if (directMessage != null) {
             ACLMessage response = handleDirectMessage(directMessage);
             this.DA.send(response);
