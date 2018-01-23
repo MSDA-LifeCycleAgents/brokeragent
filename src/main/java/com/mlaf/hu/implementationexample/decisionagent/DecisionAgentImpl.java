@@ -1,5 +1,6 @@
 package com.mlaf.hu.implementationexample.decisionagent;
 
+import com.mlaf.hu.models.InstructionSet;
 import com.mlaf.hu.models.Measurement;
 import com.mlaf.hu.models.Plan;
 import com.mlaf.hu.models.Sensor;
@@ -15,7 +16,7 @@ public class DecisionAgentImpl extends DecisionAgent {
     }
 
     @Override
-    public void storeReading(double value) {
+    public void storeReading(double value, InstructionSet is, Sensor sensor, String measurementId) {
 
     }
 

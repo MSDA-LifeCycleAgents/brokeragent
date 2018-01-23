@@ -68,7 +68,7 @@ public abstract class DecisionAgent extends Agent {
      * The amount of readings in memory is changable in the config.properties. storeReading will be executed after
      * the reading is stored in memory. This method is created so the reading could be stored elsewhere as well.
      */
-    public abstract void storeReading(double value);
+    public abstract void storeReading(double value, InstructionSet is, Sensor sensor, String measurementId);
 
     /**
      * After executing the executePlan method, which is set up using the properties in the Instruction Set, this
@@ -127,7 +127,7 @@ public abstract class DecisionAgent extends Agent {
         } catch (NullPointerException npe) {
             decisionAgentLogger.log(Logger.SEVERE, String.format("No measurement found by that ID: %s", measurementId));
         }
-        storeReading(value);
+        storeReading(value, is, sensor, measurementId);
     }
 
     private void decide(double reading, Measurement measurement, Sensor sensor) {
