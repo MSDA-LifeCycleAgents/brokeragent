@@ -1,5 +1,6 @@
 package com.mlaf.hu.proxy;
 
+import com.mlaf.hu.helpers.Configuration;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -11,6 +12,7 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jmdns.JmDNS;
@@ -45,6 +47,8 @@ public class JMDNSManager {
     private final InetAddress inetAddress;
     private final int jadeSocketPort;
     private ServiceListener listener;
+    private int refreshRate;
+    private final String refreshPropertyName = "proxy.mdns.refresh_rate";
     
     public static InetAddress getLocalIPv4Address() throws SocketException {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -91,18 +95,30 @@ public class JMDNSManager {
         start();
     }
     
-    public void restart() throws IOException{
-        logger.log(Level.INFO, "Restarting JMDNS");
-        jmdns.close();
-        start();
-    }
-    
     private void start() throws IOException{
         jmdns = JmDNS.create(inetAddress);
         if (listener != null) {
             jmdns.addServiceListener(JMDNS_TYPE, listener);
         }
         logger.log(Level.INFO, "JMDNS created for IP {0}", inetAddress.getHostAddress());
+        
+        
+        try{
+            String refRate =  Configuration.getInstance().getProperty(refreshPropertyName);
+            refreshRate = refRate != null ? Integer.parseInt(refRate) * 1000 : 60000;
+            startRefreshTask();
+        }catch(NumberFormatException e){
+            logger.log(Level.WARNING, "JMDNSManager could not start refresh task. Invalid value for: {0} in configuration.", refreshPropertyName);
+        }
+        
+    }
+    
+    private void startRefreshTask(){
+        if(refreshRate <= 0)
+            return;
+        
+        Timer timer = new Timer();
+        timer.schedule(new JMDNSRefreshTask(jmdns, JMDNS_TYPE), 0, refreshRate);
     }
 
     /**
@@ -112,23 +128,12 @@ public class JMDNSManager {
      */
     public void registerJadeAgent(String name) {
         try {
-            Map<String, String> properties = new HashMap<String, String>();
+            Map<String, String> properties = new HashMap<>();
             properties.put("DESCRIPTION", JMDNS_DESCRIPTION);
             properties.put("TYPE", "mts_client");
             properties.put("LOCATOR", "tcp://" + inetAddress.getHostAddress() + ":"
                     + jadeSocketPort + " JadeProxyAgent");
             properties.put("TIMESTAMP", JMDNS_DATE_FORMAT.format(GregorianCalendar.getInstance().getTime()));
-
-            // _fipa_service_directory._udp.local.
-//            Map<Fields,String> qualifiedNameMap = new EnumMap<Fields, String>(Fields.class);
-//            qualifiedNameMap.put(Fields.Application, "fipa_service_directory");
-//            qualifiedNameMap.put(Fields.Domain, "local");
-//            qualifiedNameMap.put(Fields.Instance, name + "@1.234:1099/JADE");
-//            qualifiedNameMap.put(Fields.Protocol, "udp");
-//            ServiceInfo si = ServiceInfo.create(qualifiedNameMap,
-//                    jadeSocketPort, 1, 1, true, properties);
-            // JMDNS cannot handle dots in the service name. They are being
-            // replaced.
             ServiceInfo si = ServiceInfo.create(JMDNS_TYPE,
                     name.replaceAll("\\.", "?"),
                     jadeSocketPort, 1, 1, true, properties);

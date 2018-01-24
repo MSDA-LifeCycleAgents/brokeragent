@@ -50,14 +50,7 @@ public class TcpMtpAgent extends Agent {
                 
                 AMSService.register(TcpMtpAgent.this, amsad);   
                 
-                ACLMessage request;
-                try {
-                    request = createInstructionRequest(aid);
-                    send(request);	
-                } catch (ServiceDiscoveryNotFoundException ex) {
-                    Logger.getLogger(TcpMtpAgent.class.getName()).log(Level.WARNING, "DecisionAgent not found, no instructionset requested: {0}", ex);
-                }
- 	
+                handshakeExternalAgent(aid);
             } catch (FIPAException ex) {
                 logger.log(Level.WARNING, "Could not register " + agentName, ex.getACLMessage());
             }
@@ -131,23 +124,17 @@ public class TcpMtpAgent extends Agent {
         }
 
         logger.log(Level.INFO, "TcpMtpAgent {0}: starting", getLocalName());
-        this.addBehaviour(new AgentJMDNSRegisterBehaviour(jmdnsManager));
-        this.addBehaviour(new CyclicBehaviour(){
-                @Override
-                public void action(){ 
-                    ACLMessage message = receive(MessageTemplate.MatchPerformative(ACLMessage.REQUEST));
-                    
-                    if(message == null || !message.getContent().equals("restart-jmdns"))
-                        return;
-                    
-                    try {
-                        jmdnsManager.restart();
-                    } catch (IOException ex) {
-                        Logger.getLogger(TcpMtpAgent.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-               
-                }
-        });   
+        this.addBehaviour(new AgentJMDNSRegisterBehaviour(jmdnsManager));   
+    }
+    
+    protected void handshakeExternalAgent(AID aid){
+        ACLMessage request;
+        try {
+            request = createInstructionRequest(aid);
+            send(request);	
+        } catch (ServiceDiscoveryNotFoundException ex) {
+            Logger.getLogger(TcpMtpAgent.class.getName()).log(Level.WARNING, "DecisionAgent not found, no instructionset requested: {0}", ex);
+        }
     }
     
     protected ACLMessage createInstructionRequest(AID receiver) throws ServiceDiscoveryNotFoundException{
