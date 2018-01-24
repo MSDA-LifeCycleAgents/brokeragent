@@ -1,6 +1,7 @@
 ## Multi Lifecycle Agent Framework
 [![Build Status](https://travis-ci.org/MSDA-LifeCycleAgents/mlaf-java.svg?branch=develop)](https://travis-ci.org/MSDA-LifeCycleAgents/mlaf-java)
-![mlaf](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/images/wink-ecosystem.gif)
+![mlaf](https://raw.githubusercontent.com/MSDA-LifeCycleAgents/mlaf-java/feature/readme/docs/images/wink-ecosystem.gif)
+This framework is put together by a group of student from the University of Applied Sciences in Utrecht. It serves the simplification of the creation of a Multi Lifecycle Agent System.
 
 
 ## Disclaimer
