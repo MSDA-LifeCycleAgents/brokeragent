@@ -124,10 +124,11 @@ public class AclXmlParser {
         ACLMessage message = new ACLMessage(getPerformative(aclObject.getPerformative()));
 
         String senderName = aclObject.getSender().get(0).getName();
+        ArrayList<String> senderUrl = aclObject.getSender().get(0).getAddresses();
 
         AID senderAid = new AID();
         senderAid.setName(senderName);
-        senderAid.addAddresses(senderName);
+        senderAid.addAddresses(senderUrl.get(0));
         message.setSender(senderAid);
 
         aclObject.getReceiver().forEach((receiver) -> {
