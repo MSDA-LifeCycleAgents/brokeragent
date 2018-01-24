@@ -132,7 +132,7 @@ public abstract class SensorAgent extends Agent {
         msg.setOntology("sensor-agent-reading");
         msg.setContent(readingXml);
         send(msg);
-        sensorAgentLogger.log(Level.INFO, String.format("New reading sent to %s for sensor: %s", destination, sensorReading.getSensors().getSensors().get(0).getId()));
+        sensorAgentLogger.log(Level.FINE, String.format("New reading sent to %s for sensor: %s", destination, sensorReading.getSensors().getSensors().get(0).getId()));
     }
 
     public boolean isRegistered() {

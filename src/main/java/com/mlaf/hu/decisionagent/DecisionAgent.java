@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class DecisionAgent extends Agent {
+public class DecisionAgent extends Agent {
     private static Configuration config = Configuration.getInstance();
     private static final String SERVICE_NAME = config.getProperty("decisionagent.service_name");
     private static final String STORAGE_BASEPATH = config.getProperty("decisionagent.storage_basepath");
@@ -61,20 +61,26 @@ public abstract class DecisionAgent extends Agent {
      * After unregistering the Sensor Agent this method will be executed. Any other cleaning of left overs by the
      * Sensor Agent should be done in here.
      */
-    public abstract void unregisterSensorAgentCallback(AID sensoragent);
+    public void unregisterSensorAgentCallback(AID sensoragent) {
+
+    }
 
     /**
      * The readings will be saved in memory. In the Measurement of the Instruction Set there is a CircularFifoQueue.
      * The amount of readings in memory is changable in the config.properties. storeReading will be executed after
      * the reading is stored in memory. This method is created so the reading could be stored elsewhere as well.
      */
-    public abstract void storeReading(double value, InstructionSet is, Sensor sensor, String measurementId);
+    public void storeReading(double value, InstructionSet is, Sensor sensor, String measurementId) {
+
+    }
 
     /**
      * After executing the executePlan method, which is set up using the properties in the Instruction Set, this
      * method will be executed.
      */
-    public abstract void executePlanCallback(Plan plan);
+    public void executePlanCallback(Plan plan) {
+
+    }
 
     public ServiceDescription createServiceDescription() {
         ServiceDescription sd = new ServiceDescription();
