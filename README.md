@@ -1,6 +1,6 @@
 ## Multi Lifecycle Agent Framework
 [![Build Status](https://travis-ci.org/MSDA-LifeCycleAgents/mlaf-java.svg?branch=develop)](https://travis-ci.org/MSDA-LifeCycleAgents/mlaf-java)
-![mlaf](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/images/wink-ecosystem.jpg)
+![mlaf](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/images/wink-ecosystem.gif)
 
 
 ## Disclaimer
