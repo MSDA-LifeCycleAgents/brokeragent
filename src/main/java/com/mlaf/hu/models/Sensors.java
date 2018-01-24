@@ -32,4 +32,5 @@ public class Sensors implements Serializable {
     public boolean isEmpty() {
         return this.sensors.isEmpty();
     }
+
 }

@@ -7,16 +7,11 @@ import com.mlaf.hu.helpers.exceptions.ParseException;
 import com.mlaf.hu.helpers.exceptions.ServiceDiscoveryNotFoundException;
 import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
 import com.mlaf.hu.models.InstructionSet;
-import com.mlaf.hu.models.Messaging;
 import com.mlaf.hu.models.SensorReading;
-import com.mlaf.hu.models.Topic;
 import com.mlaf.hu.sensoragent.behaviour.ReadSensorsBehaviour;
 import com.mlaf.hu.sensoragent.behaviour.RegisterWithDABehaviour;
-import com.mlaf.hu.sensoragent.behaviour.SendBufferBehaviour;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.ServiceException;
-import jade.core.messaging.TopicManagementHelper;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
 
@@ -151,5 +146,13 @@ public abstract class SensorAgent extends Agent {
 
     public AID getDestination() {
         return this.destination;
+    }
+
+    public InstructionSet getInstructionSet() {
+        return instructionSet;
+    }
+
+    public LinkedTransferQueue<SensorReading> getSensorReadingQueue() {
+        return sensorReadingQueue;
     }
 }

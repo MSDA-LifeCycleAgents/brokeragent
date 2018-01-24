@@ -1,5 +1,6 @@
 package com.mlaf.hu.decisionagent.behaviour;
 
+import com.mlaf.hu.helpers.XmlParser;
 import com.mlaf.hu.models.*;
 import com.mlaf.hu.decisionagent.DecisionAgent;
 import com.mlaf.hu.helpers.exceptions.ParseException;
@@ -113,7 +114,12 @@ public class ReceiveBehaviorTest extends TestCase {
         assert this.topic != null;
         assert this.topic.getTopicName() != null;
         assert this.topic.getDaysToKeepMessages() > 0;
-        String topicXML = this.RB.marshalTopic(this.topic);
+        String topicXML = null;
+        try {
+            topicXML = XmlParser.parseToXml(this.topic);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         assert topicXML.startsWith("<?xml");
         assert topicXML.contains("<daysToKeepMessages>1</daysToKeepMessages>");
         assert topicXML.contains("<name>JADE</name>");
