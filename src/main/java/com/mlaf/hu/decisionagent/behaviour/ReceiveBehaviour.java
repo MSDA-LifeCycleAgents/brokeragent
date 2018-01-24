@@ -80,6 +80,7 @@ public class ReceiveBehaviour extends CyclicBehaviour {
             response.setPerformative(ACLMessage.DISCONFIRM);
             response.setOntology("sensor-agent-register");
             response.setContent("Not registered yet.");
+            return response;
         }
         try {
             SensorReading sr = this.DA.parseSensorReadingXml(message.getContent());
