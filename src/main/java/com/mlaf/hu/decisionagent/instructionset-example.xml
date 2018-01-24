@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <instructions>
-    <identiefer>
+    <identifier>
         fVTz7OCaD8WFJE5Jvw7K
-    </identiefer>
+    </identifier>
     <messaging>
         <topic>
             <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>
@@ -25,17 +25,17 @@
                             <below>0.6</below>
                             <above>0.6</above>
                             <message>Watch out!</message>
-                            <via>ScreenAgent</via>
+                            <via>SlackAgent</via>
                             <to></to>
-                            <limit>30</limit>
+                            <limit>3</limit>
                         </plan>
                         <plan>
                             <below>0.4</below>
                             <above>0.4</above>
-                            <message>Panic!</message>
+                            <message>Panic! Measurement Y, Sensor: DummySensor1, Value:</message>
                             <via>MailAgent</via>
-                            <to>brian.vanderbijl@hu.nl</to>
-                            <limit>3600</limit>
+                            <to>thijs.gelton@hotmail.com</to>
+                            <limit>3</limit>
                         </plan>
                     </plans>
                 </measurement>
@@ -46,16 +46,16 @@
                         <plan>
                             <below>0.6</below>
                             <message>Watch out!</message>
-                            <via>ScreenAgent</via>
-                            <to></to>
+                            <via>SlackAgent</via>
+                            <to>#general</to>
                             <limit>30</limit>
                         </plan>
                         <plan>
                             <below>0.4</below>
-                            <message>Panic!</message>
+                            <message>Panic! Measurement X, Sensor: DummySensor1, Value:</message>
                             <via>MailAgent</via>
-                            <to>brian.vanderbijl@hu.nl</to>
-                            <limit>3600</limit>
+                            <to>thijs.gelton@hotmail.com</to>
+                            <limit>3</limit>
                         </plan>
                     </plans>
                 </measurement>
@@ -74,16 +74,16 @@
                         <plan>
                             <below>0.6</below>
                             <message>Watch out!</message>
-                            <via>ScreenAgent</via>
-                            <to></to>
+                            <via>SlackAgent</via>
+                            <to>#general</to>
                             <limit>30</limit>
                         </plan>
                         <plan>
                             <below>0.4</below>
-                            <message>Panic!</message>
+                            <message>Panic! Measurement only, Sensor: DummySensor2, Value:</message>
                             <via>MailAgent</via>
-                            <to>brian.vanderbijl@hu.nl</to>
-                            <limit>3600</limit>
+                            <to>thijs.gelton@hotmail.com</to>
+                            <limit>3</limit>
                         </plan>
                     </plans>
                 </measurement>
@@ -92,7 +92,8 @@
         </sensor>
     </sensors>
     <fallback>
+        <message>This is the fallback message. \The sensor_agent#fVTz7OCaD8WFJE5Jvw7K is unregistered.</message>
         <via>MailAgent</via>
-        <to></to>
+        <to>thijs.gelton@hotmail.com</to>
     </fallback>
 </instructions>
