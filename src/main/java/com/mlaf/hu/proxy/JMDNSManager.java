@@ -102,13 +102,13 @@ public class JMDNSManager {
         }
         logger.log(Level.INFO, "JMDNS created for IP {0}", inetAddress.getHostAddress());
         
-        
-        try{
-            String refRate =  Configuration.getInstance().getProperty(refreshPropertyName);
+        String refRate =  Configuration.getInstance().getProperty(refreshPropertyName);
+        try{  
             refreshRate = refRate != null ? Integer.parseInt(refRate) * 1000 : 60000;
             startRefreshTask();
         }catch(NumberFormatException e){
-            logger.log(Level.WARNING, "JMDNSManager could not start refresh task. Invalid value for: {0} in configuration.", refreshPropertyName);
+            logger.log(Level.WARNING, () -> 
+                    String.format("JMDNSManager could not start refresh task. Invalid value [%s] for [%s] in configuration: %s", refRate, refreshPropertyName, e.toString()));
         }
         
     }
