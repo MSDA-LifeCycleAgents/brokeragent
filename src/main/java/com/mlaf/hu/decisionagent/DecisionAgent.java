@@ -180,13 +180,15 @@ public abstract class DecisionAgent extends Agent {
      * This method will only be executed when the decisionagent.store_sensor_agents_on_disk=true
      */
     public void storeSensorAgents() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
-            decisionAgentLogger.log(Logger.INFO, String.format("Writing %s Sensor Agents w. Instruction Sets to disk.", this.sensorAgents.size()));
-            oos.writeObject(this.sensorAgents);
-            decisionAgentLogger.log(Logger.INFO, String.format("Written all Sensor Agents w. Instruction Sets to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            decisionAgentLogger.log(Logger.SEVERE, "Could not write Sensor Agents w. Instruction Sets to disk.");
+        if (this.sensorAgents.size() > 0) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
+                decisionAgentLogger.log(Logger.INFO, String.format("Writing %s Sensor Agents w. Instruction Sets to disk.", this.sensorAgents.size()));
+                oos.writeObject(this.sensorAgents);
+                decisionAgentLogger.log(Logger.INFO, String.format("Written all Sensor Agents w. Instruction Sets to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
+            } catch (IOException e) {
+                e.printStackTrace();
+                decisionAgentLogger.log(Logger.SEVERE, "Could not write Sensor Agents w. Instruction Sets to disk.");
+            }
         }
     }
 
