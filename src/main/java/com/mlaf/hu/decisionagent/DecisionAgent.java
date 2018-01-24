@@ -161,7 +161,7 @@ public class DecisionAgent extends Agent {
     private void executePlan(Measurement measurement, Plan plan, double reading) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
         message.setContent(String.format("%s %s, Expected value between: %s and %s", plan.getMessage(), reading,
-                measurement.getMin(), measurement.getMax()));
+                measurement.getMax() * plan.getBelow(), measurement.getMax() * plan.getAbove()));
         message.addReceiver(DFServices.getService(plan.getVia(), this));
         message.addUserDefinedParameter("to", plan.getTo());
         this.send(message);
