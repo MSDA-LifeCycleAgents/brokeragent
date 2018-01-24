@@ -196,11 +196,13 @@ public class BrokerAgent extends Agent {
     }
 
     public void storeTopics() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
-            oos.writeObject(this.topics);
-            brokerAgentLogger.log(Logger.FINE, String.format("Written all topics to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
-        } catch (IOException e) {
-            brokerAgentLogger.log(Logger.SEVERE, String.format("Could not write topics to disk %nError %s", e.getMessage()));
+        if (this.topics.size() > 0) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
+                oos.writeObject(this.topics);
+                brokerAgentLogger.log(Logger.FINE, String.format("Written all topics to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
+            } catch (IOException e) {
+                brokerAgentLogger.log(Logger.SEVERE, String.format("Could not write topics to disk %nError %s", e.getMessage()));
+            }
         }
     }
 
