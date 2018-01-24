@@ -25,10 +25,17 @@ The software is LGPLv2 licensed. For any implementation and use of our code shou
     - [Min hardware required](#minimal-hardware-required)
     - [Software requirements](#software-requirements)
 
-
 ## Features
+- [x] Decision Agent making decisions based on so called plans specified in the Instruction Set XML.
+- [x] Broker Agent for persisting messages sent via JADE's Topic management service.
+- [x] Monitoring Dashboard build on a generic TCP service. TCP service could be used to create your own dashboard.
+- [x] Logger Agent that logs all the messages to console sent by Agents where there is LoggerAgentLogHandler attached to the logger.
 
 ## Quickstart
+To get up and running with developing your own Multi Lifecycle Agent System follow these steps:
+1. git clone https://github.com/MSDA-LifeCycleAgents/mlaf-java.git into your desired directory.
+2. run mvn install inside of the the mlaf-java directory.
+3. 
 
 ## Basic Usage
 
