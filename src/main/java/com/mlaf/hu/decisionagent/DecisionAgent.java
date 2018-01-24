@@ -137,7 +137,7 @@ public abstract class DecisionAgent extends Agent {
                     executeSensorReadingWarning(sensor, measurement, reading);
                 }
                 if (plan.getAbove() != 0.0 && (measurement.getMax() * plan.getAbove() < reading) || plan.getBelow() != 0.0 && (reading < measurement.getMax() * plan.getBelow())) {
-                    executePlan(plan, reading);
+                    executePlan(measurement, plan, reading);
                     plan.setCurrentLimit(plan.getCurrentLimit() + 1);
                 }
             }
@@ -152,9 +152,10 @@ public abstract class DecisionAgent extends Agent {
         DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, String.format("Measurement %s from Sensor %s has exceeded the min or max value: %s", measurement.getId(), sensor.getId(), reading));
     }
 
-    private void executePlan(Plan plan, double reading) {
+    private void executePlan(Measurement measurement, Plan plan, double reading) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent(String.format("%s %s", plan.getMessage(), reading));
+        message.setContent(String.format("%s %s, Expected value between: %s and %s", plan.getMessage(), reading,
+                measurement.getMin(), measurement.getMax()));
         message.addReceiver(DFServices.getService(plan.getVia(), this));
         message.addUserDefinedParameter("to", plan.getTo());
         this.send(message);
