@@ -188,9 +188,9 @@ public class DecisionAgent extends Agent {
     public void storeSensorAgents() {
         if (this.sensorAgents.size() > 0) {
             try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
-                decisionAgentLogger.log(Logger.INFO, String.format("Writing %s Sensor Agents w. Instruction Sets to disk.", this.sensorAgents.size()));
+                decisionAgentLogger.log(Logger.FINE, String.format("Writing %s Sensor Agents w. Instruction Sets to disk.", this.sensorAgents.size()));
                 oos.writeObject(this.sensorAgents);
-                decisionAgentLogger.log(Logger.INFO, String.format("Written all Sensor Agents w. Instruction Sets to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
+                decisionAgentLogger.log(Logger.FINE, String.format("Written all Sensor Agents w. Instruction Sets to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
             } catch (IOException e) {
                 e.printStackTrace();
                 decisionAgentLogger.log(Logger.SEVERE, "Could not write Sensor Agents w. Instruction Sets to disk.");
