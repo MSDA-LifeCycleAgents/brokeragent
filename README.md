@@ -3,7 +3,7 @@
 
 ![mlaf](https://raw.githubusercontent.com/MSDA-LifeCycleAgents/mlaf-java/feature/readme/docs/images/wink-ecosystem.gif)
 
-This framework is put together by a group of student from the University of Applied Sciences in Utrecht. It serves the simplification of the creation of a Multi Lifecycle Agent System.
+This framework is put together by a group of students from the University of Applied Sciences in Utrecht. It serves the simplification of the creation of a Multi Lifecycle Agent System.
 
 
 ## Disclaimer
@@ -32,16 +32,18 @@ The software is LGPLv2 licensed. For any implementation and use of our code shou
     - [Software requirements](#software-requirements)
 
 ## Features
-- [x] Decision Agent making decisions based on so called plans specified in the Instruction Set XML.
-- [x] Broker Agent for persisting messages sent via JADE's Topic management service.
-- [x] Monitoring Dashboard build on a generic TCP service. TCP service could be used to create your own dashboard.
-- [x] Logger Agent that logs all the messages to console sent by Agents where there is LoggerAgentLogHandler attached to the logger.
+- [x] **Decision Agent** making decisions based on so called plans specified in the Instruction Set XML.
+- [x] **Broker Agent** for persisting messages sent via JADE's Topic management service.
+- [x] **Monitoring Dashboard** build on a _generic TCP service_. TCP service could be used to create your own dashboard.
+- [x] **Logger Agent** that logs all the messages to console sent by Agents where there is LoggerAgentLogHandler attached to the logger.
 
 ## Quickstart
 To get up and running with developing your own Multi Lifecycle Agent System follow these steps:
 1. git clone https://github.com/MSDA-LifeCycleAgents/mlaf-java.git into your desired directory.
 2. run mvn install inside of the the mlaf-java directory.
-3. 
+3. use the installed maven project as a dependency in the pom of your maven project.
+4. create a resources folder in the root of your main project (as a sibling of your src folder).
+5. inside this new folder you need to put a config.properties and a agents-stack.properties (examples can be found inside the resources folder of this repository). For furter documentation about how the config and the agents-stack should look like [go here](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/configuration.md))
 
 ## Basic Usage
 
