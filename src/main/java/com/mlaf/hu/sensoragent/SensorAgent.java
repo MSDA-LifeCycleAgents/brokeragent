@@ -77,10 +77,14 @@ public abstract class SensorAgent extends Agent {
     }
 
     private InstructionSet readInstructionSet() {
+        String instrctionSetStr = null;
         try {
-            return XmlParser.parseToObject(InstructionSet.class, getInstructionXML());
+            instrctionSetStr = getInstructionXML();
+            return XmlParser.parseToObject(InstructionSet.class, instrctionSetStr);
         } catch (ParseException e) {
-            sensorAgentLogger.log(Level.SEVERE, "Could not parse the provided XML Instructionset, stopping agent.\nSee documentation for the correct InstructionSet.", e);
+            sensorAgentLogger.log(Level.SEVERE, "Could not parse the provided XML Instructionset, " +
+                    "stopping agent.\nSee documentation for the correct InstructionSet." +
+                    "\nInstructionSet: " + instrctionSetStr, e);
             this.doDelete();
             return null;
         }
