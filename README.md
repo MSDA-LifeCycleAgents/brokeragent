@@ -1,9 +1,9 @@
 ## Multi Lifecycle Agent Framework
 
 ## Disclaimer
-This software is is created as an assignment for a school project by 4th grade students. USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHORS AND ALL AFFILIATES ASSUME NO RESPONSIBILITY FOR YOUR RESULTS.
+This software is is created as an assignment for a school project by 4th grade students. USE THE SOFTWARE AT YOUR OWN RISK. THE AUTHORS AND ALL AFFILIATES ASSUME NO RESPONSIBILITY FOR YOUR RESULTS. See the `LICENSE` file for further information.
 
-The software is LGPLv2 licensed. For any implementation and use of our code should be agreed upon beforehand. See contact details.
+The software is LGPLv2 licensed. If you end up using our software, please leave us a message, see our contact details.
 ## Table of Contents
 - [Features](#features)
 - [Quick start](#quickstart)
