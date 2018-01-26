@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -26,6 +28,7 @@ import javax.xml.bind.Marshaller;
  */
 public class AclXmlParser {
 
+    private static String cutContent = "";
     private static java.util.logging.Logger XmlParserLogger = Logger.getLogger("XmlParserLogger");
 
     public static String parseACLToXML(ACLMessage message) {
@@ -59,7 +62,7 @@ public class AclXmlParser {
             marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            
+
             marshaller.marshal(aclObject, marshalledObject);
         } catch (JAXBException ex) {
             java.util.logging.Logger.getLogger(AclXmlParser.class.getName()).log(Level.SEVERE, null, ex);
@@ -108,14 +111,16 @@ public class AclXmlParser {
     }
 
     public static ACLMessage parse(String xml, Envelope envelope) {
+
         ACLMessage message = parseBody(xml);
         message.setEnvelope(envelope);
         return message;
     }
 
     public static ACLMessage parseBody(String body) {
-
-        AclObject aclObject = JAXB.unmarshal(new StringReader(body), AclObject.class);
+        String xmlWithReplacedContent = cutContent(body);
+        AclObject aclObject = JAXB.unmarshal(new StringReader(xmlWithReplacedContent), AclObject.class);
+        aclObject.setContent(cutContent);
         return parseXMLToACL(aclObject);
     }
 
@@ -139,7 +144,7 @@ public class AclXmlParser {
             receiverAid.addAddresses(receiverUrl);
             message.addReceiver(receiverAid);
         });
-        
+
         aclObject.getReplyTo().forEach((replyTo) -> {
             String replyToName = replyTo.getName();
             String replyToUrl = replyTo.getAddresses().get(0);
@@ -148,7 +153,7 @@ public class AclXmlParser {
             replyToAid.addAddresses(replyToUrl);
             message.addReplyTo(replyToAid);
         });
-        
+
         String content = aclObject.getContent();
         String language = aclObject.getLanguage();
         String ontology = aclObject.getOntology();
@@ -162,6 +167,17 @@ public class AclXmlParser {
         message.setConversationId(conversationID);
 
         return message;
+    }
+
+    private static String cutContent(String xml) {
+        Pattern contentPattern = Pattern.compile("(?<=<content>)([\\S\\s]*)(?=</content>)");
+        Matcher m = contentPattern.matcher(xml);
+        
+        if (m.find()) {
+            cutContent = m.group(1);
+        }
+        
+        return xml.replace(cutContent, "");
     }
 
     private static int getPerformative(String performative) {
