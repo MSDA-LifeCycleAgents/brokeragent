@@ -33,6 +33,7 @@ public class DecisionAgent extends Agent {
     private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("decisionagent.logger_handler"));
     public static java.util.logging.Logger decisionAgentLogger = Logger.getLogger("DecisionAgentLogger");
     public HashMap<AID, InstructionSet> sensorAgents = new HashMap<>();
+    private boolean isUpdatingStatus;
 
     public DecisionAgent() {
         super();
@@ -199,13 +200,15 @@ public class DecisionAgent extends Agent {
     }
 
     private void loadSensorAgents() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
-            this.sensorAgents = (HashMap) ois.readObject();
-            decisionAgentLogger.log(Logger.INFO, String.format("Found %s serialized Sensor Agents w. Instruction Sets.", this.sensorAgents.size()));
-        } catch (FileNotFoundException e) {
-            decisionAgentLogger.log(Logger.INFO, String.format("Could not find serialized Sensor Agents w. Instruction Sets on disk: %s. Starting fresh.", e.getMessage()));
-        } catch (IOException | ClassNotFoundException e) {
-            decisionAgentLogger.log(Logger.INFO, String.format("Could not load file, IO Error: %s. Starting fresh.", e.getMessage()));
+        if(!isUpdatingStatus) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
+                this.sensorAgents = (HashMap) ois.readObject();
+                decisionAgentLogger.log(Logger.INFO, String.format("Found %s serialized Sensor Agents w. Instruction Sets.", this.sensorAgents.size()));
+            } catch (FileNotFoundException e) {
+                decisionAgentLogger.log(Logger.INFO, String.format("Could not find serialized Sensor Agents w. Instruction Sets on disk: %s. Starting fresh.", e.getMessage()));
+            } catch (IOException | ClassNotFoundException e) {
+                decisionAgentLogger.log(Logger.INFO, String.format("Could not load file, IO Error: %s. Starting fresh.", e.getMessage()));
+            }
         }
     }
 
@@ -214,4 +217,7 @@ public class DecisionAgent extends Agent {
     }
 
 
+    public void setUpdatingStatus(boolean updatingStatus) {
+        isUpdatingStatus = updatingStatus;
+    }
 }

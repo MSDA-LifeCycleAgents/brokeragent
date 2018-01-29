@@ -31,9 +31,11 @@ public class UpdateStatusSensorAgentBehaviour extends TickerBehaviour {
 
     @Override
     protected void onTick() {
+        this.DA.setUpdatingStatus(true);
         checkForInactivity();
         ACLMessage message = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.PROPAGATE));
         updateToActive(message);
+        this.DA.setUpdatingStatus(false);
     }
 
     private void checkForInactivity() {
