@@ -36,6 +36,8 @@ public abstract class CommunicationAgent extends Agent{
                                     send(message, to);
                                 else
                                     LOGGER.log(Level.WARNING, "Failed to send message: invalid request: {0}", message);
+                            } else {
+                                block();
                             }
                         }
                     }

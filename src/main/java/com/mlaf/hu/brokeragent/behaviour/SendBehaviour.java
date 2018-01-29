@@ -36,5 +36,6 @@ public class SendBehaviour extends CyclicBehaviour {
         if (responseGetContent != null) {
             brokerAgent.send(responseGetContent);
         }
+        block();
     }
 }
