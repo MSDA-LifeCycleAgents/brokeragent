@@ -144,8 +144,10 @@ public class DecisionAgent extends Agent {
                     executeSensorReadingWarning(sensor, measurement, reading);
                 }
                 if (plan.getAbove() != 0.0 && (measurement.getMax() * plan.getAbove() < reading) || plan.getBelow() != 0.0 && (reading < measurement.getMax() * plan.getBelow())) {
-                    executePlan(measurement, plan, reading);
+                    executePlan(sensor, measurement, plan, reading);
                     plan.setCurrentLimit(plan.getCurrentLimit() + 1);
+                } else if (!(plan.getCurrentLimit() < 1)){
+                    plan.setCurrentLimit(plan.getCurrentLimit() - 1);
                 }
             }
         }
@@ -159,10 +161,17 @@ public class DecisionAgent extends Agent {
         DecisionAgent.decisionAgentLogger.log(Logger.SEVERE, String.format("Measurement %s from Sensor %s has exceeded the min or max value: %s", measurement.getId(), sensor.getId(), reading));
     }
 
-    private void executePlan(Measurement measurement, Plan plan, double reading) {
+    private void executePlan(Sensor sensor, Measurement measurement, Plan plan, double reading) {
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setContent(String.format("%s %s, Expected value between: %s and %s", plan.getMessage(), reading,
-                measurement.getMax() * plan.getBelow(), measurement.getMax() * plan.getAbove()));
+        String above = "";
+        String below = "";
+        if (plan.getAbove() != 0.0) {
+            above = "Above: " + plan.getAbove() * measurement.getMax();
+        }
+        if (plan.getBelow() != 0.0) {
+            below = "Below: " + plan.getBelow() * measurement.getMax();
+        }
+        message.setContent(String.format("Sensor %s, Measurement %s has exceeded his described value. %s %s",sensor.getId(), measurement.getId(), below, above));
         message.addReceiver(DFServices.getService(plan.getVia(), this));
         message.addUserDefinedParameter("to", plan.getTo());
         this.send(message);
