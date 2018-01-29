@@ -1,16 +1,14 @@
 package com.mlaf.hu.communication;
 
 import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
-import com.ullink.slack.simpleslackapi.SlackChannel;
-import com.ullink.slack.simpleslackapi.SlackSession;
-import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.mlaf.hu.helpers.Configuration;
+import java.util.logging.Level;
+import net.gpedro.integrations.slack.SlackApi;
+import net.gpedro.integrations.slack.SlackException;
+import net.gpedro.integrations.slack.SlackMessage;
 
 /**
  * @author Rogier
@@ -37,18 +35,17 @@ public class SlackAgent extends CommunicationAgent {
     
     @Override
     protected void send(String message, String channel) {
-        Configuration config = Configuration.getInstance();
-        String authToken = config.getProperty("slack.auth_token");
+        String webhook_url = config.getProperty("slack.webhook_url");
+        String messageTitle = config.getProperty("slack.message_title");
+        
+        try{
+            SlackApi api = new SlackApi(webhook_url);
 
-        if (channel == null)
-            channel = config.getProperty("slack.default_channel");
-
-        try {
-            SlackSession session = SlackSessionFactory.createWebSocketSlackSession(authToken);
-            session.connect();
-            SlackChannel chan = session.findChannelByName(channel);
-            session.sendMessage(chan, message);
-        } catch (IOException e) {
+            if (channel == null)
+                api.call(new SlackMessage(messageTitle, message));
+            else
+                api.call(new SlackMessage(channel, messageTitle, message));   
+        }catch(SlackException e){
             logger.log(Level.WARNING, "Failed to send message: {0}", e.toString());
         }
     }

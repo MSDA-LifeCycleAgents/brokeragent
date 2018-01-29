@@ -32,7 +32,7 @@ public abstract class CommunicationAgent extends Agent{
                             if (aclMessage != null) {
                                 String message = aclMessage.getContent();
                                 String to = aclMessage.getUserDefinedParameter("to");
-                                if (message != null && to != null)
+                                if (message != null)
                                     send(message, to);
                                 else
                                     LOGGER.log(Level.WARNING, "Failed to send message: invalid request: {0}", message);
@@ -64,7 +64,9 @@ public abstract class CommunicationAgent extends Agent{
      * Specific handling will be implemented here for each communication agent.
      * 
      * @param message the content of the ACL message
-     * @param to the ACL message user defined parameter "to"
+     * @param to the ACL message user defined parameter "to". 
+     *  Please note that "to" parameter is optional and should be dealt with 
+     *  accordingly in method implementation.
      */
     protected abstract void send(String message, String to);
     

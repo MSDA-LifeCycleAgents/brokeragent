@@ -43,6 +43,11 @@ public class MailAgent extends CommunicationAgent{
     
     @Override
     protected void send(String message, String to){
+        if(to == null){
+            logger.log(Level.WARNING, "Failed to send message: invalid receiver: {0}" + to);
+            return;
+        }
+        
         Configuration config = Configuration.getInstance();
         String host = config.getProperty("mail.host");
         String from = config.getProperty("mail.from");
