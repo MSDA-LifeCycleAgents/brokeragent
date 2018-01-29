@@ -1,3 +1,4 @@
+![Image of Node-Red](https://raw.githubusercontent.com/MSDA-LifeCycleAgents/mlaf-java/feature/readme/docs/images/NodeRed.JPG)
 Make sure that [Node.js](https://nodejs.org/) and [Node-RED](https://nodered.org/) have been installed.
 
 Open your commandpromt or similar program and type in node-red.
