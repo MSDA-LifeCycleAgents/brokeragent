@@ -34,7 +34,7 @@ public class SensorAgentImpl extends SensorAgent {
                 "        </topic>\n" +
                 "        <directToDecisionAgent>false</directToDecisionAgent>\n" +
                 "    </messaging>\n" +
-                "    <amountOfMissedDataPackages>5</amountOfMissedDataPackages>\n" +
+                "    <amountOfMissedDataPackages>1</amountOfMissedDataPackages>\n" +
                 "    <sensors>\n" +
                 "        <sensor id=\"DummySensor1\">\n" +
                 "            <label>Systolic Blood Pressure</label>\n" +
