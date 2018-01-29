@@ -15,6 +15,13 @@ The second implementation is a SlackAgent, using webhooks. This agent is a good 
 usually is based on a default channel. When the "to" parameter is not filled, the message will be sent here. However, when a #channel or
 @person is filled as the "to" parameter, the message will be sent there.
 
+### creating a webhook
+As mentioned before, the SlackAgent relies on a webhook. Follow the instructions below to create one for your Slack group.
+* Go to your_team.slack.com/services/new
+* Search for Incoming WebHook and click in Add
+* Choose Channel to Post and press Add Incoming WebHooks Integration
+* Copy the generated webhook and paste it in the config.properties file.
+
 ## Quickstart
 An implementation of CommunicationAgent has two implemented methods: ```createServiceDescription()``` and ```send(String message, String to)```.
 All communication agents are registered in the DF by default. The ```createServiceDescription()``` is used for the description of your CommunicationAgent
