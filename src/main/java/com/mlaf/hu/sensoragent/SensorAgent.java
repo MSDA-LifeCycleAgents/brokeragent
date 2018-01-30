@@ -136,7 +136,7 @@ public abstract class SensorAgent extends Agent {
     }
 
     public boolean isRegistered() {
-        return registered;
+        return this.registered;
     }
 
     public void setRegistered(boolean registered) {

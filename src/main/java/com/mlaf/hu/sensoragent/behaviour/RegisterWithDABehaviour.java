@@ -56,7 +56,8 @@ public class RegisterWithDABehaviour extends CyclicBehaviour {
         }
         Iterator it = subscribed.getAllReplyTo();
         while(it.hasNext()) {
-            this.sa.setDestination((AID)it.next());
+            AID newDest = (AID) it.next();
+            this.sa.setDestination(newDest);
         }
         this.sa.setRegistered(true);
         SensorAgent.sensorAgentLogger.log(Logger.INFO, "Registered with the Decision Agent.\nStarting to send data from buffer.");
