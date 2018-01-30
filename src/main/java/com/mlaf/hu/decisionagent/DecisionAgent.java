@@ -171,7 +171,7 @@ public class DecisionAgent extends Agent {
         if (plan.getBelow() != 0.0) {
             below = "Below: " + plan.getBelow() * measurement.getMax();
         }
-        message.setContent(String.format("Sensor %s, Measurement %s has exceeded his described value. %s %s",sensor.getId(), measurement.getId(), below, above));
+        message.setContent(String.format("Sensor %s, Measurement %s has exceeded his described value. %s %s. Current value: %s",sensor.getId(), measurement.getId(), below, above, reading));
         message.addReceiver(DFServices.getService(plan.getVia(), this));
         message.addUserDefinedParameter("to", plan.getTo());
         this.send(message);
