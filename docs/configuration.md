@@ -19,7 +19,7 @@ proxy.mdns.refresh_rate=60
 mail.host=smtp.gmail.com
 mail.port=587
 mail.from=msda.hogeschoolutrecht@gmail.com
-mail.password=minorsda2018
+mail.password=
 mail.default_subject=Multi Agent Life Cycle Framework Notification
 mailagent.logger_handler=false
 
