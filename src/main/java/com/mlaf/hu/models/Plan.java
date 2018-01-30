@@ -3,8 +3,8 @@ package com.mlaf.hu.models;
 import java.io.Serializable;
 
 public class Plan implements Serializable {
-    private double below;
-    private double above;
+    private double below = 0;
+    private double above = 1;
     private String message;
     private String via; //FIXME should be class
     private String to;

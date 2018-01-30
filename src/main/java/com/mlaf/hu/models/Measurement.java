@@ -13,7 +13,8 @@ public class Measurement  implements Serializable {
     private transient static Configuration config = Configuration.getInstance();
     private String id;
     private Plans plans;
-    private int min, max;
+    private int min;
+    private int max;
     private double value;
     private CircularFifoQueue<Double> readings;
 
