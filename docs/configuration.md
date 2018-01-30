@@ -4,8 +4,10 @@ certain default messages and paths, enable or disable features, set refresh rate
 properly or not function at all when not configured through the properties file. 
 
 ## Quickstart
-To configure the framework, create a config.properties file in the root directory of your project. If no config.properties is found on startup,
-a default configuration will be used. Note that properties are validated in runtime, so properties of unused agents don't need to be configured 
+To configure the framework, create a config.properties file in the root of the resources directory of your project.   
+If no config.properties is found, the application will look for a configuration in {user.home}/.config/MLAF/config.properties. 
+When that file also doesnt exist a default configration will be used and placed in that location.  
+Note that properties are validated in runtime, so properties of unused agents don't need to be configured 
 or even exist. For example: if you're not making use of SlackAgent, the property ```slack.webhook_url``` will never be called.
 An example of config.properties is shown in the section below, so from here on out just mix and match the properties needed for your framework implementation.
 
