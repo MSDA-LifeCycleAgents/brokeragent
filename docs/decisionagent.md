@@ -1,4 +1,4 @@
-#Decision Agent
+# Decision Agent
 Used as it's name already described this Agent is the center of the framework and decides based on so called Instruction Sets if a described plan should be executed.
 
 ## Quickstart
