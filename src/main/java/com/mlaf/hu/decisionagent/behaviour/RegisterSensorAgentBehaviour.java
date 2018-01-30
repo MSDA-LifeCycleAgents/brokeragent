@@ -29,6 +29,7 @@ public class RegisterSensorAgentBehaviour extends CyclicBehaviour {
     public void action() {
         ACLMessage message = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.SUBSCRIBE));
         if (message == null) {
+            block();
             return;
         }
         try {
@@ -39,6 +40,7 @@ public class RegisterSensorAgentBehaviour extends CyclicBehaviour {
             response.setPerformative(ACLMessage.DISCONFIRM);
             if (!is.isMallformed()) {
                 response.setPerformative(ACLMessage.CONFIRM);
+                response.setOntology("sensor-agent-register");
                 response.addReplyTo(getDestination(is));
                 DA.registerSensorAgent(message.getSender(), is);
             }

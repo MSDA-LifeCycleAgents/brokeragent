@@ -21,6 +21,9 @@ public class RegisterWithDABehaviour extends CyclicBehaviour {
 
     @Override
     public void action() {
+        if (this.sa.isRegistered()) {
+            checkIfUnregistered();
+        }
         ACLMessage refuseSubscription = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.DISCONFIRM));
         if (refuseSubscription != null) {
             SensorAgent.sensorAgentLogger.log(Logger.WARNING, "Reason for refusing: \n" + refuseSubscription.getContent());
@@ -30,8 +33,6 @@ public class RegisterWithDABehaviour extends CyclicBehaviour {
         if (!this.sa.isRegistered() && LocalDateTime.now().isAfter(continueAfter)) {
             handleRegistration();
 
-        } else if (this.sa.isRegistered()) {
-            checkIfUnregistered();
         }
     }
 
@@ -41,6 +42,7 @@ public class RegisterWithDABehaviour extends CyclicBehaviour {
         ACLMessage unsubscribed = myAgent.receive(MessageTemplate.and(performative, ontology));
         if (unsubscribed != null) {
             this.sa.setRegistered(false);
+            this.sa.setDestination(null);
         }
     }
 
@@ -50,12 +52,13 @@ public class RegisterWithDABehaviour extends CyclicBehaviour {
     }
 
     private void onSubscribe() {
-        ACLMessage subscribed = myAgent.receive(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM));
+        ACLMessage subscribed = myAgent.receive(MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.CONFIRM),
+                MessageTemplate.MatchOntology("sensor-agent-register")));
         if (subscribed == null) {
             return;
         }
         Iterator it = subscribed.getAllReplyTo();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             AID newDest = (AID) it.next();
             this.sa.setDestination(newDest);
         }
