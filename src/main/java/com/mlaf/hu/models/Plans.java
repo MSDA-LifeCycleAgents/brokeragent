@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Plans implements Serializable {
     @XmlElement(name = "plan")
-    private ArrayList<Plan> plans = null;
+    private ArrayList<Plan> plans = new ArrayList<>();
 
     public ArrayList<Plan> getPlans() {
         return plans;
