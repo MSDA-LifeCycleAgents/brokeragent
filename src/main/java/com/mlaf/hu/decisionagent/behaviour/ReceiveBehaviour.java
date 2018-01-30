@@ -75,7 +75,8 @@ public class ReceiveBehaviour extends CyclicBehaviour {
     }
 
     private ACLMessage handleDirectMessage(ACLMessage message) {
-        ACLMessage response = new ACLMessage(ACLMessage.CONFIRM);
+        ACLMessage response = message.createReply();
+        response.setPerformative(ACLMessage.CONFIRM);
         if (!this.DA.sensorAgentExists(message.getSender())) {
             response.setPerformative(ACLMessage.DISCONFIRM);
             response.setOntology("sensor-agent-register");
