@@ -8,7 +8,7 @@
             <name>sensor_agent#fVTz7OCaD8WFJE5Jvw7K</name>
             <daysToKeepMessages>1</daysToKeepMessages>
         </topic>
-        <directToDecisionAgent>False</directToDecisionAgent>
+        <directToDecisionAgent>false</directToDecisionAgent>
     </messaging>
     <amountOfMissedDataPackages>5</amountOfMissedDataPackages>
     <sensors>
