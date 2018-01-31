@@ -180,7 +180,7 @@
                             <mainClass>jade.Boot</mainClass>
                             <arguments>
                                 <argument>-conf</argument>
-                                <argument>src/main/resource/mail-agent.properties</argument>
+                                <argument>src/main/resources/mail-agent.properties</argument>
                             </arguments>
                         </configuration>
                     </plugin>

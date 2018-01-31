@@ -63,7 +63,17 @@ to understand the requirements before sending your pull-requests.
 `master`.
 
 ## Requirements
-
 ### Minimal hardware required
+To run our JADE based framework we recommend you to run this on a device with:
+- 1 GB RAM
+- 50 MB Diskspace
+- 700Mhz+ CPU
+
+To run the Sensor Agent (Jave version) we recommend you to run it on a device with:
+- 512 MB RAM
+- 20 MB Diskspace
+- 700Mhz+ CPU
 
 ### Software requirements
+- JDK 8 or higher.
+- Git
