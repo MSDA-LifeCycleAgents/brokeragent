@@ -20,7 +20,7 @@ The software is LGPLv2 licensed. If you end up using our software, please leave 
    - [Sensor Agent](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/sensoragent.md)
    - [Communication Agents](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/communication.md)
    - [Topics and the Broker Agent](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/brokeragent.md)
-   - [Monitoring Dashboard](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/monitoring.md)
+   - [Monitoring Dashboard](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/frontend.md)
    - [Logger Agent](https://github.com/MSDA-LifeCycleAgents/mlaf-java/tree/feature/readme/docs/loggeragent.md)
 - [Support](#support)
    - [Bugs](#bugs--issues)
