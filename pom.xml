@@ -4,7 +4,7 @@
 
     <groupId>com.mlaf.hu</groupId>
     <artifactId>mlaf</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
     <build>
         <plugins>
             <plugin>
