@@ -1,5 +1,7 @@
 package com.mlaf.hu.brokeragent;
 
+import com.mlaf.hu.models.Message;
+import com.mlaf.hu.models.Topic;
 import jade.core.AID;
 import junit.framework.TestCase;
 
@@ -44,7 +46,8 @@ public class TopicTest extends TestCase {
     }
 
     public void testGetLastMessageEmpty() {
-        Topic t = new Topic(new AID("Test-Topic", true), 1);
+        Topic t = new Topic();
+        System.out.println(t.toString());
         assertEquals(null, t.getOldestMessage());
     }
 

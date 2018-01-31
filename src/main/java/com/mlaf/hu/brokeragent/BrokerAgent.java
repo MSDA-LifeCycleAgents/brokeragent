@@ -1,74 +1,91 @@
 package com.mlaf.hu.brokeragent;
 
-import com.mlaf.hu.brokeragent.behavior.ReceiveBehavior;
-import com.mlaf.hu.brokeragent.behavior.SendBehavior;
+import com.mlaf.hu.brokeragent.behaviour.ReceiveBehaviour;
+import com.mlaf.hu.brokeragent.behaviour.SaveToDiskBehaviour;
+import com.mlaf.hu.brokeragent.behaviour.SendBehaviour;
 import com.mlaf.hu.brokeragent.exceptions.InvallidTopicException;
 import com.mlaf.hu.brokeragent.exceptions.TopicNotManagedException;
+import com.mlaf.hu.helpers.Configuration;
+import com.mlaf.hu.helpers.DFServices;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
+import com.mlaf.hu.models.Message;
+import com.mlaf.hu.models.Topic;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.ServiceException;
 import jade.core.messaging.TopicManagementHelper;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
-import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.util.Logger;
 
+import javax.xml.bind.JAXB;
+import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
 
-public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan op disk via cli
-    private final static String SERVICE_NAME = "BROKER";
+public class BrokerAgent extends Agent {
+    private static Configuration config = Configuration.getInstance();
+    private static final String SERVICE_NAME = config.getProperty("brokeragent.service_name");
+    private static final String STORAGE_BASEPATH = config.getProperty("brokeragent.storage_basepath");
+    public static final long STORE_INTERVAL_IN_MS = Long.parseLong(config.getProperty("brokeragent.store_interval_in_ms"));
+    private static final String STORAGE_FILENAME = config.getProperty("brokeragent.storage_filename");
+    private static final boolean STORE_TOPICS_ON_DISK = Boolean.parseBoolean(config.getProperty("brokeragent.store_sensor_agents_on_disk"));
+    private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("brokeragent.logger_handler"));
+    private static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
     public HashMap<AID, Topic> topics = new HashMap<>();
-    private static final int DAYS_TO_KEEP_MESSAGES = 1; //TODO cli
-    public static java.util.logging.Logger brokerAgentLogger = Logger.getLogger("BrokerAgentLogger");
     private TopicManagementHelper topicHelper;
 
     @Override
     protected void setup() {
+        if (LOGGER_HANDLER) {
+            brokerAgentLogger.addHandler(new LoggerAgentLogHandler(this, 60));
+        }
         try {
-            registerToDF();
-            topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
-            addBehaviour(new SendBehavior(this, topicHelper));
-            addBehaviour(new ReceiveBehavior(this));
+            if (STORE_TOPICS_ON_DISK) {
+                boolean success = createDirectoryStructure();
+                if (new File(STORAGE_BASEPATH).exists() || success) {
+                    loadTopics();
+                    addBehaviour(new SaveToDiskBehaviour(this));
+                }
+            }
+            if (DFServices.registerAsService(createServiceDescription(), this)) {
+                topicHelper = (TopicManagementHelper) getHelper(TopicManagementHelper.SERVICE_NAME);
+                addBehaviour(new SendBehaviour(this, topicHelper));
+                addBehaviour(new ReceiveBehaviour(this));
+            }
         } catch (Exception e) {
             brokerAgentLogger.log(Logger.SEVERE, "Could not initialize BrokerAgent", e);
             System.exit(1);
         }
     }
 
-    private void registerToDF() {
+    public static ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName(SERVICE_NAME);
+        sd.setType("message-broker");
+        return sd;
+    }
+
+    protected void takeDown() {
         try {
-            DFAgentDescription dfd = new DFAgentDescription();
-            dfd.setName(this.getAID());
-            ServiceDescription sd = new ServiceDescription();
-            sd.setName(SERVICE_NAME);
-            sd.setType("message-broker");
-            // Agents that want to use this service need to "know" the weather-forecast-ontology
-            sd.addOntologies("message-broker-ontology");
-            // Agents that want to use this service need to "speak" the FIPA-SL language
-            sd.addLanguages(FIPANames.ContentLanguage.FIPA_SL);
-            dfd.addServices(sd);
-            DFService.register(this, dfd);
-            brokerAgentLogger.log(Logger.INFO, ("Registered the BrokerAgent as a service to the DF."));
-        } catch (FIPAException e) {
-            e.printStackTrace();
+            DFService.deregister(this);
+        } catch (Exception ignore) {
         }
     }
 
-    private void addNewTopicToBuffer(AID topicAID) {
-        Topic topic = new Topic(topicAID, DAYS_TO_KEEP_MESSAGES);
-        this.topics.put(topicAID, topic);
+    private Topic addNewTopicToBuffer(Topic representationTopic) {
+        this.topics.put(representationTopic.getJadeTopic(), representationTopic);
+        brokerAgentLogger.log(Logger.FINE, String.format("New topic added: %s, daysToKeepMessages: %s", representationTopic.getTopicName(), representationTopic.getDaysToKeepMessages()));
+        return representationTopic;
     }
 
-    private void registerTopic(AID topic, TopicManagementHelper helper) throws ServiceException {
+    private Topic registerTopic(Topic representationTopic, TopicManagementHelper helper) {
         try {
-            helper.register(topic);
-            this.addNewTopicToBuffer(topic);
+            helper.register(representationTopic.getJadeTopic());
+            return this.addNewTopicToBuffer(representationTopic);
         } catch (Exception e) {
-            brokerAgentLogger.log(Logger.SEVERE, String.format("Broker %s: ERROR registering to topic %s", this.getLocalName(), topic), e);
-
+            brokerAgentLogger.log(Logger.SEVERE, String.format("Broker %s: ERROR registering to topic %s", this.getLocalName(), representationTopic.getTopicName()), e);
+            return null;
         }
     }
 
@@ -91,40 +108,84 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
         }
     }
 
-    public void giveMessageToSubscriber(AID subscriber, Message message, int performative) {
-        ACLMessage msg = new ACLMessage(performative);
-        msg.addReceiver(subscriber);
-        msg.setLanguage("English");
-        msg.setContent(message.getContent());
-        send(msg);
-    }
-
-    public Message getMessageFromBuffer(AID subscriber, String topicName, TopicManagementHelper helper) throws ServiceException {
-        AID topicAID = createTopic(topicName, helper);
-        if (!this.topics.containsKey(topicAID)) {
-            brokerAgentLogger.log(Logger.INFO, () -> String.format("Topic: %s does not exist yet. Creating topic and registering topic...", topicName));
-            this.registerTopic(topicAID, helper);
-            return null;
+    public ACLMessage addSubscriberToTopic(AID subscriber, Topic representationTopic, TopicManagementHelper helper) {
+        ACLMessage message = new ACLMessage(ACLMessage.CONFIRM);
+        message.addReceiver(subscriber);
+        if (representationTopic.getTopicName() == null) {
+            String content = "The BrokerAgent needs a topic name. Use the following format for subscribing:\n" +
+                             "<daysToKeepMessages></daysToKeepMessages>\n<name></name>";
+            message.setContent(content);
+            message.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+            brokerAgentLogger.log(Logger.SEVERE, content);
+            return message;
         }
-
-        Topic topic = this.topics.get(topicAID);
-        if (topic.getSubscriber(subscriber) == null) {
-            brokerAgentLogger.log(Logger.INFO, () -> String.format("Subscriber: %s did not register to the topic yet. Adding subscriber to the topic...", subscriber.getName()));
+        AID topicAID = this.createTopic(representationTopic.getTopicName(), helper);
+        Topic topic = null;
+        try {
+            topic = this.getTopicByAID(topicAID);
+        } catch (InvallidTopicException | TopicNotManagedException e) {
+            brokerAgentLogger.log(Logger.INFO, String.format("Topic: %s does not exist yet. Creating topic and registering topic...", representationTopic.getTopicName()));
+            representationTopic.setJadeTopic(topicAID);
+            topic = this.registerTopic(representationTopic, helper);
+        }
+        if (topic != null) {
             topic.addToSubscribers(subscriber);
-            return null;
+            message.setContent(String.format("Subscribed to the Topic: %s", topic.getTopicName()));
+            message.addUserDefinedParameter("name", topic.getTopicName());
+        } else {
+            message.setContent("Something went wrong while subscribing. See JADE logs.");
+            message.setPerformative(ACLMessage.NOT_UNDERSTOOD);
         }
-
-        return topic.getOldestMessage();
-    }
-
-    public String normalizeMessage(String message) {
-        //TODO make this useful
         return message;
     }
 
+    public ACLMessage getMessageFromBuffer(AID subscriber, Topic representationTopic, TopicManagementHelper helper) {
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology("sensor-agent-reading");
+        if (representationTopic.getTopicName() == null) {
+            String content = "The BrokerAgent needs a topic name. Use the following format for requesting:\n" +
+                             "<name></name>";
+            message.setContent(content);
+            brokerAgentLogger.log(Logger.SEVERE, content);
+            return message;
+        }
+        AID topicAID = createTopic(representationTopic.getTopicName(), helper);
+        message.addReceiver(subscriber);
+        try {
+            Topic topic = this.getTopicByAID(topicAID);
+            if (topic.getSubscriber(subscriber) != null) {
+                if (topic.getOldestMessage() == null) {
+                    return null;
+                }
+                Message oldestMessage = topic.getOldestMessage();
+                message.setContent(oldestMessage.getContent());
+                message.setSender(oldestMessage.getPublisher());
+            } else {
+                message.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+                String content = String.format("Subscriber %s not subscribed for this Topic: %s. " +
+                        "Set performative to subscribe and include the following content:" +
+                        "\n <daysToKeepMessages></daysToKeepMessages>\n<name></name>", subscriber, representationTopic.getTopicName());
+                message.setContent(content);
+                brokerAgentLogger.log(Logger.SEVERE, content);
+            }
+        } catch (InvallidTopicException | TopicNotManagedException e) {
+            message.setPerformative(ACLMessage.NOT_UNDERSTOOD);
+            message.setContent(e.getMessage());
+        }
+        return message;
+    }
 
-    public Topic getTopicByAID(AID aid) throws InvallidTopicException, TopicNotManagedException {
-        //TODO Let all methods use this to get topic
+    public Topic unmarshalTopic(String message) {
+        Topic topic = new Topic();
+        try {
+            topic = JAXB.unmarshal(new StringReader(message), Topic.class);
+        } catch (Exception e) {
+            brokerAgentLogger.log(Logger.SEVERE, String.format("XML Request is not well formed. File: %s", message));
+        }
+        return topic;
+    }
+
+    private Topic getTopicByAID(AID aid) throws InvallidTopicException, TopicNotManagedException {
         if (!topicHelper.isTopic(aid)) {
             throw new InvallidTopicException(aid.getName() + " is not a valid topic AID");
         }
@@ -134,37 +195,38 @@ public class BrokerAgent extends Agent { //TODO berichten en/of topics opslaan o
         return this.topics.get(aid);
     }
 
-    public void storeTopic(AID topicAID) {
-        Topic t = null;
-        try {
-            t = getTopicByAID(topicAID);
-        } catch (InvallidTopicException e) {
-            //FIXME
-            e.printStackTrace();
-            return;
-        } catch (TopicNotManagedException e) {
-            //FIXME
-            e.printStackTrace();
-            return;
-        }
-        PersistenceHelper.storeObject(t, topicAID.getName());
-
-
-    }
-
-    public Topic getTopicFromDisk(String topicName) {
-        try {
-            return PersistenceHelper.loadTopic(topicName);
-        } catch (TopicNotManagedException e) {
-            //TODO LOG
-            e.printStackTrace();
-            return null;
+    public void storeTopics() {
+        if (this.topics.size() > 0) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
+                oos.writeObject(this.topics);
+                brokerAgentLogger.log(Logger.FINE, String.format("Written all topics to: %s", STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"));
+            } catch (IOException e) {
+                brokerAgentLogger.log(Logger.SEVERE, String.format("Could not write topics to disk %nError %s", e.getMessage()));
+            }
         }
     }
 
-    public void loadTopic(String topicName) {
-        Topic topic = getTopicFromDisk(topicName);
-        AID aid = topicHelper.createTopic(topicName);
-        this.topics.put(aid, topic);
+    private void loadTopics() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(STORAGE_BASEPATH + STORAGE_FILENAME + ".ser"))) {
+            this.topics = (HashMap) ois.readObject();
+            brokerAgentLogger.log(Logger.INFO, String.format("Found serialized topics: \n%s", HashMapToString()));
+        } catch (FileNotFoundException e) {
+            brokerAgentLogger.log(Logger.INFO, String.format("Could not find serialized topics on disk: %s. Starting fresh.", e.getMessage()));
+        } catch (IOException | ClassNotFoundException e) {
+            brokerAgentLogger.log(Logger.INFO, String.format("Could not load file, IO Error: %s. Starting fresh.", e.getMessage()));
+        }
     }
+
+    private String HashMapToString() {
+        StringBuilder toString = new StringBuilder();
+        for (Map.Entry<AID, Topic> entry : this.topics.entrySet()) {
+            toString.append(entry.getKey()).append(" : ").append(entry.getValue().toString()).append(" \n");
+        }
+        return toString.toString();
+    }
+
+    private static boolean createDirectoryStructure() {
+        return (new File(STORAGE_BASEPATH).mkdirs()); // Return success
+    }
+
 }

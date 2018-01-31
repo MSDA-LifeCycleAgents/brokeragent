@@ -1,78 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mlaf.hu.communication;
 
-import com.ullink.slack.simpleslackapi.SlackChannel;
-import com.ullink.slack.simpleslackapi.SlackSession;
-import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
-import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.lang.acl.ACLMessage;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+
+
 import com.mlaf.hu.helpers.Configuration;
-import com.mlaf.hu.helpers.XmlParser;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
+import java.util.logging.Level;
+import net.gpedro.integrations.slack.SlackApi;
+import net.gpedro.integrations.slack.SlackException;
+import net.gpedro.integrations.slack.SlackMessage;
 
 /**
- *
  * @author Rogier
  */
-public class SlackAgent extends Agent{
-    private static final Logger logger = Logger.getLogger(SlackAgent.class.getName());
-    
+public class SlackAgent extends CommunicationAgent {
+    private static final java.util.logging.Logger logger = jade.util.Logger.getLogger(SlackAgent.class.getName());
+    private static Configuration config = Configuration.getInstance();
+    private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("slack.logger_handler"));
+
+    public SlackAgent() {
+        super();
+        if (LOGGER_HANDLER) {
+            logger.addHandler(new LoggerAgentLogHandler(this, 60));
+        }
+    }
+
     @Override
-    public void setup(){
-        addBehaviour(
-            new CyclicBehaviour(){
-                @Override
-                public void action(){ 
-                    ACLMessage aclMessage = receive();
-                    if(aclMessage != null && aclMessage.getPerformative() == ACLMessage.REQUEST){
-                        String content = aclMessage.getContent();
-                        
-                        try {
-                            Document xml = XmlParser.loadXMLFromString(content);
-                            Element root = xml.getDocumentElement();
-                            
-                            String message = XmlParser.getString("content", root);
-                            String channel = XmlParser.getString("channel", root);
-                            
-                            if(message != null)
-                                sendMessage(message, channel);
-                            else
-                                logger.log(Level.WARNING, "Failed to send message: invalid request");
-                            
-                        } catch (ParserConfigurationException | SAXException | IOException ex) {
-                            logger.log(Level.WARNING, "Failed to parse message: {0}", ex.getMessage());
-                        }
-                    }
-                }
-            }
-        );
+    public ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName("SlackAgent");
+        sd.setType("SlackAgent");
+        return sd;
     }
     
-    private void sendMessage(String message, String channel){
-        Configuration config = Configuration.getInstance();
-        String authToken = config.getProperty("slack.auth_token");
+    @Override
+    protected void send(String message, String channel) {
+        String webhook_url = config.getProperty("slack.webhook_url");
+        String messageTitle = config.getProperty("slack.message_title");
         
-        if(channel == null)
-            channel = config.getProperty("slack.default_channel");
-        
-        try {
-            SlackSession session = SlackSessionFactory.createWebSocketSlackSession(authToken);
-            session.connect();
-            SlackChannel chan = session.findChannelByName(channel);
-            session.sendMessage(chan, message);
-        } catch (IOException e) {
+        try{
+            SlackApi api = new SlackApi(webhook_url);
+
+            if (channel == null)
+                api.call(new SlackMessage(messageTitle, message));
+            else
+                api.call(new SlackMessage(channel, messageTitle, message));   
+        }catch(SlackException e){
             logger.log(Level.WARNING, "Failed to send message: {0}", e.toString());
-        }    
+        }
     }
 }

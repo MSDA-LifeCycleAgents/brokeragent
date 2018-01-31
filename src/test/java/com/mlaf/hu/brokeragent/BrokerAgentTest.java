@@ -4,6 +4,9 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.messaging.TopicManagementHelper;
 import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 
 public class BrokerAgentTest extends TestCase {
@@ -15,9 +18,41 @@ public class BrokerAgentTest extends TestCase {
     }
 
 
+    @Before
+    public void setUp() throws Exception {
+    }
 
+    @After
+    public void tearDown() throws Exception {
+    }
 
+    @Test
+    public void storeMessage() {
+    }
 
+    @Test
+    public void addSubscriberToTopic() {
+    }
 
+    @Test
+    public void getMessageFromBuffer() {
+    }
+
+    @Test
+    public void parseSubscribeMessage() {
+    }
+
+    @Test
+    public void parseRetrieveMessage() {
+    }
+
+    @Test
+    public void storeTopics() {
+    }
+
+    @Test
+    public void loadTopics() {
+
+    }
 
 }

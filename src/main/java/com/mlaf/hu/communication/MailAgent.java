@@ -1,17 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.mlaf.hu.communication;
 
-import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.lang.acl.ACLMessage;
-import java.io.IOException;
+import com.mlaf.hu.loggeragent.LoggerAgentLogHandler;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+
 import java.util.Properties;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -20,53 +13,41 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
-import javax.xml.parsers.ParserConfigurationException;
+
 import com.mlaf.hu.helpers.Configuration;
-import com.mlaf.hu.helpers.XmlParser;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
+import jade.util.Logger;
 
 /**
  *
  * @author Rogier
  */
-public class MailAgent extends Agent{
-    private static final Logger logger = Logger.getLogger(MailAgent.class.getName());
-    
+public class MailAgent extends CommunicationAgent{
+    private static final java.util.logging.Logger logger = Logger.getLogger(MailAgent.class.getName());
+    private static Configuration config = Configuration.getInstance();
+    private static final boolean LOGGER_HANDLER = Boolean.parseBoolean(config.getProperty("mailagent.logger_handler"));
+
+    public MailAgent() {
+        super();
+        if (LOGGER_HANDLER) {
+            logger.addHandler(new LoggerAgentLogHandler(this, 60));
+        }
+    }
+
     @Override
-    public void setup(){
-        addBehaviour(
-            new CyclicBehaviour(){
-                @Override
-                public void action(){ 
-                    ACLMessage aclMessage = receive();
-                    if(aclMessage != null && aclMessage.getPerformative() == ACLMessage.REQUEST){
-                        String content = aclMessage.getContent();
-                        
-                        try {
-                            Document xml = XmlParser.loadXMLFromString(content);
-                            Element root = xml.getDocumentElement();
-                            
-                            String message = XmlParser.getString("content", root);
-                            String subject = XmlParser.getString("subject", root);
-                            String to = XmlParser.getString("to", root);
-                            
-                            if(message != null && to != null)
-                                sendMail(message, subject, to);
-                            else
-                                logger.log(Level.WARNING, "Failed to send message: invalid request");
-                            
-                        } catch (ParserConfigurationException | SAXException | IOException ex) {
-                            logger.log(Level.WARNING, "Failed to parse message: {0}", ex.getMessage());
-                        }
-                    }
-                }
-            }
-        );
+    public ServiceDescription createServiceDescription() {
+        ServiceDescription sd = new ServiceDescription();
+        sd.setName("MailAgent");
+        sd.setType("MailAgent");
+        return sd;
     }
     
-    private void sendMail(String message, String subject, String to){
+    @Override
+    protected void send(String message, String to){
+        if(to == null){
+            logger.log(Level.WARNING, "Failed to send message: invalid receiver: {0}" + to);
+            return;
+        }
+        
         Configuration config = Configuration.getInstance();
         String host = config.getProperty("mail.host");
         String from = config.getProperty("mail.from");
@@ -78,15 +59,14 @@ public class MailAgent extends Agent{
             return;
         }
         
-        if(subject == null)
-            subject = config.getProperty("mail.default_subject");
+        String subject = config.getProperty("mail.default_subject");
         
         Properties sysProps = System.getProperties();
         sysProps.setProperty("mail.smtp.auth", "true");
-	sysProps.setProperty("mail.smtp.starttls.enable", "true");
+	    sysProps.setProperty("mail.smtp.starttls.enable", "true");
         sysProps.setProperty("mail.smtp.host", host);
         sysProps.setProperty("mail.smtp.port", port);
-        
+
         Session session = Session.getInstance(sysProps, new Authenticator(){
             @Override
             protected PasswordAuthentication  getPasswordAuthentication(){
@@ -96,13 +76,12 @@ public class MailAgent extends Agent{
         
         try{
             MimeMessage mime = new MimeMessage(session);
-            
             mime.setFrom(new InternetAddress(from));
             mime.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             mime.setSubject(subject);
             mime.setText(message);
-            
             Transport.send(mime);
+            logger.log(Logger.INFO, "Send e-mail to " + to + " with message:\n" + message);
         }catch(MessagingException e){
             logger.log(Level.WARNING, "Failed to send message: {0}", e.toString());
         }
